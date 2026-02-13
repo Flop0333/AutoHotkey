@@ -22,7 +22,7 @@
 #Include Storage\FileService.ahk
 
 scriptName := StrSplit(A_ScriptName, '.ahk')[1]
-TraySetIcon(Paths.appsStandalone "\Command Storer\icon.png")
+TraySetIcon(Paths.appsIntegrated "\Command Storer\icon.png")
 
 global DEFAULT_SET := "Powershell"
 
@@ -49,7 +49,7 @@ CreateSet(*) {
     newSet := UserInput().WaitForInput()
     if (newSet = "")
         return
-    FileOpen(Paths.appsStandalone "\Command Storer\Storage\Command Sets\" newSet ".txt", "rw")
+    FileOpen(Paths.appsIntegrated "\Command Storer\Storage\Command Sets\" newSet ".txt", "rw")
     mainGui.Destroy()
     CommandStorer_ShowMainGui()
 }
@@ -67,12 +67,12 @@ DeleteSet(*) {
     if Result = "No"
         Return
   
-    FileDelete(Paths.appsStandalone "\Command Storer\Storage\Command Sets\" selectedSet)
+    FileDelete(Paths.appsIntegrated "\Command Storer\Storage\Command Sets\" selectedSet)
     Reload()
   }
 
 AddAllSetButtons() {
-    Loop Files, Paths.appsStandalone "\Command Storer\Storage\Command Sets\*.*", "FD"
+    Loop Files, Paths.appsIntegrated "\Command Storer\Storage\Command Sets\*.*", "FD"
             AddSingleSetButton(A_LoopFileName)
 }
  
@@ -87,9 +87,9 @@ InsertCommandsToListView(file, fileName){
     listView.ModifyCol(3,,fileName) ; Set the Set name as the header
     listView.Delete()
     
-    Loop Files, Paths.appsStandalone "\Command Storer\Storage\Command Sets\*.*", "FD" ; Look for the file
+    Loop Files, Paths.appsIntegrated "\Command Storer\Storage\Command Sets\*.*", "FD" ; Look for the file
         if (A_LoopFileName = file) {
-            Loop read, Paths.appsStandalone "\Command Storer\Storage\Command Sets\" file { ; Read the file and add the commands to the listview
+            Loop read, Paths.appsIntegrated "\Command Storer\Storage\Command Sets\" file { ; Read the file and add the commands to the listview
                 keybinding := StrSplit(A_LoopReadLine, "|")[1]
                 command := StrSplit(A_LoopReadLine, "|")[2]
                 descreption := StrSplit(A_LoopReadLine, "|")[3]
