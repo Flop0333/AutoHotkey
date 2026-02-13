@@ -12,12 +12,15 @@ I'm excited to show my AutoHotkey v2 workflow system that I've been building! It
 - ⌨️ **CapsLock Modifier** - Repurpose CapsLock as a powerful modifier key
 - 🖱️ **Mouse Gestures** - Execute actions with mouse movement patterns
 
+
 ### Dashboards
 - 🚀 **Age of Efficiency** - Command launcher for bookmarks, searches, and scripts
 ![alt text](<Dashboards/Age Of Efficiency/Demo.gif>)
 
+
 - 🎹 **Macro Board** - Stream Deck-like interface with customizable buttons
 ![alt text](<Dashboards/Macro Board/Demo.gif>)
+
 
 ### Productivity Apps
 - 📸 **Screen Snipper** - Screenshot/snipper tool with OCR support
@@ -27,6 +30,7 @@ I'm excited to show my AutoHotkey v2 workflow system that I've been building! It
 - 🤓 **Emoji Sender** - Quick emoji picker with keyboard shortcuts
 - ⌨️ **Capslock Modifier** - Capslock as powerful modifier key
 - ♾️ **And much more!**
+
 
 ## 🏗️ Architecture
 
@@ -42,8 +46,11 @@ I'm excited to show my AutoHotkey v2 workflow system that I've been building! It
 
 
 ## 💭 Philosophy
+Every component is modular, following OOP/SOLID principles and build with care for maximum flexibility and maintainability.
 
-This project embraces **code-first configuration** - sometimes editing code is faster (and more fun) than clicking through UIs. All components are designed to be modular and readable with OOP and SOLID principles in mind.
+This project embraces **code-first configuration** - sometimes editing code is faster (and more fun) than clicking through UIs.
 
-**Open & Collaborative** - Free to use, modify, and share. 
-I would LOVE it to get some Feedback. Contributions are welcome!
+
+**Final**
+I can't wait to hear your thoughts, feedback, bug reports.
+Let me know what you think! 💭

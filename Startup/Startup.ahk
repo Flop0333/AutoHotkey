@@ -28,7 +28,6 @@ RunStartup(profile?) {
     Run(Paths.dashboards "\Age of Efficiency\Age of Efficiency.ahk")
     Run(Paths.dashboards "\Macro Board\Macro Board.ahk")
 
-    Run(Paths.appsStandalone "\Command Storer\Command Storer.ahk")
     Run(Paths.appsStandalone "\Desktops Manager\Desktops Manager.ahk")
     Run(Paths.appsStandalone "\Emoji Sender\Emoji Sender.ahk")
     Run(Paths.appsStandalone "\Mouse Gestures\Mouse Gestures.ahk")
@@ -37,6 +36,7 @@ RunStartup(profile?) {
     Run(Paths.appsStandalone "\Text Speaker.ahk")
     Run(Paths.appsStandalone "\Window Manager.ahk")
 
+    Run(Paths.appsIntegrated "\Command Storer\Command Storer.ahk")
     Run(Paths.appsIntegrated "\App Hotkeys.ahk")
     Run(Paths.appsIntegrated "\Hotkeys.ahk")
     Run(Paths.appsIntegrated "\Mouse Toys.ahk")

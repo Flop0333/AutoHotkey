@@ -56,9 +56,9 @@ class Secret {
 
 class SecretsFileManager {
 
-    static FILE_PATH := Paths.lib "\Secrets\Secrets.ahk"
-    static BASE_FILE_PATH := Paths.lib "\Secrets\Secrets Base.ahk"
-    static FILE_EXAMPLE_PATH := Paths.lib "\Secrets\Secrets Example.ahk"
+    static FILE_PATH := Paths.autohotkey "\Secrets\Secrets.ahk"
+    static BASE_FILE_PATH := Paths.autohotkey "\Secrets\Secrets Base.ahk"
+    static FILE_EXAMPLE_PATH := Paths.autohotkey "\Secrets\Secrets Example.ahk"
 
     static GetSecretFromFile(requestedSecret) {
         fileContent := FileRead(this.FILE_PATH)

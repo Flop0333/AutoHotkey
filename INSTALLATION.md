@@ -5,7 +5,7 @@
 1. **Clone the repository** to any folder you want
 
 2. **Configure Secrets** (Required)
-   - Navigate to `Lib/Secrets/`
+   - Navigate to `Secrets/`
    - Copy `Secrets Example.ahk` → `Secrets.ahk`
    - Fill in your personal values (optional)
 
@@ -40,7 +40,7 @@ Review and customize these files before use:
 **Scripts not working?**
 - Ensure AutoHotkey v2 is installed
 - Check file paths match the expected Documents location
-- Verify `Secrets.ahk` exists in `Lib/Secrets/`
+- Verify `Secrets.ahk` exists in `Secrets/`
 
 **Need Help?**
 - Open an issue or reach out directly

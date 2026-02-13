@@ -6,7 +6,7 @@
 #Include Core\Paths.ahk
 #Include Core\Links.ahk
 #Include ..\Profiles\Profile Manager.ahk
-#Include Secrets\Secrets Service.ahk
+#Include ..\Secrets\Secrets Service.ahk
 
 ; Extensions
 #Include Extensions\Array.ahk

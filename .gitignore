@@ -5,4 +5,4 @@ Profiles/current_profile.ini
 Dashboards/Macro Board/Settings/Profile Settings/
 
 Lib/Test.ahk
-Lib/Secrets/Secrets.ahk
+Secrets/Secrets.ahk

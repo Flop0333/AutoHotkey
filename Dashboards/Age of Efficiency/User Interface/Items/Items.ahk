@@ -2,7 +2,7 @@
 #Include ../../Database/Internet Search/SearchEnginesState.ahk
 #Include ../../Database/Apps/AppsState.ahk
 #Include ../../Input Handler/Command Executor.ahk
-#Include ..\..\..\..\Lib\Secrets\Secrets Service.ahk
+#Include ..\..\..\..\Secrets\Secrets Service.ahk
 
 Global TAB_OPTIONS := {Bookmarks: "Bookmarks", Apps: "Apps", Search: "Search"}
 

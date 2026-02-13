@@ -14,7 +14,7 @@
 ; ============================================================================
 
 #Include ..\Lib\Core\Paths.ahk
-#Include ..\Lib\Secrets\Secrets Service.ahk
+#Include ..\Secrets\Secrets Service.ahk
 
 Class Profile {
     __New(displayName, deviceName) {

@@ -17,12 +17,12 @@
 #Include ..\..\Lib\Core.ahk
 #Include Button.ahk
 #Include Controller.ahk
+#Include "..\..\Apps Integrated\Command Storer\Command Storer.ahk"
 #Include ..\..\Apps Integrated\Spell Checker.ahk
 #Include ..\..\Apps Integrated\Kill All Ahk Processes.ahk
 #Include ..\..\Apps Integrated\Fake Working Mode.ahk
 #Include ..\..\Lib\Apps\Spotify.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
-#Include "..\..\Apps Standalone\Command Storer\Command Storer.ahk"
 
 ; ============================================================================
 ; === BUTTONS REGISTRATION ======================---==========================
