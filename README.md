@@ -15,7 +15,7 @@ I'm excited to show my AutoHotkey v2 workflow system that I've been building! It
 
 ### Dashboards
 - 🚀 **Age of Efficiency** - Command launcher for bookmarks, searches, and scripts
-![alt text](<Dashboards/Age Of Efficiency/Demo.gif>)
+![alt text](<Dashboards/Age of Efficiency/Demo.gif>)
 
 - 🎹 **Macro Board** - Stream Deck-like interface with customizable buttons
 ![alt text](<Dashboards/Macro Board/Demo.gif>)
