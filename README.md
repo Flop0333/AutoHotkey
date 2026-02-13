@@ -22,9 +22,9 @@ I'm excited to show my AutoHotkey v2 workflow system that I've been building! It
 
 
 ### Productivity Apps
-- 📸 **Screen Snipper** - Screenshot/snipper tool with OCR support
-- 🐭 **Mouse Gestures** - 
-- 🪟 **Window Management** - drag, resize, mini/maximize & always-on-top
+- 📸 **Screen Snipper with OCR** - Capture and extract text from screens in seconds
+- 🐭 **Mouse Gestures** - Execute quick actions with mouse movements 
+- 🪟 **Window Management** - Drag, resize & control windows with CapsLock shortcuts
 - 🧑‍💻 **Command Storer** - Quick access to frequently used commands
 - 🤓 **Emoji Sender** - Quick emoji picker with keyboard shortcuts
 - ⌨️ **Capslock Modifier** - Capslock as powerful modifier key
