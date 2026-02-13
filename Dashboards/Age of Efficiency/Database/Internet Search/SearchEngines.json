@@ -1,0 +1,50 @@
+[
+	{
+		"category": "",
+		"command": "G",
+		"icon": "Google",
+		"id": 1,
+		"title": "Google",
+		"url": "https://www.google.com/search?q="
+	},
+	{
+		"category": "Streaming",
+		"command": "Y",
+		"icon": "Youtube",
+		"id": 2,
+		"title": "Youtube",
+		"url": "https://www.youtube.com/results?search_query="
+	},
+	{
+		"category": "Documentation",
+		"command": "Ahk",
+		"icon": "AutoHotkey",
+		"id": 3,
+		"title": "AutoHotkey",
+		"url": "https://www.autohotkey.com/docs/v2/"
+	},
+	{
+		"category": "",
+		"command": "Maps",
+		"icon": "Google Maps",
+		"id": 4,
+		"title": "Maps",
+		"url": "https://www.google.com/maps/dir/home/"
+	},
+	{
+		"category": "Streaming",
+		"command": "F",
+		"icon": "Flixer",
+		"id": 7,
+		"title": "Flixer",
+		"url": "https://theflixertv.to/search/"
+	},
+	{
+		"category": "Streaming",
+		"command": "GTT",
+		"icon": "GoToTub",
+		"id": 8,
+		"title": "GoToTub",
+		"url": "https://gototub.net/browse?c=movie&m=filter&keyword="
+	}
+]

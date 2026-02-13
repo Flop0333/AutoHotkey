@@ -1,0 +1,3 @@
+ |Generate Directive|ng g directive
+ |Generate Pipe|ng g pipe
+ |Generate Class|ng g class

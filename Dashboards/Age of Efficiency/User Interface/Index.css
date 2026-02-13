@@ -1,0 +1,81 @@
+:root {
+  --sidebar-width: 250px;
+
+  --font-size: 16px;
+  --font-family: Verdana, 'Geneva', Tahoma, sans-serif;
+  
+  --gold: gold;
+  --white: #e6e6e6;
+  --grey: #666;
+  --green: #294728;
+  --light-green: #638b61;
+  --blue: #2d6c90;;
+  --light-blue: #6ab4de;
+  --secondary-color: #1a1a1a;
+
+  --button-padding: 10px 40px;
+  --border-radius: 5px;
+  --transformation: transform 0.24s ease-in-out, filter 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  --button-shadow-hover: drop-shadow(-6px 5px 9px rgba(0, 0, 0, 0.995));
+  
+  --theme-path: 'Library\\Theme\\';
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  font-family: var(--font-family);
+  background-color: var(--secondary-color);
+  overflow-y: hidden; 
+  cursor: url('../Library/Theme/cursor main.cur'), auto;
+  background: transparent;
+  background-image: url('../Library/Theme/background sidebar.png');
+  background-color: transparent;
+  background-size: 40% 100%;
+  background-repeat: repeat;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+#sidebar-container {
+  width: var(--sidebar-width);
+
+}
+
+#main-container {
+  flex-grow: 1;
+  background: transparent;
+  background-image: 
+    url('../Library/Theme/background main.png'),
+    url('../Library/Theme/background main overlay.png'); 
+    background-size:  100% 100%, 55% 55%;
+  background-position: center center, center center;
+  background-repeat: no-repeat, no-repeat;
+  background-blend-mode: multiply;
+}
+
+
+button {
+  text-align: center;
+  padding: 10px 40px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  border: none;
+  font-size: calc(var(--font-size) * 1.2);
+  transition: var(--transformation)
+}
+
+button:hover {
+  transform: scale(1.05);
+  cursor: inherit;
+}
+
+button:active,
+button.selected {
+  transition: transform 0.6s ease-in-out, filter 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
+  transform: scale(1.16);
+  outline: none;
+}

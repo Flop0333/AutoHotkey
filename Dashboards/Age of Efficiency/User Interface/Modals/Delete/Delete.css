@@ -1,0 +1,30 @@
+.delete-item-container {
+  background: transparent;
+  padding: 40px;
+  text-align: center;
+  margin-top: 0px;
+
+  background-image: 
+    url('../../Library/Theme/background main.png'),
+    url('../../Library/Theme/delete background overlay.png');
+  background-size:  100% 100%, 90% 90%;
+  background-position: center center, center center;
+  background-repeat: no-repeat, no-repeat;
+  background-blend-mode: multiply;
+}
+
+#delete-item-title {
+  margin-top: 0px;
+  margin-bottom: 40px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.yesBtn, .noBtn {
+  background-color: var(--light-green);
+  outline: none;
+}

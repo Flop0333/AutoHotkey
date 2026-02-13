@@ -1,0 +1,100 @@
+:root {
+  --tab-font-size: calc(var(--font-size) * 1.4);
+  --navbar-button-width: 200px;
+  --navbar-button-font-family: Georgia, 'Times New Roman', Times, serif;
+  --button-shadow-selected-navbar: drop-shadow(0 0px 17px rgba(255, 255, 255, 0.836));
+  --button-shadow-hover-navbar: drop-shadow(-1px -3px 12px rgba(138, 138, 138, 0.594));
+}
+
+header {
+  padding-right: 20px;
+  height: 145px;
+  display: flex;
+  flex-direction: column;
+  background-image: url('../Library/Theme/background navbar.png');
+  background-size: 98% 100%;
+  background-repeat: no-repeat;
+}
+
+#navbar-title {
+  font-size: var(--tab-font-size);
+  color: var(--white);
+  margin: 0;
+  justify-content: center;
+  align-self: center;
+  margin-top: -8px;
+  filter: var(--button-shadow-hover);
+}
+
+.title-btn-container,
+.tab-container {
+  display: flex;
+  align-items: center;
+}
+
+.title-btn-container,
+.add-button {
+  justify-content: flex-end;
+}
+
+/* Tab Buttons */
+.tab-container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  justify-content: space-evenly;
+  align-content: center;
+  flex-wrap: wrap;
+  margin: 0;
+  /* gap: 10px; */
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.tab {
+  margin-top: 40px;
+  font-size: var(--tab-font-size);
+  font-family: var(--navbar-button-font-family);
+  color: var(--gold);
+  width: var(--navbar-button-width);
+  
+  background-image: url('../Library/Theme/Navbar button.png');
+  background-color: transparent;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.tab:hover {
+  filter: var(--button-shadow-hover-navbar);
+}
+
+.tab.selected {
+  filter: var(--button-shadow-selected-navbar);
+}
+
+
+/* Title Buttons (dialog boxes) */
+.title-btn {
+  filter: var(--button-shadow-hover);
+  font-size: 10pt;
+  padding: 0.7em 1.1em;
+  color: #e6e6e6;
+  cursor: pointer;
+  background-color: transparent;
+  font-family: Webdings;
+  border: none;
+  background-image: url('../Library/Theme/dialog boxes buttons.png');
+  background-color: transparent;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transition: var(--transformation);
+}
+
+.title-btn:hover {
+  transform: scale(1.05);
+}
+
+.title-btn-close:hover {
+  filter: drop-shadow(0 0px 20px rgb(114, 4, 4));
+} 
+

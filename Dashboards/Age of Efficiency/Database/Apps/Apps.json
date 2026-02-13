@@ -1,0 +1,102 @@
+[
+	{
+		"action": "StartFakeWorkMode",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "PC Management",
+		"command": "FW",
+		"icon": "Beer",
+		"id": 5,
+		"title": "Fake Work Mode"
+	},
+	{
+		"action": "OpenAgeOfEfficiency",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "PC Management",
+		"command": "A",
+		"icon": "AoE",
+		"id": 4,
+		"title": "Age of Efficiency"
+	},
+	{
+		"action": "ShutPcDown",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "PC Management",
+		"command": "SD",
+		"icon": "Shut Down",
+		"id": 6,
+		"title": "Shut Down"
+	},
+	{
+		"action": "RerunStartup",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "PC Management",
+		"command": "RE",
+		"icon": "Restart",
+		"id": 7,
+		"title": "Reload Startup"
+	},
+	{
+		"action": "ShowStatusMeme",
+		"argument": "",
+		"argumentRequired": 1,
+		"category": "Dev Tools",
+		"command": "SC",
+		"icon": "Dog",
+		"id": 8,
+		"title": "Status Code Memes"
+	},
+	{
+		"action": "StartPBIReformat",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "Dev Tools",
+		"command": "PBI",
+		"icon": "VGZ",
+		"id": 11,
+		"title": "PBI Reformat"
+	},
+	{
+		"action": "StartPictureInPicture",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "Dev Tools",
+		"command": "P",
+		"icon": "Youtube",
+		"id": 13,
+		"title": "Picture in picture"
+	},
+	{
+		"action": "StartRemoteDesktop",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "Dev Tools",
+		"command": "V",
+		"icon": "Dog",
+		"id": 14,
+		"title": "Start VOW"
+	},
+	{
+		"action": "StartTimer",
+		"argument": "",
+		"argumentRequired": 1,
+		"category": "PC Management",
+		"command": "T",
+		"icon": "Timer",
+		"id": 15,
+		"title": "Timer"
+	},
+	{
+		"action": "KillAllAHkProcesses",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "",
+		"command": "Kill",
+		"icon": "AutoHotkey",
+		"id": 16,
+		"title": "Kill AutoHotkey"
+	}
+]

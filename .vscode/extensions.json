@@ -1,0 +1,12 @@
+{
+  // Workspace extension recommendations.
+  "recommendations": [
+    // AutoHotkey v2 Language Support — thqby.vscode-autohotkey2-lsp
+    "thqby.vscode-autohotkey2-lsp",
+    // Advanced AutoHotkey debugger — zero-plusplus.vscode-autohotkey-debug
+    "zero-plusplus.vscode-autohotkey-debug",
+    // GitLens — eamodio.gitlens
+    "eamodio.gitlens"
+  ],
+  "unwantedRecommendations": []
+}

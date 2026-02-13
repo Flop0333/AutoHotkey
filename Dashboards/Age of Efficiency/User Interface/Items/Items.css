@@ -1,0 +1,116 @@
+:root {
+  --items-button-height: 50px;
+  --item-button-height-padding: 15px;
+  --item-button-gap: 15px;
+  --item-button-width: 86%;
+
+  --add-button-size: 40px;  
+  --icon-size: 24px;
+  --edit-delete-icon-size: 24px;
+  --items-button-transparency: rgba(255, 255, 255, 0.876);
+}
+/* Add Button */
+.add-button {
+  display: flex;
+  align-items: center;
+  background-image: url('../Library/Theme/add item.png');
+  background-color: transparent;
+  background-repeat: no-repeat;
+  height: var(--add-button-size);
+  margin-left: auto; /* This pushes the button to the right */
+  justify-content: end;
+  z-index: 999;
+  margin-right: 33px;
+  margin-top: 5px;
+}
+
+
+/* Items */
+.items {
+  margin-right: 15px;
+  margin-left: 60px;
+  border-radius: 8px;
+  /* height: calc(100vh - 140px);  */
+  height: 87vh; /* Set heigt when scrolling starts */
+  width: var(--item-button-width);
+  overflow-y: auto; /* activate scrollable when out of view */
+}
+
+.items::-webkit-scrollbar {
+  display: none;
+}
+
+#items-list {
+  list-style-type: none;
+  padding-left: 0;
+  display: grid;
+  gap: var(--item-button-gap); /* Space between items */
+  margin-bottom: 90px;
+}
+
+.item-button {
+  height: var(--items-button-height);
+  padding-left: 30px;
+  padding-right: 30px;
+  background-color: var(--items-button-transparency);
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  transition: var(--transformation);
+  cursor: pointer;
+  align-items: center;
+}
+
+
+.item-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
+  cursor:inherit;
+}
+
+.item-content {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
+
+.item-title {
+  margin: 0;
+  margin-right: 10px;
+}
+
+.item-command {
+  margin: 0;
+  font-size: 12px;
+  color: var(--grey);
+}
+
+/* Icons */
+.custom-item-icon {
+  height: var(--icon-size);
+  width: var(--icon-size);
+  margin-right: 20px;
+  opacity: 90%;
+}
+
+.edit-icon,
+.delete-icon {
+  height: var(--edit-delete-icon-size);
+  width: var(--edit-delete-icon-size);
+  cursor: pointer;
+  transition: var(--transformation);
+  margin-left: 15px;
+  cursor: inherit;
+}
+
+.edit-icon {
+  background-image: url('Library/Theme/edit item.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.edit-icon:hover,
+.delete-icon:hover {
+  transform: scale(1.1);
+}

@@ -1,0 +1,4 @@
+ |Get-ExecutionPolicy|Get Execution Policy
+ |Set-ExecutionPolicy RemoteSigned|Set ExecutionPolicy
+ |mstsc /l|Get Remote Desktop Windows 
+ |vsts-npm-auth -config .npmrc -F|Reauthorize

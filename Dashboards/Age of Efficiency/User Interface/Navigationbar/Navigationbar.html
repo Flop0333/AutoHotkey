@@ -1,0 +1,16 @@
+<link href="Navigationbar/Navigationbar.css" rel="stylesheet">
+
+<header>
+  <nav class="title-btn-container">
+    <span class='title-btn' onclick='ahk.Minimize()'>0</span>
+    <span class='title-btn title-btn-maximize' onclick='ahk.Maximize()'>1</span>
+    <span class='title-btn title-btn-close' onclick='ahk.Close()'>r</span>
+  </nav>
+  
+  <span id="navbar-title">Age of Efficiency II</span>
+  <nav class="tab-container">
+    <button class="tab selected" onclick="Navigationbar.onClick(this)">Bookmarks</button>
+    <button class="tab" onclick="Navigationbar.onClick(this)">Apps</button>
+    <button class="tab" onclick="Navigationbar.onClick(this)">Search</button>
+  </nav>
+</header>

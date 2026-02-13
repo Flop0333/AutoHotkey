@@ -1,0 +1,21 @@
+.message-modal-container {
+  border: none;
+  border-radius: 5px;
+}
+
+.message-modal-container::backdrop {
+  background-color: rgb(0, 0, 0);
+  opacity: 55%;
+}
+
+.message-container {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#message-ok-button {
+  margin-top: 20px;
+  background-color: var(--light-green);
+}

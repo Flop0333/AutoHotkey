@@ -1,0 +1,1 @@
+#Include ..\Tools\OCR\lib\OCR.ahk

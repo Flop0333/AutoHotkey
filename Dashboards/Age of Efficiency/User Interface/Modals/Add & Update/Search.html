@@ -1,0 +1,33 @@
+<link href="Modals/Add & Update/AddUpdate.css" rel="stylesheet">
+
+<div id="add-update-container" class="add-update-container">
+    <form id="addItemForm" onsubmit="AddUpdateModal.submit(event);return false;">
+        <h2 id="addTitle">Add Search</h2>
+
+        <label for="title">Title:</label>
+        <input type="text" id="title" required>
+
+        <label for="command">Command:</label>
+        <input type="text" id="command">
+
+        <label for="url">Url:</label>
+        <input type="text" id="url" required>
+
+        <label for="category">Category:</label>
+        <select id="category"> </select>
+        <input type="text" id="customCategory" style="display:none;" placeholder="Enter a new category">
+
+        <label for="icon">Icon:</label>
+        <div id="icon-dropdown" class="custom-dropdown">
+            <div id="selected-icon-container">
+                <img id="selected-icon-img" src="" alt="">
+                <span id="selected-icon-text"></span>
+            </div>
+            <ul id="icon-options" class="dropdown-content">
+                <!-- Options will be populated here -->
+            </ul>
+        </div>
+
+        <button type="submit" id="submit-button">Add Item</button>
+    </form>
+</div>

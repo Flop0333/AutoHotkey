@@ -1,0 +1,379 @@
+[
+	{
+		"category": "Streaming",
+		"command": "y",
+		"icon": "Youtube",
+		"id": 1,
+		"isSecret": 0,
+		"title": "Youtube",
+		"url": "youtube.com"
+	},
+	{
+		"category": "Shops",
+		"command": "MP",
+		"icon": "Marktplaats",
+		"id": 2,
+		"isSecret": 0,
+		"title": "Marktplaats",
+		"url": "Marktplaats.nl"
+	},
+	{
+		"category": "AI",
+		"command": "VG",
+		"icon": "VGZ",
+		"id": 4,
+		"isSecret": 1,
+		"title": "VgzGPT",
+		"url": "WorkAI"
+	},
+	{
+		"category": "",
+		"command": "W",
+		"icon": "WhatsApp",
+		"id": 5,
+		"isSecret": 0,
+		"title": "WhatsApp",
+		"url": "https://web.whatsapp.com"
+	},
+	{
+		"category": "",
+		"command": "Maps",
+		"icon": "Google Maps",
+		"id": 6,
+		"isSecret": 0,
+		"title": "Maps",
+		"url": "https://www.google.com/maps/dir/home"
+	},
+	{
+		"category": "Streaming",
+		"command": "S",
+		"icon": "Spotify",
+		"id": 7,
+		"isSecret": 0,
+		"title": "Spotify Web",
+		"url": "https://open.spotify.com/"
+	},
+	{
+		"category": "VGZ",
+		"command": "B",
+		"icon": "Azure Devops",
+		"id": 8,
+		"isSecret": 1,
+		"title": "Board",
+		"url": "WorkBoard"
+	},
+	{
+		"category": "VGZ",
+		"command": "VM",
+		"icon": "Azure",
+		"id": 9,
+		"isSecret": 1,
+		"title": "Virtual Machine",
+		"url": "WorkVM"
+	},
+	{
+		"category": "VGZ",
+		"command": "OFM",
+		"icon": "VGZ",
+		"id": 10,
+		"isSecret": 1,
+		"title": "OFM",
+		"url": "OFMUrl"
+	},
+	{
+		"category": "VGZ",
+		"command": "AFAS",
+		"icon": "VGZ",
+		"id": 11,
+		"isSecret": 1,
+		"title": "AFAS",
+		"url": "AFASUrl"
+	},
+	{
+		"category": "VGZ",
+		"command": "Declaratie",
+		"icon": "VGZ",
+		"id": 12,
+		"isSecret": 1,
+		"title": "Declaratie",
+		"url": "DeclaratieUrl"
+	},
+	{
+		"category": "VGZ",
+		"command": "Verlof",
+		"icon": "VGZ",
+		"id": 13,
+		"isSecret": 1,
+		"title": "Verlof",
+		"url": "VerlofUrl"
+	},
+	{
+		"category": "Apollo",
+		"command": "AP",
+		"icon": "Azure Devops",
+		"id": 14,
+		"isSecret": 1,
+		"title": "Apollo Pull Requests",
+		"url": "ApolloPullRequestsUrl"
+	},
+	{
+		"category": "Apollo",
+		"command": "APP",
+		"icon": "Azure Devops",
+		"id": 15,
+		"isSecret": 1,
+		"title": "Apollo Pipeline",
+		"url": "ApolloPipelineUrl"
+	},
+	{
+		"category": "Apollo",
+		"command": "APO",
+		"icon": "VGZ",
+		"id": 16,
+		"isSecret": 1,
+		"title": "Apollo OT",
+		"url": "ApolloOTUrl"
+	},
+	{
+		"category": "Apollo",
+		"command": "APA",
+		"icon": "VGZ",
+		"id": 17,
+		"isSecret": 1,
+		"title": "Apollo AT",
+		"url": "ApolloATUrl"
+	},
+	{
+		"category": "Apollo",
+		"command": "APOI",
+		"icon": "Azure Application Insights",
+		"id": 18,
+		"isSecret": 1,
+		"title": "Apollo OT Insights",
+		"url": "ApolloOTInsightsUrl"
+	},
+	{
+		"category": "Apollo",
+		"command": "APAI",
+		"icon": "Azure Application Insights",
+		"id": 19,
+		"isSecret": 1,
+		"title": "Apollo AT Insights",
+		"url": "ApolloATInsightsUrl"
+	},
+	{
+		"category": "Apollo",
+		"command": "APPI",
+		"icon": "Azure Application Insights",
+		"id": 20,
+		"isSecret": 1,
+		"title": "Apollo PR Insights",
+		"url": "ApolloPRInsightsUrl"
+	},
+	{
+		"category": "Athena",
+		"command": "ATA",
+		"icon": "Azure Devops",
+		"id": 23,
+		"isSecret": 1,
+		"title": "API Pull Requests",
+		"url": "APIPullRequestsUrl"
+	},
+	{
+		"category": "Athena",
+		"command": "ATK",
+		"icon": "Azure Devops",
+		"id": 24,
+		"isSecret": 1,
+		"title": "Kennis Pull Requests",
+		"url": "KennisPullRequestsUrl"
+	},
+	{
+		"category": "Athena",
+		"command": "ATC",
+		"icon": "Azure Devops",
+		"id": 25,
+		"isSecret": 1,
+		"title": "Callcenter Pull Requests",
+		"url": "CallcenterPullRequestsUrl"
+	},
+	{
+		"category": "Athena",
+		"command": "ATKO",
+		"icon": "VGZ",
+		"id": 26,
+		"isSecret": 1,
+		"title": "Kennis OT",
+		"url": "KennisOTUrl"
+	},
+	{
+		"category": "Athena",
+		"command": "ATKA",
+		"icon": "VGZ",
+		"id": 27,
+		"isSecret": 1,
+		"title": "Kennis AT",
+		"url": "KennisATUrl"
+	},
+	{
+		"category": "Athena",
+		"command": "ATCO",
+		"icon": "VGZ",
+		"id": 28,
+		"isSecret": 1,
+		"title": "Callcenter OT",
+		"url": "CallcenterOTUrl"
+	},
+	{
+		"category": "Athena",
+		"command": "ATCA",
+		"icon": "VGZ",
+		"id": 29,
+		"isSecret": 1,
+		"title": "Callcenter AT",
+		"url": "CallcenterATUrl"
+	},
+	{
+		"category": "Athena",
+		"command": "ATP",
+		"icon": "Azure Devops",
+		"id": 33,
+		"isSecret": 1,
+		"title": "Athena Pipeline",
+		"url": "AthenaPipelineUrl"
+	},
+	{
+		"category": "Athena",
+		"command": "ATOI",
+		"icon": "Azure Application Insights",
+		"id": 34,
+		"isSecret": 1,
+		"title": "Athena OT Insights",
+		"url": "AthenaOTInsightsUrl"
+	},
+	{
+		"category": "Athena",
+		"command": "ATAI",
+		"icon": "Azure Application Insights",
+		"id": 35,
+		"isSecret": 1,
+		"title": "Athena AT Insights",
+		"url": "AthenaATInsightsUrl"
+	},
+	{
+		"category": "VGZ",
+		"command": "PW",
+		"icon": "VGZ",
+		"id": 36,
+		"isSecret": 1,
+		"title": "Password Reset",
+		"url": "PasswordResetUrl"
+	},
+	{
+		"category": "VGZ",
+		"command": "ZAZ",
+		"icon": "VGZ",
+		"id": 37,
+		"isSecret": 1,
+		"title": "Zelf Aan Zet",
+		"url": "ZelfAanZetUrl"
+	},
+	{
+		"category": "VGZ",
+		"command": "ICT",
+		"icon": "VGZ",
+		"id": 38,
+		"isSecret": 1,
+		"title": "ICT Portal",
+		"url": "ICTPortalUrl"
+	},
+	{
+		"category": "VGZ",
+		"command": "Dossier",
+		"icon": "VGZ",
+		"id": 39,
+		"isSecret": 1,
+		"title": "Medewerkers Dossier",
+		"url": "MedewerkersDossierUrl"
+	},
+	{
+		"category": "VGZ",
+		"command": "Cherwell",
+		"icon": "VGZ",
+		"id": 40,
+		"isSecret": 1,
+		"title": "Cherwell",
+		"url": "CherwellUrl"
+	},
+	{
+		"category": "Apollo",
+		"command": "APOS",
+		"icon": "Swagger",
+		"id": 41,
+		"isSecret": 1,
+		"title": "Apollo OT Swagger",
+		"url": "ApolloOTSwaggerUrl"
+	},
+	{
+		"category": "Tools",
+		"command": "Photoshop",
+		"icon": "Photoshop",
+		"id": 42,
+		"isSecret": 0,
+		"title": "Photoshop",
+		"url": "https://pixlr.com/nl/editor/"
+	},
+	{
+		"category": "Tools",
+		"command": "DNS",
+		"icon": "default",
+		"id": 43,
+		"isSecret": 0,
+		"title": "DNS Checker",
+		"url": "http://dnscheker.org"
+	},
+	{
+		"category": "Tools",
+		"command": "PL",
+		"icon": "Pluralsight",
+		"id": 44,
+		"isSecret": 0,
+		"title": "Pluralsight",
+		"url": "https://www.pluralsight.com/"
+	},
+	{
+		"category": "Shops",
+		"command": "Bol",
+		"icon": "default",
+		"id": 45,
+		"isSecret": 0,
+		"title": "Bol",
+		"url": "https://www.bol.com/nl"
+	},
+	{
+		"category": "Apollo",
+		"command": "APAS",
+		"icon": "Swagger",
+		"id": 46,
+		"isSecret": 1,
+		"title": "Apollo AT Swagger",
+		"url": "ApolloATSwaggerUrl"
+	},
+	{
+		"category": "AI",
+		"command": "GPT",
+		"icon": "ChatGPT",
+		"id": 47,
+		"isSecret": 0,
+		"title": "ChatGPT",
+		"url": "https://chatgpt.com/"
+	},
+	{
+		"category": "VGZ",
+		"command": "DS",
+		"icon": "VGZ",
+		"id": 48,
+		"title": "DS Components",
+		"url": "https://unicorn.vgz.nl/?path=/story/all-components--all-components"
+	}
+]

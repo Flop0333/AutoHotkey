@@ -1,0 +1,8 @@
+# Profile configuration - Current profile is set on startup
+Profiles/current_profile.ini
+
+# Profile-specific settings for Macro Board - Changes when resizing Marco Baord
+Dashboards/Macro Board/Settings/Profile Settings/
+
+Lib/Test.ahk
+Lib/Secrets/Secrets.ahk

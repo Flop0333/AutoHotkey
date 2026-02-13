@@ -1,0 +1,11 @@
+body { 
+    font-family: Segoe UI, Roboto, Arial; 
+    color: whitesmoke;
+    background-image: url('assets/main background.jpg');
+    background-size: cover; /* stretch to fill while preserving aspect ratio */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    overflow: hidden; /* Prevent scrolling */
+    margin: 0;
+}
