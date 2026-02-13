@@ -1,5 +1,5 @@
 GetScript() {
-  return FileOpen("Storage\Command Sets\" selectedSet, "rw")
+  return FileOpen(Paths.appsStandalone "\Command Storer\Storage\Command Sets\" selectedSet, "rw")
 }
 
 WriteItemToFile() {
@@ -15,14 +15,14 @@ DeleteItemFromFile(selectedRow) {
 
   ; Read the file and add the commands to the array, except the one that was deleted
   lines := []
-  Loop read, "Storage\Command Sets\" selectedSet {
+  Loop read, Paths.appsStandalone "\Command Storer\Storage\Command Sets\" selectedSet {
       if (A_Index = selectedRow)
           continue
       lines.Push(A_LoopReadLine)
   }
 
   ; Delete file and write all lines back to the file in a for loop
-  FileDelete("Storage\Command Sets\" selectedSet)
+  FileDelete(Paths.appsStandalone "\Command Storer\Storage\Command Sets\" selectedSet)
   script := GetScript() 
   for index, line in lines
     script.WriteLine(line)
@@ -30,7 +30,7 @@ DeleteItemFromFile(selectedRow) {
 
 GetLongestFileName() {
   longest := 0
-  Loop Files, "Command Sets\*.*", "FD"
+  Loop Files, Paths.appsStandalone "\Command Storer\Storage\Command Sets\*.*", "FD"
   {
     if (StrLen(A_LoopFileName) > longest)
       longest := StrLen(A_LoopFileName)
@@ -40,9 +40,9 @@ GetLongestFileName() {
 
 GetMostAmountOfLines() { ; For setting the final height of ListView and Gui
   most := 0
-  Loop Files, "Command Sets\*.*", "FD"
+  Loop Files, Paths.appsStandalone "\Command Storer\Storage\Command Sets\*.*", "FD"
   {
-    Loop read, "Command Sets\" A_LoopFileName
+    Loop read, Paths.appsStandalone "\Command Storer\Storage\Command Sets\" A_LoopFileName
     if (A_Index > most)
       most := A_Index
   }

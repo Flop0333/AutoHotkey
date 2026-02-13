@@ -1,4 +1,6 @@
-A modular AutoHotkey v2 system for workflow optimization with profile-based configurations.
+Hey everyone! 👋
+
+I'm excited to show my AutoHotkey v2 workflow system that I've been building! It's a modular collection of productivity tools that's transformed how I work.
 
 **New to this project?** → [Installation Guide](INSTALLATION.md)
 

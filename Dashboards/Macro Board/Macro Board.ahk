@@ -22,6 +22,7 @@
 #Include ..\..\Apps Integrated\Fake Working Mode.ahk
 #Include ..\..\Lib\Apps\Spotify.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
+#Include "..\..\Apps Standalone\Command Storer\Command Storer.ahk"
 
 ; ============================================================================
 ; === BUTTONS REGISTRATION ======================---==========================
@@ -30,7 +31,9 @@
 buttons := [
     ToggleButton(ToggleSpellChecker, GetSpellCheckerState, "Spell Checker", "spell checker.gif"),
     Button(KillAllAHkProcesses, "Kill All AHK Processes", "game over.gif"),
-]
+    Button(CommandStorer_ShowMainGui, "Command Storer", "tetris.gif"),
+    ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),
+] 
 
 profileButtons := Map(
     Profiles.woonkamerLaptops, [
@@ -43,11 +46,11 @@ profileButtons := Map(
         Button(OpenAI, "ChatGpt", "ai.gif"),
     ],
     Profiles.work, [
-        ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),
         Button(OpenNotionVGZDashboard, "VGZ Dashboard", "notion.gif"),
     ],
     Profiles.devbox, [
-        ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),
+        Button(OpenNotionVGZDashboard, "VGZ Dashboard", "notion.gif"),
+        Button(Msgbox, "Pizza Default")
     ],
     Profiles.default, [
         Button(Msgbox, "Pizza Default")

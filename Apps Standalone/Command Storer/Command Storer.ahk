@@ -16,16 +16,17 @@
 ; ============================================================================
 
 #SingleInstance Force
+#Include ..\..\Lib\Core\Paths.ahk
 #Include ..\..\Lib\Tools\User Input.ahk
 #Include ..\..\Lib\Extensions\Dark Gui.ahk
 #Include Storage\FileService.ahk
-TraySetIcon("icon.png")
 
 scriptName := StrSplit(A_ScriptName, '.ahk')[1]
+TraySetIcon(Paths.appsStandalone "\Command Storer\icon.png")
 
 global DEFAULT_SET := "Powershell"
 
-#C:: WinExist(scriptName) ? WinActivate() : ShowMainGui()
+#C:: WinExist(scriptName) ? WinActivate() : CommandStorer_ShowMainGui()
 
 Class CommandStorer {
 
@@ -35,11 +36,11 @@ Class CommandStorer {
     
     static _SetupTrayMenu_() {
         A_TrayMenu.Delete()
-        A_TrayMenu.Add("Open Editor",   (*) => WinExist(scriptName) ? WinActivate() : ShowMainGui())
+        A_TrayMenu.Add("Open Editor",   (*) => WinExist(scriptName) ? WinActivate() : CommandStorer_ShowMainGui())
         A_TrayMenu.Add()
         A_TrayMenu.Add("Exit",   (*) => ExitApp())
         A_TrayMenu.Add()
-        A_TrayMenu.Add("Win + C",  (*) => WinExist(scriptName) ? WinActivate() : ShowMainGui())
+        A_TrayMenu.Add("Win + C",  (*) => WinExist(scriptName) ? WinActivate() : CommandStorer_ShowMainGui())
         A_TrayMenu.Disable("Win + C")
     }
 }
@@ -48,9 +49,9 @@ CreateSet(*) {
     newSet := UserInput().WaitForInput()
     if (newSet = "")
         return
-    FileOpen("Storage\Command Sets\" newSet ".txt", "rw")
+    FileOpen(Paths.appsStandalone "\Command Storer\Storage\Command Sets\" newSet ".txt", "rw")
     mainGui.Destroy()
-    ShowMainGui()
+    CommandStorer_ShowMainGui()
 }
 
 DeleteSet(*) {
@@ -66,12 +67,12 @@ DeleteSet(*) {
     if Result = "No"
         Return
   
-    FileDelete("Storage\Command Sets\" selectedSet)
+    FileDelete(Paths.appsStandalone "\Command Storer\Storage\Command Sets\" selectedSet)
     Reload()
   }
 
 AddAllSetButtons() {
-    Loop Files, "Storage\Command Sets\*.*", "FD"
+    Loop Files, Paths.appsStandalone "\Command Storer\Storage\Command Sets\*.*", "FD"
             AddSingleSetButton(A_LoopFileName)
 }
  
@@ -86,9 +87,9 @@ InsertCommandsToListView(file, fileName){
     listView.ModifyCol(3,,fileName) ; Set the Set name as the header
     listView.Delete()
     
-    Loop Files, "Storage\Command Sets\*.*", "FD" ; Look for the file
+    Loop Files, Paths.appsStandalone "\Command Storer\Storage\Command Sets\*.*", "FD" ; Look for the file
         if (A_LoopFileName = file) {
-            Loop read, "Storage\Command Sets\" file { ; Read the file and add the commands to the listview
+            Loop read, Paths.appsStandalone "\Command Storer\Storage\Command Sets\" file { ; Read the file and add the commands to the listview
                 keybinding := StrSplit(A_LoopReadLine, "|")[1]
                 command := StrSplit(A_LoopReadLine, "|")[2]
                 descreption := StrSplit(A_LoopReadLine, "|")[3]
@@ -150,7 +151,7 @@ global FINAL_WIDTH := BUTTON_START_POS_X + 200 + (GetLongestFileName() * 12)
 global LISTVIEW_OPTIONS := " h540 w1170 cblack Grid 0x8000 0x4 0x10" ; disable header, only one item can be selected
 global selectedSet
 
-ShowMainGui(){
+CommandStorer_ShowMainGui(){
     global mainGui := DarkGui("-Caption" , "Eazy Commands").fontSize(12)
     mainGui.SetFont("italic")
     global newKeybinding := MainGui.AddEdit("x" LISTVIEW_START_X + 147 " y" LISTVIEW_START_Y - 42 " w100 h27", "keybinding")
