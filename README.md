@@ -50,6 +50,8 @@ Every component is modular, following OOP/SOLID principles and build with care f
 This project embraces **code-first configuration** - sometimes editing code is faster (and more fun) than clicking through UIs.
 
 
-**Final**
+
 I can't wait to hear your thoughts, feedback & bug reports.
 Let me know what you think! 💭
+
+Discord Post: [https://discord.com/channels/115993023636176902/1471948793359630479]
