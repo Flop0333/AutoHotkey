@@ -7,16 +7,15 @@ I'm excited to show my AutoHotkey v2 workflow system that I've been building! It
 ## ✨ Features
 
 ### Core Tools
-- 🖥️ **Virtual Desktops Manager** - Auto-launch apps per desktop with custom hotkeys
-- 🪟 **Window Manager** - Drag, resize, and control windows with CapsLock shortcuts
+- 🖥️ **Virtual Desktops Manager** - Seamlessly auto-launch apps per virtual desktop
+- 🪟 **Window Manager** - Drag, resize & control windows with CapsLock shortcuts
 - ⌨️ **CapsLock Modifier** - Repurpose CapsLock as a powerful modifier key
-- 🖱️ **Mouse Gestures** - Execute actions with mouse movement patterns
+- 🖱️ **Mouse Gestures** - Execute quick actions with mouse movements
 
 
 ### Dashboards
 - 🚀 **Age of Efficiency** - Command launcher for bookmarks, searches, and scripts
 ![alt text](<Dashboards/Age Of Efficiency/Demo.gif>)
-
 
 - 🎹 **Macro Board** - Stream Deck-like interface with customizable buttons
 ![alt text](<Dashboards/Macro Board/Demo.gif>)
@@ -52,5 +51,5 @@ This project embraces **code-first configuration** - sometimes editing code is f
 
 
 **Final**
-I can't wait to hear your thoughts, feedback, bug reports.
+I can't wait to hear your thoughts, feedback & bug reports.
 Let me know what you think! 💭
