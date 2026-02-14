@@ -22,7 +22,6 @@
 #Include Storage\FileService.ahk
 
 scriptName := StrSplit(A_ScriptName, '.ahk')[1]
-TraySetIcon(Paths.appsIntegrated "\Command Storer\icon.png")
 
 global DEFAULT_SET := "Powershell"
 
