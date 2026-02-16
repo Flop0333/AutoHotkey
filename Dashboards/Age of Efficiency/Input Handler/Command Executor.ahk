@@ -32,10 +32,9 @@ Class CommandExecutor {
             return false
 
         ; If bookmark is secret, get actual url from Secrets
-        if bookmark.isSecret
-            bookmark.url := Secrets.%bookmark.url%.GetOrSet()
+        url := bookmark.isSecret ? Secrets.%bookmark.url%.GetOrSet() : bookmark.url
         
-        Browser.OpenUrlUnderMouse(bookmark.url)
+        Browser.OpenUrlUnderMouse(url)
         return true
     }
     
