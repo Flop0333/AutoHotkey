@@ -6,6 +6,7 @@ OpenCalendar() =>   (Info("Open Calendar"), Run("https://calendar.google.com/cal
 OpenAI() =>         (Info("Open AI"), Run("https://chatgpt.com/"))
 OpenWeer() =>       (Info("Open Weer"), Run(Secrets.WeatherUrl.GetOrSet()))
 OpenGoogleMaps() => (Info("Open Google Maps"), Run(Secrets.GooglemapsUrl.GetOrSet()))
+CloseAllBrowsers() =>(Info("Close browsers"), Browser.CloseAll())
 
 Class Browser extends App {
     static defaultBrowser := Brave
@@ -48,6 +49,18 @@ Class Browser extends App {
     static CloseTab() => Send("^w")
     static NextTab() => Send("^{Tab}")
     static PreviousTab() => Send("^+{Tab}")
+    static CloseAll() {
+            DetectHiddenWindows true
+            SetTitleMatchMode 'RegEx'
+            HWNDs := []
+            HWNDs.Push(WinGetList('ahk_exe ' Brave.ahk_exe))
+            HWNDs.Push(WinGetList('ahk_exe ' Edge.ahk_exe))
+            HWNDs.Push(WinGetList('ahk_exe ' Chrome.ahk_exe))
+            For HWND in HWNDs {
+                if HWND != A_ScriptHwnd
+                    try WinKill(HWND)
+            }
+    }
 }
 
 Class Brave extends Browser {

@@ -47,6 +47,7 @@ profileButtons := Map(
     ],
     Profiles.work, [
         Button(OpenNotionVGZDashboard, "VGZ Dashboard", "notion.gif"),
+        Button(CloseAllBrowsers, "Kill Browsers", "game over.gif"),
     ],
     Profiles.devbox, [
         Button(OpenNotionVGZDashboard, "VGZ Dashboard", "notion.gif"),
