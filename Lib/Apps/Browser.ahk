@@ -6,7 +6,7 @@ OpenCalendar() =>   (Info("Open Calendar"), Run("https://calendar.google.com/cal
 OpenAI() =>         (Info("Open AI"), Run("https://chatgpt.com/"))
 OpenWeer() =>       (Info("Open Weer"), Run(Secrets.WeatherUrl.GetOrSet()))
 OpenGoogleMaps() => (Info("Open Google Maps"), Run(Secrets.GooglemapsUrl.GetOrSet()))
-CloseAllBrowsers() => Browser.CloseAll()
+CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 
 Class Browser extends App {
     static defaultBrowser := Brave
