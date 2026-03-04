@@ -44,6 +44,7 @@ class Secrets extends SecretsBase {
     static ICTPortalUrl := Secret("ICT Portal", "Cherwell ICT portal", "")
     static MedewerkersDossierUrl := Secret("Medewerkers Dossier", "Employee dossier in AFAS", "")
     static CherwellUrl := Secret("Cherwell", "Cherwell service management", "")
+    static Dashboard := Secret("Dashboard", "Team Dashboard", "")
     
     ; Apollo URLs
     static ApolloPullRequestsUrl := Secret("Apollo Pull Requests", "Azure DevOps Apollo pull requests", "")

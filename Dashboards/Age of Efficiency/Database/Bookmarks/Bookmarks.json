@@ -375,5 +375,14 @@
 		"id": 48,
 		"title": "DS Components",
 		"url": "https://unicorn.vgz.nl/?path=/story/all-components--all-components"
+	},
+	{
+		"category": "VGZ",
+		"command": "DASH",
+		"icon": "VGZ",
+		"id": 49,
+		"isSecret": 1,
+		"title": "Team Dashboard",
+		"url": "Dashboard"
 	}
 ]

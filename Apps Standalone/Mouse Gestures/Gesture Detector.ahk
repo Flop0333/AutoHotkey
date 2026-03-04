@@ -69,7 +69,7 @@ class GestureDetector {
             SendInput("{" GestureConfig.Hotkey "}")
         ; Execute the action associated with the detected gesture
         else
-            Gestures.GetAction(this.activeGesture).Call()
+            try Gestures.GetAction(this.activeGesture).Call()
     }
  
     SetStartCoordinates() {
