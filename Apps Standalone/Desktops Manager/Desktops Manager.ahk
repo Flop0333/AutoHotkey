@@ -45,7 +45,7 @@ GetDesktopsForProfile() {
         config["S"] := Desktop(8,   RequiredWindow("Edge",     () => Run("msedge.exe " Links.spotify,,"Max")))
         config["C"] := Desktop(9,   RequiredWindow("Calendar", () => Run(Links.googleCalendar)))
         
-        config["V"] := Desktop(10,  RequiredWindow("Azure",    () => Run(Links.work.virtualMachine), false))
+        config["V"] := Desktop(10)
         config["B"] := Desktop(11,  RequiredWindow("Brave",    () => Run(Links.work.board)))
         config["N"] := Desktop(12,  RequiredWindow("Notion",   () => WinMaximize("ahk_exe Notion.exe")))
                                         .OnLeave(() => WinMinimize("ahk_exe Notion.exe"))
