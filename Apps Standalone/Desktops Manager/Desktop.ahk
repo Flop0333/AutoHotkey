@@ -37,7 +37,7 @@ Class Desktop {
 
       if !WinExist(window.title) {
         this._DisplayLaunchingMessage(window.title)
-        try window.launchMethod.Call()
+        try window.launchMethod.Call() ; TODO: this does open a browser tab in a brower that is allready open (on another desktop) instead of opening it one the desktops switched too
       } 
       else if window.activate = true {
           try WinMaximize(window.title)
@@ -49,7 +49,7 @@ Class Desktop {
   _DisplayLaunchingMessage(title) {
     desktopMessageGui := DarkGui("-Caption +Owner").FontSize(15)
     desktopMessageGui.BackColor := "0x1F1F1F"
-    textField := desktopMessageGui.AddText("Center -E0x200 Background0x1F1F1F w200 h25", "Launching " title)
+    desktopMessageGui.AddText("Center -E0x200 Background0x1F1F1F w200 h25", "Launching " title)
     WinSetTransparent(255, desktopMessageGui)
     WinSetRegion("0-0 w290 h60 r20-20", desktopMessageGui) ; this casus a small flash at the top of the gui. TODO: create more spare at top and move whole thing down?
     

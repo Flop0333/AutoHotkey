@@ -373,6 +373,7 @@
 		"command": "DS",
 		"icon": "VGZ",
 		"id": 48,
+		"isSecret": 0,
 		"title": "DS Components",
 		"url": "https://unicorn.vgz.nl/?path=/story/all-components--all-components"
 	},
@@ -384,5 +385,14 @@
 		"isSecret": 1,
 		"title": "Team Dashboard",
 		"url": "Dashboard"
+	},
+	{
+		"category": "",
+		"command": "Weer",
+		"icon": "default",
+		"id": 50,
+		"isSecret": "0",
+		"title": "Weer",
+		"url": "https://www.weeronline.nl/Europa/Nederland/Blitterswijck/4058134/weersverwachting-48uur"
 	}
 ]
