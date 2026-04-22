@@ -33,13 +33,13 @@ GetDesktopsForProfile() {
     config["3"] := Desktop(2)
     
     if (ProfileManager.Is(Profiles.devbox)) {
-        config["R"] := Desktop(3,   RequiredWindow("Edge",      () => Run(Links.work.apolloPullRequest) Run(Links.work.athenaPullRequest))),
+        config["R"] := Desktop(3,   RequiredWindow("Edge",      () => Run(Secrets.ApolloPullRequest.Get()) Run(Secrets.AthenaPullRequest.Get()))),
         config["Y"] := Desktop(4,   RequiredWindow("YouTube",   () => Run(Links.youtube)))
         
         config["A"] := Desktop(5,   RequiredWindow("Code",      () => Run("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk C:\Users\BremerF\Documents\AutoHotkey",,"Max")))
         config["G"] := Desktop(6,   RequiredWindow("Edge",      () => Run(Links.chatGpt)))
         
-        config["B"] := Desktop(7,  RequiredWindow("Edge",      () => Run(Links.work.board)))
+        config["B"] := Desktop(7,  RequiredWindow("Edge",      () => Run(Secrets.WorkBoard.Get())))
         config["N"] := Desktop(8,  RequiredWindow("Notion",    () => WinMaximize("ahk_exe Notion.exe")))
                                         .OnLeave(() => WinMinimize("ahk_exe Notion.exe"))
     }
