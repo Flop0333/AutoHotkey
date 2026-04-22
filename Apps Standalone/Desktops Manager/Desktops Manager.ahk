@@ -32,27 +32,20 @@ GetDesktopsForProfile() {
     config["2"] := Desktop(1)
     config["3"] := Desktop(2)
     
-    if (ProfileManager.Is(Profiles.work)) {
-        config["Q"] := Desktop(3,   RequiredWindow("YouTube",  () => Run(Links.youtube)))
-        config["W"] := Desktop(4,   RequiredWindow("WhatsApp", () => Run(Links.whatsApp)))
-        config["R"] := Desktop(5,   RequiredWindow("Brave",    () => Run(Links.Apollo.pullRequest) Run(Links.Athena.callcenter.pullRequest))),
-        config["T"] := Desktop(6, 
-                        RequiredWindow("Outlook", () => Run("OUTLOOK.EXE",,"Min"), false),
-                        RequiredWindow("Teams",   () => WinMaximize("Microsoft Teams")))
-                            .OnLeave(() => WinMinimize("ahk_class TeamsWebView"))
+    if (ProfileManager.Is(Profiles.devbox)) {
+        config["R"] := Desktop(3,   RequiredWindow("Edge",      () => Run(Links.work.apolloPullRequest) Run(Links.work.athenaPullRequest))),
+        config["Y"] := Desktop(4,   RequiredWindow("YouTube",   () => Run(Links.youtube)))
         
-        config["A"] := Desktop(7,   RequiredWindow("Code",     () => Send("#4") WinMaximize("ahk_exe Code.exe")))
-        config["S"] := Desktop(8,   RequiredWindow("Edge",     () => Run("msedge.exe " Links.spotify,,"Max")))
-        config["C"] := Desktop(9,   RequiredWindow("Calendar", () => Run(Links.googleCalendar)))
+        config["A"] := Desktop(5,   RequiredWindow("Code",      () => Run("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk C:\Users\BremerF\Documents\AutoHotkey",,"Max")))
+        config["G"] := Desktop(6,   RequiredWindow("Edge",      () => Run(Links.chatGpt)))
         
-        config["V"] := Desktop(10).OnLeave(() => SetCapsLockState('Off'))
-        config["B"] := Desktop(11,  RequiredWindow("Brave",    () => Run(Links.work.board)))
-        config["N"] := Desktop(12,  RequiredWindow("Notion",   () => WinMaximize("ahk_exe Notion.exe")))
+        config["B"] := Desktop(7,  RequiredWindow("Edge",      () => Run(Links.work.board)))
+        config["N"] := Desktop(8,  RequiredWindow("Notion",    () => WinMaximize("ahk_exe Notion.exe")))
                                         .OnLeave(() => WinMinimize("ahk_exe Notion.exe"))
     }
 
     if (ProfileManager.Is(Profiles.woonkamerLaptops)) {
-        config["Q"] := Desktop(3,   RequiredWindow("YouTube",  () => Run(Links.youtube)))
+        config["Q"] := Desktop(3,   RequiredWindow("YouTube",   () => Run(Links.youtube)))
     }
     
     return config
@@ -62,7 +55,7 @@ GetDesktopsForProfile() {
 desktops := GetDesktopsForProfile()
 
 ; On devbox, use Alt instead of Capslock for switching
-if ProfileManager.Is(Profiles.devbox) {
+if ProfileManager.Is(Profiles.work) {
     for key, desktopObj in desktops
         Hotkey("Alt & " . key, ((d) => (*) => HandleSwitch(d))(desktopObj))
 }

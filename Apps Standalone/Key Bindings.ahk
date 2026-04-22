@@ -9,6 +9,7 @@
 
 ; Work
 :X:\f::Secrets.WorkMail.Send()
+:X:\f2::Secrets.SecondWorkMail.Send()
 :X:\b::Secrets.WorkAdminMail.Send()
 :O:\r::6916009000
 :O:\l0::localhost:4200

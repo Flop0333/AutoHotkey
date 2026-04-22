@@ -3,6 +3,8 @@
 	static work := {
 		board:     		Secrets.WorkBoard.Get(),
 		virtualMachine: Secrets.WorkVM.Get(),
+		apolloPullRequest: Secrets.ApolloPullRequest.Get(),
+		athenaPullRequest: Secrets.AthenaPullRequest.Get(),
 	}
 
 	static youtube 			:= "https://www.youtube.com"
@@ -11,4 +13,5 @@
 	static googleCalendar 	:= "https://calendar.google.com/calendar/u/0/r"
 	static notionCalendar 	:= "https://calendar.notion.so/"
 	static googleMaps 		:= "https://www.google.com/maps/dir/home"
+	static chatGpt 			:= "https://chatgpt.com/"
 }

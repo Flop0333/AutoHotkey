@@ -11,6 +11,7 @@
 
 class SecretsBase {
     static WorkMail := Secret("work email", "Used in key bindings", "")
+    static SecondWorkMail := Secret("second work email", "Used in key bindings", "")
     static WorkAdminMail := Secret("work admin email", "Used in key bindings", "")
     static PersonalMail := Secret("personal email", "Used in key bindings", "")
     static FamilyMail := Secret("family email", "Used in key bindings", "")
@@ -27,6 +28,8 @@ class SecretsBase {
     static WorkDeviceNames := Secret("Work Device Names", "Used for profiles to identify work devices by computer name", "")
     static WorkBoard := Secret("Work Board", "Link to board", "")
     static WorkVM := Secret("Work Virtual Machine", "Link to work virtual machine", "")
+    static ApolloPullRequest := Secret("Apollo Pull Requests", "Link to Apollo pull requests", "")
+    static AthenaPullRequest := Secret("Athena Pull Requests", "Link to Athena pull requests", "")
     
     static WorkAI := Secret("Work AI", "Link to work AI", "")
     
