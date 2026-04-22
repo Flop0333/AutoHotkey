@@ -9,7 +9,7 @@ Class App {
     static Maximize() => WinMaximize("ahk_exe " this.ahk_exe)
     static Minimize() => WinMinimize("ahk_exe " this.ahk_exe)
     
-    static IsRunning() => WinExist(this.winTitle)
+    static IsRunning() => ("ahk_exe " this.ahk_exe)
     
     static Launch() {
         if this.IsRunning() {
