@@ -5,9 +5,6 @@
 #Include ..\Lib\Core.ahk
 A_MaxHotkeysPerInterval := 420
 
-; Revert horizontal scrolling wheel
-WheelLeft:: WheelRight
-WheelRight:: WheelLeft
 
 ~XButton2 & WheelDown:: {
     If GetKeyState("XButton2", "P")
@@ -19,6 +16,10 @@ WheelRight:: WheelLeft
         Send("{Volume_Up}")
 }
 
+#HotIf !ProfileManager.Is(Profiles.devbox) ; Disable mouse toys on devbox to prevent interference with VM workflow
+; Revert horizontal scrolling wheel
+WheelLeft:: WheelRight
+WheelRight:: WheelLeft
 
 #HotIf ProfileManager.Is(Profiles.woonkamerLaptops)
 ; Manage Volume with Left Mouse Button + Scroll

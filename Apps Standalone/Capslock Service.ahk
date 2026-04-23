@@ -32,10 +32,13 @@ CapsLock:: {
 }
 *CapsLock:: Send '{Blind}{vk07}'                     ; This forces capslock into a modifying key & blocks the alt/start menus
 
+
+; Currently turned of because of new DevBox workflow (which keeps the host always open/visible on another monitor)
+
 ; Ensures host desktop regains focus if CapsLock is pressed while in a VM window.
 ; Used with Desktops Manager to prevent hotkeys from being trapped in the VM.
 EnsureHostFocus() {
-   virtualMachineClass := "ahk_class TscShellContainerClass"
-    if WinActive(virtualMachineClass)
-      WinActivate("ahk_class Shell_TrayWnd") ; Activate the taskbar of the host
+   ; virtualMachineClass := "ahk_class TscShellContainerClass"
+   ;  if WinActive(virtualMachineClass)
+   ;    WinActivate("ahk_class Shell_TrayWnd") ; Activate the taskbar of the host
 }

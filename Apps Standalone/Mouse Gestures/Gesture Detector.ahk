@@ -20,6 +20,9 @@ class GestureDetector {
     ShouldAllowGesture() {
         ; Override this method to add custom blocking conditions
         ; Example: if WinActive("ahk_class Notepad") return false
+        if WinGetProcessName("ahk_id " GetWinUnderMouse()) = "msrdc.exe" ; Don't trigger gestures on windows DevBox
+            return false
+
         return true
     }
     

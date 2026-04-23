@@ -33,14 +33,15 @@ GetDesktopsForProfile() {
     config["3"] := Desktop(2)
     
     if (ProfileManager.Is(Profiles.devbox)) {
-        config["R"] := Desktop(3,   RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get()))),
+        config["R"] := Desktop(3,   RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get())))
         config["Y"] := Desktop(4,   RequiredWindow("YouTube",   () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Links.youtube))) 
         
         config["A"] := Desktop(5,   RequiredWindow("Code",      () => Run("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk C:\Users\BremerF\Documents\AutoHotkey",,"Max")))
         config["G"] := Desktop(6,   RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Links.chatGpt)))
         
-        config["B"] := Desktop(7,  RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.WorkBoard.Get())))
-        config["N"] := Desktop(8,  RequiredWindow("Notion",    () => WinMaximize("ahk_exe Notion.exe")))
+        config["C"] := Desktop(7) ; for code
+        config["B"] := Desktop(8,  RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.WorkBoard.Get())))
+        config["N"] := Desktop(9,  RequiredWindow("Notion",    () => WinMaximize("ahk_exe Notion.exe")))
                                         .OnLeave(() => WinMinimize("ahk_exe Notion.exe"))
     }
 
