@@ -25,8 +25,8 @@ Class Profile {
 
 Class Profiles {
     static work := Profile("Work", Secrets.WorkDeviceNames.Get())
-    static devbox := Profile("Dev Box", ["DESKTOP-2NC1KCL", "CPC-fbrem-HLWU3"]) ; [VM, Dev Box]
-    static woonkamerLaptops := Profile("Woonkamer Laptops", ["LAPTOP-OAJ27GV8", "LAPTOP-LNTJIJKB"]) ; [Amyrion, Magneet]
+    static devbox := Profile("Dev Box", "CPC-fbrem-HLWU3")
+    static woonkamerLaptops := Profile("Woonkamer Laptops", ["LAPTOP-OAJ27GV8", "LAPTOP-LNTJIJKB", "DESKTOP-2NC1KCL"]) ; [Amyrion, Magneet, PC]
     static default := Profile("Default", "")
 }
 
@@ -54,8 +54,8 @@ Class ProfileManager {
                     this.current := profile
                     this._SaveCurrentProfileToFile()
                     return
-                }
-                
+            }
+
         this.Set(Profiles.default)
     }
 

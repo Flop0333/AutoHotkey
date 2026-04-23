@@ -25,15 +25,13 @@ class SecretsBase {
     static NotionHuisNotesUrl := Secret("Notion Huis Notes URL", "Used to open the Huis Notes page in Notion", "")
     static NotionWorkDashboardUrl := Secret("Notion Work Dashboard URL", "Used to open the Work Dashboard page in Notion", "")
 
+    ; Work URLs
     static WorkDeviceNames := Secret("Work Device Names", "Used for profiles to identify work devices by computer name", "")
     static WorkBoard := Secret("Work Board", "Link to board", "")
     static WorkVM := Secret("Work Virtual Machine", "Link to work virtual machine", "")
     static ApolloPullRequest := Secret("Apollo Pull Requests", "Link to Apollo pull requests", "")
     static AthenaPullRequest := Secret("Athena Pull Requests", "Link to Athena pull requests", "")
-    
     static WorkAI := Secret("Work AI", "Link to work AI", "")
-    
-    ; Work URLs
     static OFMUrl := Secret("OFM", "SharePoint OFM documentation", "")
     static AFASUrl := Secret("AFAS", "portal", "")
     static DeclaratieUrl := Secret("Declaratie", "declaratie form", "")
