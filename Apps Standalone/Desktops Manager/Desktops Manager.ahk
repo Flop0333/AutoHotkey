@@ -25,6 +25,8 @@
 
 #Include ..\..\Lib\Core.ahk
 #Include Desktop.ahk
+#Include <Apps\Spotify>
+#Include <Apps\Notion>
 
 GetDesktopsForProfile() {
     config := Map()
@@ -50,7 +52,18 @@ GetDesktopsForProfile() {
     }
 
     if (ProfileManager.Is(Profiles.woonkamerLaptops)) {
-        config["Q"] := Desktop(3,   RequiredWindow("YouTube",   () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Links.youtube)))
+        config["Q"] := Desktop(3,   RequiredWindow("YouTube",   () => Browser.OpenInNewBrowser(Links.youtube)))
+        config["W"] := Desktop(4) ; WhatsApp
+
+        config["A"] := Desktop(5,   RequiredWindow("Code",      () => Run(A_AppData "\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk " A_MyDocuments "\AutoHotkey",,"Max")))
+        config["S"] := Desktop(6,   RequiredWindow("Spotify",   () => Spotify.Launch()))
+        config["G"] := Desktop(7,   RequiredWindow("Brave",     () => Browser.OpenInNewBrowser(Links.chatGpt)))
+        
+        config["C"] := Desktop(8,   RequiredWindow("Calendar",   () => Browser.OpenInNewBrowser(Links.googleCalendar)))
+        config["V"] := Desktop(9) ; VM
+        config["N"] := Desktop(10,  RequiredWindow("Notion",    () => Notion.Launch()))
+                                .OnLeave(() => Notion.Minimize())
+
     }
     
     return config

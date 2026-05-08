@@ -26,6 +26,7 @@ Class Browser extends App {
         Run(this.ahk_exe " " url)
     }
 
+    static OpenInNewBrowser(url) => Run(Browser.defaultBrowser.ahk_exe " --new-window " url,,"Max")
 
     static OpenUrlUnderMouse(url) {
         ; Get window under mouse

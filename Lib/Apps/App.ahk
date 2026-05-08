@@ -13,7 +13,10 @@ Class App {
     
     static Launch() {
         if this.IsRunning() {
-            this.Activate()
+            try this.Activate()
+            catch {
+                Run(this.path)
+            }
             return
         }
 
