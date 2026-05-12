@@ -13,6 +13,7 @@ static DESKTOP_ACCESSOR_PATH   := Paths.lib "\Tools\Desktops DLL Library\Virtual
     static SendWindowToDesktop(number, activeHwnd) => DllCall(DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "MoveWindowToDesktopNumber", "Ptr"), "Ptr", activeHwnd, "Int", number, "Int")
     static GetCurrentDesktopNumber() => DllCall(DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "GetCurrentDesktopNumber", "Ptr"), "Int")
     static GoToDesktopNumber(number) => DllCall(DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "GoToDesktopNumber", "Ptr"), "Int", number, "Int")
+    static GetDesktopCount() => DllCall(DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "GetDesktopCount", "Ptr"), "Int")
     static PinWindow(hwnd) => DllCall(DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "PinWindow", "Ptr"), "UInt", hwnd)
     static UnpinWindow(hwnd) => DllCall(DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "UnPinWindow", "Ptr"), "UInt", hwnd)
     static IsWindowPinned(hwnd) => DllCall(DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "IsPinnedWindow", "Ptr"), "UInt", hwnd)
