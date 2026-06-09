@@ -20,7 +20,7 @@ Class FakeWorkMode {
         this.Enabled := state = "" ? !this.Enabled : state
         if this.Enabled
             this.Start()
-        Info("Fake Work Mode " (this.Enabled ? "Enabled" : "Disabled"))
+        ; Info("Fake Work Mode " (this.Enabled ? "Enabled" : "Disabled"))
     }
     
     static Start() {

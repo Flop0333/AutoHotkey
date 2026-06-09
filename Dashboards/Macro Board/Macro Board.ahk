@@ -23,6 +23,7 @@
 #Include ..\..\Apps Integrated\Fake Working Mode.ahk
 #Include ..\..\Lib\Apps\Spotify.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
+#Include ..\..\Startup\Startup.ahk
 
 ; ============================================================================
 ; === BUTTONS REGISTRATION ======================---==========================
@@ -33,6 +34,7 @@ buttons := [
     Button(KillAllAHkProcesses, "Kill All AHK Processes", "game over.gif"),
     Button(CommandStorer_ShowMainGui, "Command Storer", "tetris.gif"),
     ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),
+    Button(RunStartup, "Reload Startup")
 ] 
 
 profileButtons := Map(
@@ -50,11 +52,10 @@ profileButtons := Map(
         Button(CloseAllBrowsers, "Kill Browsers", "game over.gif"),
     ],
     Profiles.devbox, [
-        Button(OpenNotionVGZDashboard, "VGZ Dashboard", "notion.gif"),
-        Button(Msgbox, "Pizza Default")
+        Button(OpenNotionVGZDashboard, "VGZ Dashboard", "notion.gif")
     ],
     Profiles.default, [
-        Button(Msgbox, "Pizza Default")
+        Button(MsgBox, "Pizza Default")
     ]
 )
 
