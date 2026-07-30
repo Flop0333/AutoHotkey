@@ -38,7 +38,7 @@ GetDesktopsForProfile() {
         config["2"] := Desktop(startPos + 1)
         config["3"] := Desktop(startPos + 2)
         config["R"] := Desktop(startPos + 3,   RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get())))
-        config["Y"] := Desktop(startPos + 4,   RequiredWindow("YouTube",   () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Links.youtube))) 
+        config["Y"] := Desktop(startPos + 4,   RequiredWindow("YouTube",   () => Run(Brave.ahk_exe " --new-window " Links.youtube))) 
         
         config["A"] := Desktop(startPos + 5,   RequiredWindow("Code",      () => Run("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk C:\Users\BremerF\Documents\AutoHotkey",,"Max")))
         config["G"] := Desktop(startPos + 6,   RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Links.chatGpt)))
