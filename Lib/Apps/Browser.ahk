@@ -9,7 +9,7 @@ OpenGoogleMaps() => (Info("Open Google Maps"), Run(Secrets.GooglemapsUrl.GetOrSe
 CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 
 Class Browser extends App {
-    static defaultBrowser := Brave
+    static defaultBrowser := ProfileManager.Is(Profiles.work) || ProfileManager.Is(Profiles.devbox) ? Edge : Brave
     static browsers := [Brave,Edge,Chrome]
     
     static __New() => this.Init(this.defaultBrowser.winTitle, this.defaultBrowser.ahk_exe)
@@ -26,6 +26,7 @@ Class Browser extends App {
         Run(this.ahk_exe " " url)
     }
 
+    static OpenInNewBrowser(url) => Run(Browser.defaultBrowser.ahk_exe " --new-window " url,,"Max")
 
     static OpenUrlUnderMouse(url) {
         ; Get window under mouse

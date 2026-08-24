@@ -51,7 +51,8 @@ class Secret {
         return this._value
     }
 
-    Send() => ClipSend(this.GetOrSet()) sleep(100) Send("{BackSpace}") ; Remove space added by ClipSend
+    ; Send() => ClipSend(this.GetOrSet()) sleep(100) Send("{BackSpace}") ; Remove space added by ClipSend
+    Send() => ClipSend(this.GetOrSet())
 }
 
 class SecretsFileManager {

@@ -17,7 +17,8 @@ class NotionPages {
 Class Notion extends App {
     static __New() => App.Init(
         winTitle := "Notion", 
-        ahk_exe := "Notion.exe"
+        ahk_exe := "Notion.exe",
+        path := A_AppData "\Microsoft\Windows\Start Menu\Programs\Notion.lnk"
     )
     
     static OpenPage(page) {

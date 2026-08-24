@@ -54,8 +54,8 @@ Class ProfileManager {
                     this.current := profile
                     this._SaveCurrentProfileToFile()
                     return
-                }
-                
+            }
+
         this.Set(Profiles.default)
     }
 
