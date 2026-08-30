@@ -24,11 +24,12 @@
 ; ============================================================================
 
 #Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Actions\Modules\Window Actions.ahk
 #Include Desktop.ahk
-#Include <Apps\VsCode>
-#Include <Apps\Notion>
-#Include <Apps\Spotify>
-#Include <Apps\WhatsApp>
+#Include ..\..\Lib\Apps\VsCode.ahk
+#Include ..\..\Lib\Apps\Notion.ahk
+#Include ..\..\Lib\Apps\Spotify.ahk
+#Include ..\..\Lib\Apps\WhatsApp.ahk
 
 
 GetDesktopsForProfile() {
@@ -78,12 +79,17 @@ GetDesktopsForProfile() {
 ; ===== HOTKEY CONFIGURATION =====
 desktops := GetDesktopsForProfile()
 
+ActionRegistry.RegisterAll([
+    WindowActions.PreviousDesktop((*) => DesktopsDDL.GoToPrevious()),
+    WindowActions.TogglePinToDesktops((*) => DesktopsDDL.TogglePin())
+])
+
 for key, desktopObj in desktops
     Capslock.Hotkey(key, ((d) => (*) => HandleSwitch(d))(desktopObj))
 
 ; Foreward & Backward
-Capslock.Hotkey("Tab", (*) => DesktopsDDL.GoToPrevious())
-Capslock.Hotkey("P", (*) => DesktopsDDL.TogglePin())
+Capslock.Hotkey("Tab", ActionBinding.Callback("desktop.previous", "desktop-hotkeys"))
+Capslock.Hotkey("P", ActionBinding.Callback("desktop.pin-window.toggle", "desktop-hotkeys"))
 
 ; ===== HELPER FUNCTIONS =====
 global onLeaveAction := ""

@@ -28,6 +28,10 @@ Class CommandExecutor {
     }
     
     static _TryBookmark() {
+        ; An argument selects the matching search engine instead of a same-name bookmark.
+        if this._argument != ""
+            return false
+
         if !(bookmark := BookmarksState.GetByCommandOrTitle(this._command))
             return false
 
@@ -42,12 +46,26 @@ Class CommandExecutor {
         if !(app := AppsState.GetByCommandOrTitle(this._command))
             return false
 
-        if app.argumentRequired {
-            argument := this._argument || CommandInput().WaitForInput()
-            if argument != "" ; User has cancelled input
-                %app.action%(argument)
-        } else
-            %app.action%()
+        if !ActionRegistry.Has(app.actionId) {
+            Info("Action is not registered: " app.actionId)
+            return true
+        }
+
+        action := ActionRegistry.Get(app.actionId)
+        argument := this._argument
+        if action.Argument.IsRequired && argument = ""
+            argument := CommandInput().WaitForInput()
+
+        if action.Argument.IsRequired && argument = ""
+            return true ; User cancelled input.
+
+        context := ActionContext("age-of-efficiency", ProfileManager.current)
+        result := argument != ""
+            ? ActionRegistry.Invoke(action.Id, argument, context)
+            : ActionRegistry.Invoke(action.Id, unset, context)
+
+        if result.status != ActionResult.STATUS_SUCCESS && result.status != ActionResult.STATUS_CANCELLED
+            Info(result.message)
 
         return true
     }

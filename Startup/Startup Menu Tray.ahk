@@ -18,13 +18,18 @@
 ; ============================================================================
 
 #Include ..\Apps Integrated\Kill All Ahk Processes.ahk
+#Include ..\Lib\Actions\Action Binding.ahk
+#Include ..\Lib\Actions\Modules\System Actions.ahk
 
 class StartupMenuTray {
     __New() {
+		ActionRegistry.SetProfileProvider((*) => ProfileManager.current)
+		ActionRegistry.RegisterIfMissing(SystemActions.ReloadStartup(RunStartup))
+		ActionRegistry.RegisterIfMissing(SystemActions.KillAhkProcesses((*) => KillAllAHkProcesses(true)))
         A_TrayMenu.Delete()
-        A_TrayMenu.Add("Reload", (*) => Reload())
+        A_TrayMenu.Add("Reload", ActionBinding.Callback("system.reload-startup", "startup-tray"))
         this._AddProfilesToTrayMenu()
-        A_TrayMenu.Add("Exit", (*) => KillAllAHkProcesses())
+        A_TrayMenu.Add("Exit", ActionBinding.Callback("system.kill-ahk-processes", "startup-tray"))
     }
 
     _AddProfilesToTrayMenu() {

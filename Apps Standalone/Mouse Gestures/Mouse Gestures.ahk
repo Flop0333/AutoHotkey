@@ -21,25 +21,36 @@
 ; ============================================================================
 
 #Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Actions\Modules\Window Actions.ahk
 #Include Gesture Detector.ahk
 CoordMode "Mouse", "Screen"
+
+ActionRegistry.RegisterAll([
+    WindowActions.MoveToLeftMonitor((*) => MoveWindowToMonitor("Left")),
+    WindowActions.MoveToRightMonitor((*) => MoveWindowToMonitor("Right")),
+    WindowActions.MaximizeUnderMouse(MaximizeWindow),
+    WindowActions.MinimizeUnderMouse(MinimizeWindow)
+])
 
 GestureDetector() ; Initialize the gesture detector
 
 class Gestures {
     static gestures := Map()
     
-    static Add(gesturePattern, command) => this.gestures[gesturePattern] := command
-    static GetAction(gesturePattern) => this.gestures.Has(gesturePattern) ? this.gestures[gesturePattern] : false
+    static Add(gesturePattern, actionId) {
+        ActionBinding.Require(actionId)
+        this.gestures[gesturePattern] := actionId
+    }
+    static GetActionId(gesturePattern) => this.gestures.Has(gesturePattern) ? this.gestures[gesturePattern] : false
 }
 
 ;=============================================================
 ;=== GESTURES REGISTRATION ===================================
 ;=============================================================
-Gestures.Add("L", (*) => MoveWindowToMonitor("Left"))
-Gestures.Add("R", (*) => MoveWindowToMonitor("Right"))
-Gestures.Add("U", (*) => MaximizeWindow())
-Gestures.Add("D", (*) => MinimizeWindow())
+Gestures.Add("L", "window.move-to-left-monitor")
+Gestures.Add("R", "window.move-to-right-monitor")
+Gestures.Add("U", "window.maximize-under-mouse")
+Gestures.Add("D", "window.minimize-under-mouse")
 
 
 ;=============================================================

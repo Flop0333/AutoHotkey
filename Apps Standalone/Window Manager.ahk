@@ -19,13 +19,21 @@
 ; ============================================================================
 
 #Include ..\Lib\Core.ahk
+#Include ..\Lib\Actions\Modules\Window Actions.ahk
 SetWinDelay(0)
 CoordMode("Mouse")
 
-CapsLock.Hotkey("LButton",  (*) => DragWindow())
-CapsLock.Hotkey("RButton",  (*) => ResizeWindow())
-CapsLock.Hotkey("MButton",  (*) => WinClose(Win.WinUnderMouse()))
-CapsLock.Hotkey("Up",       (*) => Win.ToggleAlwaysOnTop())
+ActionRegistry.RegisterAll([
+    WindowActions.DragUnderMouse(DragWindow),
+    WindowActions.ResizeUnderMouse(ResizeWindow),
+    WindowActions.CloseUnderMouse((*) => WinClose(Win.WinUnderMouse())),
+    WindowActions.ToggleAlwaysOnTop((*) => Win.ToggleAlwaysOnTop())
+])
+
+CapsLock.Hotkey("LButton", ActionBinding.Callback("window.drag-under-mouse", "window-hotkeys"))
+CapsLock.Hotkey("RButton", ActionBinding.Callback("window.resize-under-mouse", "window-hotkeys"))
+CapsLock.Hotkey("MButton", ActionBinding.Callback("window.close-under-mouse", "window-hotkeys"))
+CapsLock.Hotkey("Up", ActionBinding.Callback("window.always-on-top.toggle", "window-hotkeys"))
 
 DragWindow() {
     MouseGetPos(&origionalMouseX, &origionalMouseY, &winId)

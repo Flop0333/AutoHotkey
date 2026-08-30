@@ -24,24 +24,28 @@
 #Include ..\Lib\Apps\Notion.ahk
 #Include ..\Lib\Apps\Spotify.ahk
 #Include ..\Lib\Apps\KeePass.ahk
+#Include ..\Lib\Actions\Modules\Application Actions.ahk
+#Include Actions\Hotkey Actions.ahk
+
+HotkeyActions.Register()
 
 ; ================================
 ; Generic Hotkeys
 ; ================================
 ; VS Code
 #HotIf WinActive("ahk_exe Code.exe")
-^WheelUp::Send("{Ctrl Down}{+}{Ctrl Up}") ; Zoom in
-^WheelDown::Send("{Ctrl Down}{-}{Ctrl Up}") ; Zoom out
+^WheelUp::ActionBinding.Invoke("vscode.zoom-in", unset, "global-hotkeys")
+^WheelDown::ActionBinding.Invoke("vscode.zoom-out", unset, "global-hotkeys")
 
 ; Google Calendar
 #HotIf WinActive("Google Calendar")
-^Left::Send("k") ;Jump week foreward
-^Right::Send("j") ;Jump week backward
+^Left::ActionBinding.Invoke("calendar.previous-week", unset, "global-hotkeys")
+^Right::ActionBinding.Invoke("calendar.next-week", unset, "global-hotkeys")
 
 
 ; ================================
 ; Profile-specific Hotkeys
 ; ================================
 #HotIf ProfileManager.Is(Profiles.work)
-CapsLock.Hotkey("D", (*) => KeePass.InsertMainPassword())
-CapsLock.Hotkey("!D", (*) => KeePass.InsertSecondaryPassword())
+CapsLock.Hotkey("D", ActionBinding.Callback("keepass.main-password.insert", "global-hotkeys"))
+CapsLock.Hotkey("!D", ActionBinding.Callback("keepass.secondary-password.insert", "global-hotkeys"))

@@ -19,7 +19,7 @@ class Buttons {
 			var buttonElement = document.createElement('button');
 			buttonElement.className = 'macro-button';
 			buttonElement.title = button.tooltip;
-			buttonElement.dataset.funcName = button.funcName;
+			buttonElement.dataset.actionId = button.actionId;
 			this._setBackground(buttonElement, button);
 			
 			// Set initial toggle state

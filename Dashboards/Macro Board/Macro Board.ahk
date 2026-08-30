@@ -24,38 +24,43 @@
 #Include ..\..\Lib\Apps\Spotify.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
 #Include ..\..\Startup\Startup.ahk
+#Include ..\..\Lib\Actions\Modules\Application Actions.ahk
+#Include ..\..\Lib\Actions\Modules\System Actions.ahk
+#Include Actions\Macro Board Actions.ahk
+
+MacroBoardActions.Register()
 
 ; ============================================================================
 ; === BUTTONS REGISTRATION ======================---==========================
 ; ============================================================================
 
 buttons := [
-    ToggleButton(ToggleSpellChecker, GetSpellCheckerState, "Spell Checker", "spell checker.gif"),
-    Button(KillAllAHkProcesses, "Kill All AHK Processes", "game over.gif"),
-    Button(CommandStorer_ShowMainGui, "Command Storer", "tetris.gif"),
-    ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),
-    Button(RunStartup, "Reload Startup")
+    Button("writing.spell-checker.toggle"),
+    Button("system.kill-ahk-processes"),
+    Button("development.command-storer.open"),
+    Button("productivity.fake-work-mode.toggle"),
+    Button("system.reload-startup")
 ] 
 
 profileButtons := Map(
     Profiles.woonkamerLaptops, [
-        Button(OpenNotionShitFixen, "S H I T  F I X E N", "notion.gif"),
-        Button(StartSpotifyGoodMorningJazz, "Start Spotify Playlist", "spotify.gif"),
-        Button(OpenFinancien, "Financiën Sheet", "tetris.gif"),
-        Button(OpenCalendar, "Calendar", "calendar.gif"),
-        Button(OpenGoogleMaps, "Maps", "maps.gif"),
-        Button(OpenWeer, "Weer", "weer.gif"),
-        Button(OpenAI, "ChatGpt", "ai.gif"),
+        Button("notion.shit-fixen.open"),
+        Button("spotify.good-morning-jazz.start"),
+        Button("personal.finances.open"),
+        Button("calendar.open"),
+        Button("maps.open"),
+        Button("weather.open"),
+        Button("chatgpt.open"),
     ],
     Profiles.work, [
-        Button(OpenNotionVGZDashboard, "VGZ Dashboard", "notion.gif"),
-        Button(CloseAllBrowsers, "Kill Browsers", "game over.gif"),
+        Button("notion.work-dashboard.open"),
+        Button("browser.close-all"),
     ],
     Profiles.devbox, [
-        Button(OpenNotionVGZDashboard, "VGZ Dashboard", "notion.gif")
+        Button("notion.work-dashboard.open")
     ],
     Profiles.default, [
-        Button(MsgBox, "Pizza Default")
+        Button("demo.pizza")
     ]
 )
 
