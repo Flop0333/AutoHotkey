@@ -2,7 +2,7 @@
 #Include ..\Core\Paths.ahk
 
 class MidiMixer extends App {
-	static __New() => App.Init(
+	static __New() => this.Init(
 		winTitle := "MIDI Mixer",
 		ahk_exe := "MIDI Mixer.exe",
 		path := Paths.windows.LocalAppData "\Programs\midi-mixer-app"

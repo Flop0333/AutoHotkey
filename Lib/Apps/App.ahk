@@ -13,18 +13,21 @@ Class App {
     
     static Launch() {
         if this.IsRunning() {
+            MsgBox("App is already running, activating it instead.")
             try this.Activate()
             catch {
-                Run(this.path)
+                MsgBox("Failed to activate app, trying to run it instead. ahk_exe: " this.ahk_exe   " path: " this.path)
+                Run(this.ahk_exe)
             }
             return
         }
 
-        if this.path {
-            Run(this.path)
+        if this.ahk_exe {
+            MsgBox("App is not running, launching it now.")
+            Run(this.ahk_exe)
             return
         }
-
-        Run(this.ahk_exe)
+        MsgBox("App is not running, but no ahk_exe is defined to launch it. Please define a path in the app class.")
+        Run(this.path)
     }
 }

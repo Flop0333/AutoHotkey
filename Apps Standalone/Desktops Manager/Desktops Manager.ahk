@@ -25,47 +25,51 @@
 
 #Include ..\..\Lib\Core.ahk
 #Include Desktop.ahk
-; #Include <Apps\Spotify>
-; #Include <Apps\Notion>
+#Include <Apps\VsCode>
+#Include <Apps\Notion>
+#Include <Apps\Spotify>
+#Include <Apps\WhatsApp>
+
 
 GetDesktopsForProfile() {
+    desktopCounter := 0 ; Start at 0, increment for each desktop added
     config := Map()
     
     if (ProfileManager.Is(Profiles.devbox)) {
         devBoxDesktopsAmount := 10
-        startPos := DesktopsDDL.GetDesktopCount() = devBoxDesktopsAmount ? 0 : 1 ; Devbox has 'Local desktops' which takes the first slot, so we need to shift all desktops by 1
-        config["1"] := Desktop(startPos) ; Because of 'Local desktops' in devbox, we start at 1 instead of 0
-        config["2"] := Desktop(startPos + 1)
-        config["3"] := Desktop(startPos + 2)
-        config["R"] := Desktop(startPos + 3,   RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get())))
-        config["Y"] := Desktop(startPos + 4,   RequiredWindow("YouTube",   () => Run(Brave.ahk_exe " --new-window " Links.youtube))) 
+        desktopCounter := DesktopsDDL.GetDesktopCount() = devBoxDesktopsAmount ? 0 : 1 ; Devbox has 'Local desktops' which takes the first slot, so we need to shift all desktops by 1
+
+        config["1"] := Desktop(desktopCounter++) ; Because of 'Local desktops' in devbox, we start at 1 instead of 0
+        config["2"] := Desktop(desktopCounter++)
+        config["3"] := Desktop(desktopCounter++)
         
-        config["A"] := Desktop(startPos + 5,   RequiredWindow("Code",      () => Run("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk C:\Users\BremerF\Documents\AutoHotkey",,"Max")))
-        config["G"] := Desktop(startPos + 6,   RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Links.chatGpt)))
+        config["R"] := Desktop(desktopCounter++,   RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get())))
+        config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",   () => Run(Brave.ahk_exe " --new-window " Links.youtube))) 
         
-        config["C"] := Desktop(startPos + 7) ; for code
-        config["B"] := Desktop(startPos + 8,  RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.WorkBoard.Get())))
-        config["N"] := Desktop(startPos + 9,  RequiredWindow("Notion",    () => WinMaximize("ahk_exe Notion.exe")))
+        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",      () => Run("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk C:\Users\BremerF\Documents\AutoHotkey",,"Max")))
+        config["G"] := Desktop(desktopCounter++,   RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Links.chatGpt)))
+        
+        config["C"] := Desktop(desktopCounter++) ; for code
+        config["B"] := Desktop(desktopCounter++,  RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.WorkBoard.Get())))
+        config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",    () => WinMaximize("ahk_exe Notion.exe")))
                                         .OnLeave(() => WinMinimize("ahk_exe Notion.exe"))
-    } else {
-        config["1"] := Desktop(0)
-        config["2"] := Desktop(1)
-        config["3"] := Desktop(2)
     }
 
     if (ProfileManager.Is(Profiles.woonkamerLaptops)) {
-        ; config["Q"] := Desktop(3,   RequiredWindow("YouTube",   () => Browser.OpenInNewBrowser(Links.youtube)))
-        ; config["W"] := Desktop(4) ; WhatsApp
+        config["1"] := Desktop(desktopCounter++)
+        config["2"] := Desktop(desktopCounter++)
+        config["3"] := Desktop(desktopCounter++)
 
-        ; config["A"] := Desktop(5,   RequiredWindow("Code",      () => Run(A_AppData "\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk " A_MyDocuments "\AutoHotkey",,"Max")))
-        ; config["S"] := Desktop(6,   RequiredWindow("Spotify",   () => Spotify.Launch()))
-        ; config["G"] := Desktop(7,   RequiredWindow("Brave",     () => Browser.OpenInNewBrowser(Links.chatGpt)))
+        config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",      () => WhatsApp.Launch()))
+        config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",    () => Run(Brave.ahk_exe " --new-window " Links.youtube))) 
         
-        ; config["C"] := Desktop(8,   RequiredWindow("Calendar",   () => Browser.OpenInNewBrowser(Links.googleCalendar)))
-        ; config["V"] := Desktop(9) ; VM
-        ; config["N"] := Desktop(10,  RequiredWindow("Notion",    () => Notion.Launch()))
-        ;                         .OnLeave(() => Notion.Minimize())
-
+        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => Run(A_AppData "\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk " A_MyDocuments "\AutoHotkey",,"Max")))
+        config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    () => Spotify.Launch()))
+        config["G"] := Desktop(desktopCounter++,   RequiredWindow("ChatGPT",    () => Run("ahk_exe ChatGPT.exe")),
+                                                    RequiredWindow("Brave",    () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Links.chatGpt)))
+        
+        config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.Launch()))
+        config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      () => Notion.Launch()))
     }
     
     return config

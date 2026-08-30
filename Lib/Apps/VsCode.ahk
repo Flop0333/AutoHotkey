@@ -3,7 +3,7 @@
 
 class VsCode extends App {
 	static autohotkeyWorkspace := Paths.autohotkey "\VS Code Workspace.code-workspace"
-	static __New() => App.Init(
+	static __New() => this.Init(
 		winTitle := "Visual Studio Code",
 		ahk_exe := "Code.exe",
 		path := "C:\Users\" A_UserName "\AppData\Local\Programs\Microsoft VS Code Insiders\Code - Insiders.exe"

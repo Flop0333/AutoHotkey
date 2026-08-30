@@ -2,7 +2,7 @@
 #Include ..\Tools\UIA-v2\Lib\UIA.ahk
 
 class KeePass extends App {
-	static __New() => App.Init(
+	static __New() => this.Init(
 		winTitle := "Database.kdbx - KeePass",
 		ahk_exe := "KeePass.exe"
 	)

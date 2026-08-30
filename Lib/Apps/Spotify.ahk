@@ -9,7 +9,7 @@ Class Playlist {
 }
 
 Class Spotify extends App {
-    static __New() => App.Init(
+    static __New() => this.Init(
 		winTitle := "Spotify",
 		ahk_exe := "Spotify.exe",
         path := A_AppData "\Microsoft\Windows\Start Menu\Programs\Spotify.lnk"
