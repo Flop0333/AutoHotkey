@@ -11,22 +11,17 @@ Class App {
     
     static IsRunning() => ("ahk_exe " this.ahk_exe)
     
-    static Launch() {
+    static Launch(useExe := true) {
         if this.IsRunning() {
-            try this.Activate()
-            catch {
-                RunWait(this.ahk_exe)
+            try {
+                this.Activate()
                 this.Maximize()
+                return
             }
-            return
         }
-        
-        if this.ahk_exe {
-            RunWait(this.ahk_exe)
-            this.Maximize()
-            return
-        }
-        RunWait(this.path)
+        DarkToolTip("Launching " this.winTitle).FollowMouse().AlignText("Center")
+        RunWait(useExe ? this.ahk_exe : this.path)
         this.Maximize()
+
     }
 }

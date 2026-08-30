@@ -20,6 +20,8 @@ Class Notion extends App {
         ahk_exe := "Notion.exe",
         path := A_AppData "\Microsoft\Windows\Start Menu\Programs\Notion.lnk"
     )
+
+    static Launch() => super.Launch(useExe := false) ; Use the .lnk file to launch Notion, so it opens in the background instead of in the foreground
     
     static OpenPage(page) {
         Info("Open Notion " page.title, timeout := 4000)

@@ -36,39 +36,11 @@ Class Desktop {
     for window in this._requiredWindows {
 
       if !WinExist(window.title) {
-        this._DisplayLaunchingMessage(window.title)
         try window.launchMethod.Call() ; TODO: this does open a browser tab in a brower that is allready open (on another desktop) instead of opening it one the desktops switched too
       } 
       else if window.activate = true {
           try WinMaximize(window.title)
           try WinActivate(window.title)
-      }
-    }
-  }
-
-  _DisplayLaunchingMessage(title) {
-    desktopMessageGui := DarkGui("-Caption +Owner").FontSize(15)
-    desktopMessageGui.BackColor := "0x1F1F1F"
-    desktopMessageGui.AddText("Center -E0x200 Background0x1F1F1F w200 h25", "Launching " title)
-    WinSetTransparent(255, desktopMessageGui)
-    WinSetRegion("0-0 w290 h60 r20-20", desktopMessageGui) ; this casus a small flash at the top of the gui. TODO: create more spare at top and move whole thing down?
-    
-    startTime := A_TickCount
-    duration := 1300 ; ms
-    SetTimer(_ShowGuiAtMousePos, 20)
-    
-    _ShowGuiAtMousePos() {
-      CoordMode("Mouse")
-      MouseGetPos(&xPos, &yPos)
-      x := xPos - 130
-      y := yPos + 15
-      desktopMessageGui.Show(Format("x{} y{}", x, y))
-      elapsedTime := A_TickCount - startTime
-      
-      ; Check if the duration has passed
-      if (elapsedTime > duration) {
-        SetTimer(_ShowGuiAtMousePos, 0) ; stop
-        desktopMessageGui.Destroy()
       }
     }
   }

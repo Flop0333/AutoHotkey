@@ -18,7 +18,7 @@ Class WhatsApp extends App {
         if (A_ComputerName = "floplaptop") 
             appId := "5319275A.WhatsAppDesktop_cv1g1gvanyjgm!App"
 
-
+        DarkToolTip("Launching " this.winTitle).FollowMouse().AlignText("Center")
         try Run(appsFolderPrefix appId)
         catch  
             Info("appId for this computer not set! Set it in WhatsApp.ahk", timeout := 5000)
