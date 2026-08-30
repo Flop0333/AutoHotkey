@@ -60,13 +60,13 @@ GetDesktopsForProfile() {
         config["2"] := Desktop(desktopCounter++)
         config["3"] := Desktop(desktopCounter++)
 
-        config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",      () => WhatsApp.Launch()))
-        config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",    () => Run(Brave.ahk_exe " --new-window " Links.youtube))) 
+        config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",    () => WhatsApp.Launch()))
+        config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",    () => Browser.OpenInNewBrowser(Links.youtube))) 
         
-        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => Run(A_AppData "\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk " A_MyDocuments "\AutoHotkey",,"Max")))
+        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.openAutoHotkey()))
         config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    () => Spotify.Launch()))
         config["G"] := Desktop(desktopCounter++,   RequiredWindow("ChatGPT",    () => Run("ahk_exe ChatGPT.exe")),
-                                                    RequiredWindow("Brave",    () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Links.chatGpt)))
+                                                    RequiredWindow("Brave",    () => Browser.OpenInNewBrowser(Links.chatGpt)))
         
         config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.Launch()))
         config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      () => Notion.Launch()))

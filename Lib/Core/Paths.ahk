@@ -1,6 +1,7 @@
 Class Paths {
 
 	static autohotkey 	:= Paths._ResolveBasePath()
+	static personalOS 	:= A_MyDocuments "\Personal OS"
 
 	static appsIntegrated	:= this.autohotkey "\Apps Integrated"
 	static appsStandalone	:= this.autohotkey "\Apps Standalone"

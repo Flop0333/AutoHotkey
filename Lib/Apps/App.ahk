@@ -15,15 +15,18 @@ Class App {
         if this.IsRunning() {
             try this.Activate()
             catch {
-                Run(this.ahk_exe)
+                RunWait(this.ahk_exe)
+                this.Maximize()
             }
             return
         }
-
+        
         if this.ahk_exe {
-            Run(this.ahk_exe)
+            RunWait(this.ahk_exe)
+            this.Maximize()
             return
         }
-        Run(this.path)
+        RunWait(this.path)
+        this.Maximize()
     }
 }
