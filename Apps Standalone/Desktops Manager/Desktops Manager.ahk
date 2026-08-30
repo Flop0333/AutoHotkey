@@ -78,19 +78,12 @@ GetDesktopsForProfile() {
 ; ===== HOTKEY CONFIGURATION =====
 desktops := GetDesktopsForProfile()
 
-; On devbox, use Alt instead of Capslock for switching
-if ProfileManager.Is(Profiles.work) {
-    for key, desktopObj in desktops
-        Hotkey("Alt & " . key, ((d) => (*) => HandleSwitch(d))(desktopObj))
-}
-else {
-    for key, desktopObj in desktops
-        Capslock.Hotkey(key, ((d) => (*) => HandleSwitch(d))(desktopObj))
+for key, desktopObj in desktops
+    Capslock.Hotkey(key, ((d) => (*) => HandleSwitch(d))(desktopObj))
 
-    ; Foreward & Backward
-    Capslock.Hotkey("Tab", (*) => DesktopsDDL.GoToPrevious())
-    Capslock.Hotkey("P", (*) => DesktopsDDL.TogglePin())
-}
+; Foreward & Backward
+Capslock.Hotkey("Tab", (*) => DesktopsDDL.GoToPrevious())
+Capslock.Hotkey("P", (*) => DesktopsDDL.TogglePin())
 
 ; ===== HELPER FUNCTIONS =====
 global onLeaveAction := ""

@@ -42,16 +42,6 @@
 ; ================================
 ; Profile-specific Hotkeys
 ; ================================
-#HotIf ProfileManager.Is(Profiles.woonkamerLaptops)
-~LButton & N:: Notion.OpenPage(NotionPages.shitFixen)
-~LButton & S:: Spotify.StartPlaylist(Playlist.goodMorningJazz)
-~LButton & F:: OpenFinancien()
-~LButton & C:: OpenCalendar()
-~LButton & A:: OpenAI()
-~LButton & W:: OpenWeer()
-~LButton & M:: OpenGoogleMaps()
-
-
 #HotIf ProfileManager.Is(Profiles.work)
 CapsLock.Hotkey("D", (*) => KeePass.InsertMainPassword())
 CapsLock.Hotkey("!D", (*) => KeePass.InsertSecondaryPassword())
