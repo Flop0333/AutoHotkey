@@ -4,10 +4,10 @@
 
 1. **Clone the repository** to any folder you want
 
-2. **Configure Secrets** (Required)
-   - Navigate to `Secrets/`
-   - Copy `Secrets Example.ahk` → `Secrets.ahk`
-   - Fill in your personal values (optional)
+2. **Configure Secrets** (Optional)
+   - `Secrets/My Secrets.json` is created automatically on first run
+   - Fill in your personal values, or let the app prompt for them when needed
+   - Secrets removed from the catalog are moved to the local `Secrets/Removed Secrets.json` archive
 
 3. **Run the startup script**
    ```
@@ -40,7 +40,8 @@ Review and customize these files before use:
 **Scripts not working?**
 - Ensure AutoHotkey v2 is installed
 - Check file paths match the expected Documents location
-- Verify `Secrets.ahk` exists in `Secrets/`
+- Missing keys in `My Secrets.json` are restored with an empty value
+- Invalid JSON is reported and left untouched so existing secret data is not overwritten
 
 **Need Help?**
 - Open an issue or reach out directly

@@ -4,9 +4,8 @@
 ;
 ; [SETUP]
 ;   1. Include a link to this file in your Startup folder or run it standalone
-;   2. Before running make sure to update the Secrets.ahk file by copying the 
-;       Secrets Example.ahk. This is because the Secrets.ahk are not tracked 
-;       by Git, so after cloning this repo the file does not exist yet.
+;   2. Secrets/My Secrets.json is created and synchronized automatically. The file
+;       is not tracked; missing values safely resolve to an empty string.
 ; 
 ; [FEATURES]
 ;   - Manually set profile on startup (or auto-detect based on computer name)
@@ -19,6 +18,8 @@
 #Include Startup Menu Tray.ahk
 
 RunStartup(profile?) {
+    SecretsFileManager.Initialize()
+
     IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetByComputerName()
     StartupMessage()
     StartupMenuTray()
