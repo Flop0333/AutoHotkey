@@ -9,10 +9,14 @@
  * Consumers should invoke actions only through Invoke(), never Execute.Call().
  */
 class ActionRegistry {
+    /** Process-local definitions; every separately running AHK script has its own registry. */
     static _actions := Map()
+    /** Trusted source of the active profile used by policy checks. */
     static _profileProvider := (*) => ""
+    /** Injectable prompt keeps confirmation testable and UI-independent. */
     static _confirmationProvider := (message, title, options) => MsgBox(message, title, options)
 
+    /** Adds one definition and rejects duplicate IDs regardless of casing. */
     static Register(definition) {
         if Type(definition) != "Action"
             throw TypeError("ActionRegistry.Register expects an Action")
@@ -24,6 +28,7 @@ class ActionRegistry {
         return definition
     }
 
+    /** Atomically registers a batch and rolls it all back when one item fails. */
     static RegisterAll(actions, source := "unknown module") {
         if !(actions is Array)
             throw TypeError("ActionRegistry.RegisterAll expects an Array")
@@ -42,8 +47,10 @@ class ActionRegistry {
         return actions
     }
 
+    /** Checks whether an ID is registered in this process. */
     static Has(id) => this._actions.Has(this._NormalizeId(id))
 
+    /** Returns a definition or throws when its ID is unknown. */
     static Get(id) {
         id := this._NormalizeId(id)
         if !this._actions.Has(id)
@@ -51,8 +58,10 @@ class ActionRegistry {
         return this._actions[id]
     }
 
+    /** Returns a definition, or an empty string when its ID is unknown. */
     static TryGet(id) => this._actions.Get(this._NormalizeId(id), "")
 
+    /** Lists definitions with optional profile, availability, category, state, or tag filters. */
     static GetAll(filters := unset) {
         filters := IsSet(filters) ? filters : {}
         results := []
@@ -62,6 +71,7 @@ class ActionRegistry {
         return results
     }
 
+    /** Searches presentation metadata while honoring optional GetAll() filters. */
     static Search(query, filters := unset) {
         query := StrLower(Trim(query))
         results := []
@@ -111,6 +121,7 @@ class ActionRegistry {
         return results
     }
 
+    /** Enforces every policy, executes once, and always returns an ActionResult. */
     static Invoke(id, argument := unset, context := unset) {
         startedAt := A_TickCount
         id := this._NormalizeId(id)
@@ -150,6 +161,7 @@ class ActionRegistry {
         }
     }
 
+    /** Safely evaluates a definition's runtime availability predicate. */
     static IsAvailable(actionOrId) {
         definition := Type(actionOrId) = "Action" ? actionOrId : this.Get(actionOrId)
         try return !!definition.IsAvailable.Call()
@@ -157,6 +169,7 @@ class ActionRegistry {
             return false
     }
 
+    /** Applies profile restrictions; restricted actions fail closed without a profile. */
     static IsEligible(actionOrId, profile := "") {
         definition := Type(actionOrId) = "Action" ? actionOrId : this.Get(actionOrId)
         allowedProfiles := definition.Profiles
@@ -174,6 +187,7 @@ class ActionRegistry {
         return false
     }
 
+    /** Reads toggle state with profile, availability, error, and logging safeguards. */
     static TryGetState(id, context := unset) {
         startedAt := A_TickCount
         id := this._NormalizeId(id)
@@ -199,6 +213,7 @@ class ActionRegistry {
         }
     }
 
+    /** Convenience API for trusted callers that prefer an exception to an ActionResult. */
     static GetState(id, context := unset) {
         result := this.TryGetState(id, IsSet(context) ? context : ActionContext("state"))
         if !result.Succeeded
@@ -206,6 +221,7 @@ class ActionRegistry {
         return result.value
     }
 
+    /** Reports consumer IDs missing from the live process registry. */
     static ValidateReferences(ids) {
         errors := []
         for id in ids
@@ -237,6 +253,7 @@ class ActionRegistry {
         return issues
     }
 
+    /** Formats Diagnose() output for a tray dialog or developer message. */
     static FormatDiagnostics() {
         issues := this.Diagnose()
         if issues.Length = 0
@@ -248,27 +265,33 @@ class ActionRegistry {
         return report
     }
 
+    /** Clears definitions, mainly for tests; configured providers remain intact. */
     static Reset() => this._actions.Clear()
 
+    /** Sets the sole authoritative source used for profile eligibility. */
     static SetProfileProvider(provider) {
         if !HasMethod(provider, "Call")
             throw TypeError("ActionRegistry profile provider must be callable")
         this._profileProvider := provider
     }
+    /** Injects confirmation UI or a deterministic test double. */
     static SetConfirmationProvider(provider) {
         if !HasMethod(provider, "Call")
             throw TypeError("ActionRegistry confirmation provider must be callable")
         this._confirmationProvider := provider
     }
+    /** Number of definitions registered in the current process. */
     static Count {
         get => this._actions.Count
     }
 
+    /** Finalizes results through the bounded, metadata-only action log. */
     static _Complete(result, context) {
         ActionLog.Record(result.actionId, context.consumer, result.status, result.durationMs)
         return result
     }
 
+    /** Shared filter implementation used by listing and search. */
     static _MatchesFilters(definition, filters) {
         if filters.HasOwnProp("profile") && !this.IsEligible(definition, filters.profile)
             return false
@@ -291,6 +314,7 @@ class ActionRegistry {
         return true
     }
 
+    /** Makes lookup case-insensitive and rejects empty IDs at the boundary. */
     static _NormalizeId(id) {
         id := StrLower(Trim(id))
         if id = ""

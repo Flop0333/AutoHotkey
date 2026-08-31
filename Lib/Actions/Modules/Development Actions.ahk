@@ -1,6 +1,9 @@
 #Requires AutoHotkey v2
 
-/** Canonical definitions for reusable development workflow actions. */
+/**
+ * Canonical metadata factories for reusable development workflow actions.
+ * The registering script injects implementations that depend on its available tools.
+ */
 class DevelopmentActions {
     static StatusMeme(execute) => Action(ActionIds.Development.StatusMemeShow, "Status Code Memes", execute, {
         description: "Show the image for an HTTP status code", category: "Development", icon: "Dog",

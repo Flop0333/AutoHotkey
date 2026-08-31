@@ -1,6 +1,9 @@
 #Requires AutoHotkey v2
 
-/** Canonical definitions for system-level actions used by multiple consumers. */
+/**
+ * Canonical metadata and safety policies for shared system-level actions.
+ * Callers inject implementations because lifecycle behavior depends on the entry point.
+ */
 class SystemActions {
     static CapsLockOff(execute) => Action(ActionIds.System.CapsLockOff, "Turn Caps Lock Off", execute, {
         description: "Ensure Caps Lock is turned off", category: "System"

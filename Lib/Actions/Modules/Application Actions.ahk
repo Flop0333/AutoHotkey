@@ -1,6 +1,9 @@
 #Requires AutoHotkey v2
 
-/** Canonical action definitions for application behaviors shared by consumers. */
+/**
+ * Canonical metadata factories for application behavior shared by consumers.
+ * Most implementations are injected; tiny dependency-free Send actions stay inline.
+ */
 class ApplicationActions {
     static NotionSidebarToggle(execute) => Action(ActionIds.Application.NotionSidebarToggle, "Toggle Notion Sidebar", execute, {category: "Notion"})
     static TeamsMicrophoneToggle(execute) => Action(ActionIds.Application.TeamsMicrophoneToggle, "Mute or Unmute Teams", execute, {category: "Teams"})

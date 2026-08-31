@@ -1,6 +1,9 @@
 #Requires AutoHotkey v2
 
-/** Canonical definitions for reusable productivity, writing, and media actions. */
+/**
+ * Canonical metadata factories for reusable productivity, writing, and media actions.
+ * execute changes behavior; getState is supplied only for toggle-style actions.
+ */
 class ProductivityActions {
     static Timer(execute) => Action(ActionIds.Productivity.TimerStart, "Timer", execute, {
         description: "Start a focus timer for a number of minutes", category: "Productivity", icon: "Timer",

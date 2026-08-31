@@ -8,12 +8,13 @@
  * Consumer-specific bindings and layout do not belong in this model.
  *
  * Example:
- *   Action("timer.start", "Start Timer", StartTimer, {
+ *   Action(ActionIds.Productivity.TimerStart, "Start Timer", StartTimer, {
  *       category: "Productivity",
  *       argument: ActionArgument.Required("Minutes")
  *   })
  */
 class Action {
+    /** Validates and freezes the action contract supplied by a definition factory. */
     __New(id, title, execute, options := unset) {
         id := StrLower(Trim(id))
         title := Trim(title)
@@ -50,51 +51,67 @@ class Action {
             throw TypeError("Action '" id "' confirmation must be an ActionConfirmation")
     }
 
+    /** Stable machine-facing identifier; consumers should use the matching ActionIds constant. */
     Id {
         get => this._id
     }
+    /** Human-facing name used by dashboards, menus, and diagnostics. */
     Title {
         get => this._title
     }
+    /** Callable implementation; invoke it through ActionRegistry, never directly. */
     Execute {
         get => this._execute
     }
+    /** Optional longer explanation for discovery UIs and tooltips. */
     Description {
         get => this._description
     }
+    /** Optional presentation grouping used by search and filters. */
     Category {
         get => this._category
     }
+    /** Optional consumer-neutral icon name or path. */
     Icon {
         get => this._icon
     }
+    /** Alternative search terms; a clone prevents callers mutating the definition. */
     Aliases {
         get => this._aliases.Clone()
     }
+    /** Profiles allowed to use this action; an empty list means all profiles. */
     Profiles {
         get => this._profiles.Clone()
     }
+    /** Search and policy labels such as "sensitive". */
     Tags {
         get => this._tags.Clone()
     }
+    /** Describes whether Invoke() accepts or requires one argument. */
     Argument {
         get => this._argument
     }
+    /** Runtime predicate for dependencies such as a running application. */
     IsAvailable {
         get => this._isAvailable
     }
+    /** Optional state reader for toggle-style actions. */
     GetState {
         get => this._getState
     }
+    /** Central confirmation policy applied before execution. */
     Confirmation {
         get => this._confirmation
     }
+    /** An action is state-aware when it supplies a state reader. */
     IsToggle {
         get => this._getState != ""
     }
 
+    /** Reads an optional named field without requiring every caller to build a full options object. */
     _Option(options, name, defaultValue) => options.HasOwnProp(name) ? options.%name% : defaultValue
 
+    /** Defensively copies array metadata so an Action stays read-only by convention. */
     _CloneList(value, fieldName) {
         if value is Array
             return value.Clone()

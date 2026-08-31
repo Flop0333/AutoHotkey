@@ -1,6 +1,9 @@
 #Requires AutoHotkey v2
 
-/** Canonical action definitions for window, monitor, and desktop controls. */
+/**
+ * Canonical metadata factories for window, monitor, and desktop controls.
+ * Each factory receives the callable owned by the script that registers it.
+ */
 class WindowActions {
     static DragUnderMouse(execute) => Action(ActionIds.Window.DragUnderMouse, "Drag Window", execute, {category: "Window"})
     static ResizeUnderMouse(execute) => Action(ActionIds.Window.ResizeUnderMouse, "Resize Window", execute, {category: "Window"})

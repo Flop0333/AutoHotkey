@@ -2,6 +2,7 @@
 
 /** Stable action identifiers used by AutoHotkey source code. */
 class ActionIds {
+    /** IDs for registry diagnostics, lifecycle, and machine-level behavior. */
     class System {
         static RegistryDiagnostics := "system.action-registry-diagnostics"
         static CapsLockOff := "system.caps-lock.off"
@@ -10,6 +11,7 @@ class ActionIds {
         static Shutdown := "system.shutdown"
     }
 
+    /** IDs for manipulating ordinary application windows. */
     class Window {
         static DragUnderMouse := "window.drag-under-mouse"
         static ResizeUnderMouse := "window.resize-under-mouse"
@@ -21,11 +23,13 @@ class ActionIds {
         static MinimizeUnderMouse := "window.minimize-under-mouse"
     }
 
+    /** IDs for virtual-desktop behavior. */
     class Desktop {
         static Previous := "desktop.previous"
         static TogglePinWindow := "desktop.pin-window.toggle"
     }
 
+    /** IDs for timers, screen capture, and focused-work tools. */
     class Productivity {
         static TimerStart := "productivity.timer.start"
         static FakeWorkStart := "productivity.fake-work-mode.start"
@@ -36,14 +40,17 @@ class ActionIds {
         static ScreenSnipSave := "productivity.screen-snip.save"
     }
 
+    /** IDs for media behavior that is not tied to one application. */
     class Media {
         static PictureInPictureStart := "media.picture-in-picture.start"
     }
 
+    /** IDs for text and writing assistance. */
     class Writing {
         static SpellCheckerToggle := "writing.spell-checker.toggle"
     }
 
+    /** IDs for development workflow tools. */
     class Development {
         static CommandStorerOpen := "development.command-storer.open"
         static PbiReformatStart := "development.pbi-reformat.start"
@@ -51,10 +58,12 @@ class ActionIds {
         static StatusMemeShow := "development.status-meme.show"
     }
 
+    /** IDs that open or control suite-owned user interfaces. */
     class Ui {
         static AgeOfEfficiencyOpen := "ui.age-of-efficiency.open"
     }
 
+    /** IDs associated with a particular external application or website. */
     class Application {
         static BrowserCloseAll := "browser.close-all"
         static CalendarOpen := "calendar.open"
@@ -82,6 +91,7 @@ class ActionIds {
         static VsCodeSecondaryAction := "vscode.project-action.secondary"
     }
 
+    /** Non-production examples used to demonstrate registry integration. */
     class Demo {
         static Pizza := "demo.pizza"
     }
