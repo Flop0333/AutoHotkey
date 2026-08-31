@@ -31,7 +31,11 @@ Class MacroBoard extends WebViewToo {
 		WindowPositionTracker(this.Gui, this.settingsService)
 	}
 
-	Show() => super.Show(this.showOptions, MacroBoard.WIN_TITLE)
+	Show() {
+		super.Show(this.showOptions, MacroBoard.WIN_TITLE)
+		; Refresh state changed by hotkeys or other consumers while the board was hidden.
+		try this.ExecuteScript("window.macroBoardButtons?.refreshStates();")
+	}
 	
 	; Keep the GUI at the bottom persistently by re-applying Z-order periodically.
 	PlaceOnBottom() {

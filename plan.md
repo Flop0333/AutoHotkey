@@ -107,31 +107,31 @@ Consumer-specific information must not be placed in the core action unless it is
 - [x] Define confirmation levels for normal, sensitive, and destructive actions.
 - [x] Mark current destructive actions, including PC shutdown, closing all browsers, and killing all AHK processes, with an appropriate confirmation policy.
 - [x] Add a central error-reporting path that does not expose secret values or argument contents by default.
-- [ ] Add lightweight invocation logging containing timestamp, action ID, consumer, status, and duration.
-- [ ] Make logging optional and bounded so it cannot grow indefinitely.
-- [ ] Add a development-only registry diagnostic that lists duplicate IDs, missing callables, invalid profiles, broken state getters, and unavailable icon references where practical.
+- [x] Add lightweight invocation logging containing timestamp, action ID, consumer, status, and duration.
+- [x] Make logging optional and bounded so it cannot grow indefinitely.
+- [x] Add a development-only registry diagnostic that lists duplicate IDs, missing callables, invalid profiles, broken state getters, and unavailable icon references where practical.
 
 ### 5. Define Action Modules
 
 - [x] Create a clear folder and naming convention for action-registration modules.
-- [ ] Register system actions such as reload startup, shutdown, Caps Lock off, and kill AHK processes.
-- [ ] Register productivity actions such as timer, fake work mode, screen/OCR-related actions, and picture-in-picture.
-- [ ] Register application actions for Notion, Spotify, browsers, KeePass, VS Code, Teams, WhatsApp, and other existing app adapters that are currently exposed to users.
-- [ ] Register development actions such as PBI reformat, status-code memes, remote desktop, and command-storage access.
+- [x] Register system actions such as reload startup, shutdown, Caps Lock off, and kill AHK processes.
+- [x] Register productivity actions such as timer, fake work mode, screen/OCR-related actions, and picture-in-picture.
+- [x] Register application actions for Notion, Spotify, browsers, KeePass, VS Code, Teams, WhatsApp, and other existing app adapters that are currently exposed to users.
+- [x] Register development actions such as PBI reformat, status-code memes, remote desktop, and command-storage access.
 - [x] Register window and virtual-desktop actions that are appropriate for reuse across multiple consumers.
 - [x] Keep private URLs, credentials, email addresses, and machine-specific values in the Secrets/Profile/Paths layers rather than action metadata.
 - [x] Ensure action modules do not create UIs, bind hotkeys, or execute actions merely because they were included.
 
 ### 6. Age of Efficiency Migration
 
-- [ ] Add an Age of Efficiency adapter that converts eligible registered actions into its command-preview representation.
+- [x] Add an Age of Efficiency adapter that converts eligible registered actions into its command-preview representation.
 - [x] Replace dynamic `%app.action%()` execution with registry invocation by stable action ID.
 - [x] Migrate existing app records to action IDs while preserving user-facing commands, titles, categories, icons, and argument prompts.
 - [x] Decide whether Age of Efficiency action presentation remains JSON-configurable or is generated entirely from registry metadata; document and implement the chosen ownership boundary.
 - [x] Preserve bookmark and internet-search execution while making collision handling deterministic and visible to the user.
-- [ ] Show unavailable or profile-ineligible actions consistently, either filtered out or visibly disabled according to a documented rule.
+- [x] Show unavailable or profile-ineligible actions consistently, either filtered out or visibly disabled according to a documented rule.
 - [x] Surface registry validation and execution failures through the existing UI without raw exception dialogs.
-- [ ] Remove obsolete action-name strings and wrappers only after every existing command has a registry equivalent.
+- [x] Remove obsolete action-name strings and wrappers only after every existing command has a registry equivalent.
 
 ### 7. Macro Board Migration
 
@@ -140,7 +140,7 @@ Consumer-specific information must not be placed in the core action unless it is
 - [x] Preserve profile-specific button sets, ordering, layout, and saved window settings.
 - [x] Route all button execution through registry invocation.
 - [x] Display unavailable and failed actions consistently without freezing or closing the WebView.
-- [ ] Refresh toggle state after execution and when the board is shown.
+- [x] Refresh toggle state after execution and when the board is shown.
 - [x] Remove the old direct-function button path after all current buttons have migrated and passed regression checks.
 
 ### 8. Hotkey and Gesture Migration
@@ -156,30 +156,30 @@ Consumer-specific information must not be placed in the core action unless it is
 ### 9. Tray and Other Consumers
 
 - [x] Route reusable Startup tray actions through the registry while retaining profile-switch menu construction in the tray consumer.
-- [ ] Provide a documented adapter pattern that future consumers can follow without depending on Age of Efficiency or Macro Board internals.
-- [ ] Add one minimal example consumer in documentation showing lookup, discovery, state reading, and invocation.
-- [ ] Confirm that future voice, phone, or AI consumers can enumerate safe actions without automatically gaining permission to invoke sensitive or destructive actions.
+- [x] Provide a documented adapter pattern that future consumers can follow without depending on Age of Efficiency or Macro Board internals.
+- [x] Add one minimal example consumer in documentation showing lookup, discovery, state reading, and invocation.
+- [x] Confirm that future voice, phone, or AI consumers can enumerate safe actions without automatically gaining permission to invoke sensitive or destructive actions.
 
 ### 10. Compatibility and Cleanup
 
-- [ ] Remove duplicated action metadata only after the final consumer using it has migrated.
-- [ ] Remove obsolete wrapper functions that add no behavior beyond forwarding to the canonical callable.
+- [x] Remove duplicated action metadata only after the final consumer using it has migrated.
+- [x] Remove obsolete wrapper functions that add no behavior beyond forwarding to the canonical callable.
 - [x] Remove string-based dynamic function invocation from migrated paths.
 - [x] Update includes so action modules and registry initialization cannot cause circular dependencies.
 - [ ] Confirm startup still works for Work, Dev Box, Woonkamer Laptops, and Default profiles when optional applications or secrets are absent.
-- [ ] Update README architecture and customization sections to explain how to add an action and expose it in each consumer.
-- [ ] Add a migration note explaining renamed IDs, changed command aliases, and intentional behavior changes.
+- [x] Update README architecture and customization sections to explain how to add an action and expose it in each consumer.
+- [x] Add a migration note explaining renamed IDs, changed command aliases, and intentional behavior changes.
 
 ### 11. Verification
 
 - [x] Add automated or scriptable checks for action construction, duplicate registration, lookup, filtering, required arguments, profile eligibility, availability, confirmation, cancellation, state reading, exception handling, and structured results.
 - [x] Add a registry validation command that can run without launching all dashboards or executing registered actions.
-- [ ] Verify every action ID referenced by a consumer exists.
+- [x] Verify every action ID referenced by a consumer exists.
 - [ ] Verify every existing Age of Efficiency app command still invokes the intended behavior or has a documented replacement.
 - [ ] Verify every existing Macro Board button still renders and invokes the intended behavior for each profile.
 - [ ] Verify migrated hotkeys and gestures invoke exactly once and honor their original context conditions.
 - [ ] Verify destructive actions cannot run from any consumer without satisfying their confirmation policy.
-- [ ] Verify secrets and sensitive arguments are absent from logs, diagnostics, and registry enumeration.
+- [x] Verify secrets and sensitive arguments are absent from logs, diagnostics, and registry enumeration.
 - [ ] Perform a clean-start test on every available profile and record any profile that could not be tested locally.
 - [ ] Perform an extended normal-use test covering startup, profile switching, dashboard reopening, script reloads, and action failures.
 
@@ -212,7 +212,7 @@ The implementation is fully complete only when all statements below are true.
 
 - [x] Given a toggle action, when its state changes, then Macro Board can retrieve and display the new state without owning a duplicate state function.
 - [ ] Given a destructive action, when invoked from Age of Efficiency, Macro Board, a hotkey, a gesture, or a future adapter, then the same registry confirmation policy applies.
-- [ ] Given a sensitive argument or secret-backed action, when it executes or fails, then logs and diagnostics do not contain the secret value.
+- [x] Given a sensitive argument or secret-backed action, when it executes or fails, then logs and diagnostics do not contain the secret value.
 - [ ] Given a consumer attempts to bypass profile, availability, or confirmation checks, when it invokes through the public registry API, then the registry still enforces those checks.
 
 ### Consumer Consistency
@@ -233,16 +233,16 @@ The implementation is fully complete only when all statements below are true.
 
 - [ ] Every implementation task in this file is checked or explicitly moved to a documented later scope with a reason.
 - [ ] Every acceptance statement passes, with manual-only checks identified as such.
-- [ ] All current action consumers use stable action IDs for migrated behavior.
-- [ ] No migrated consumer directly invokes an action callable or dynamically invokes a function-name string.
-- [ ] Registry validation completes without duplicate IDs, missing consumer references, or invalid metadata.
-- [ ] Documentation contains one clear path for adding a new action and exposing it through each supported consumer.
-- [ ] The repository contains no newly introduced secrets, personal values, or machine-specific absolute paths.
+- [x] All current action consumers use stable action IDs for migrated behavior.
+- [x] No migrated consumer directly invokes an action callable or dynamically invokes a function-name string.
+- [x] Registry validation completes without duplicate IDs, missing consumer references, or invalid metadata.
+- [x] Documentation contains one clear path for adding a new action and exposing it through each supported consumer.
+- [x] The repository contains no newly introduced secrets, personal values, or machine-specific absolute paths.
 - [ ] The implementation has completed a clean-start and normal-use regression test without critical failures.
 
 ## Current Implementation Checkpoint (2026-08-30)
 
-Work is intentionally paused here in a runnable, reviewable state. The checkboxes above remain the authoritative record of overall completion.
+This checkpoint was resumed on 2026-08-31. The checkboxes above remain the authoritative record of overall completion.
 
 ### Completed in This Implementation Pass
 
@@ -264,14 +264,11 @@ These bindings are not unfinished migrations unless their reuse requirements cha
 
 ### Recommended Resume Point
 
-Resume with the unchecked tasks in sections 5 through 11, in this order:
+The cleanup phase was completed on 2026-08-31. Behavior-free forwarding aliases and obsolete callable-name examples were removed; consumer-owned presentation overrides were retained intentionally. Continue with the remaining verification work in sections 10 and 11:
 
-1. Add bounded, secret-safe logging and a user-facing registry diagnostics command.
-2. Finish the Age of Efficiency adapter and its unavailable/profile-ineligible presentation rule.
-3. Refresh Macro Board toggle state whenever the board is shown.
-4. Register the remaining genuinely reusable system, productivity, application, and development actions.
-5. Add the documented adapter example and update README/migration documentation.
-6. Run manual clean-start and normal-use regression checks for every available profile.
+1. Run manual clean-start and normal-use regression checks for every available profile.
+2. Verify dashboard commands, buttons, hotkeys, gestures, confirmations, and optional-app failure behavior interactively.
+3. Record any optional applications or profiles that cannot be tested on the current machine.
 
 ### How to Validate Before Continuing
 

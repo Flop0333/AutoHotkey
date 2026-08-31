@@ -43,6 +43,16 @@ I'm excited to show my AutoHotkey v2 workflow system that I've been building! It
 
 **Apps Standalone** - Independent utilities that can run separately (Window Manager, Command Storer, etc.) 
 
+### Action Registry
+
+Reusable behavior is identified by stable action IDs and registered through the central Action Registry. Dashboards, hotkeys, gestures, tray menus, and desktop layouts reference those IDs instead of directly calling each other's functions. The registry consistently applies profile rules, availability, arguments, confirmations, state reading, safe failure handling, and bounded metadata-only logging.
+
+Canonical definitions live in `Lib/Actions/Modules`. These files are inert factories: including one does not execute an action or create a consumer. The application that owns the real callable registers the definition and its interfaces reference the stable ID.
+
+To add or expose an action, follow the [Action Registry Guide](docs/Action%20Registry%20Guide.md). Existing ID changes and intentional compatibility differences are recorded in the [migration notes](docs/Action%20Registry%20Migration.md).
+
+For validation, run `Tests/RunRegistryTests.ahk`, `Tests/ValidateActionReferences.ps1`, and the applicable `Tests/Compile*.ahk` harness.
+
 
 ## 💭 Philosophy
 Every component is modular, following OOP/SOLID principles and build with care for maximum flexibility and maintainability.

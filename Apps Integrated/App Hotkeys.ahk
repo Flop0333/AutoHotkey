@@ -2,6 +2,7 @@
 #NoTrayIcon
 #Include ..\Lib\Core.ahk
 #Include Actions\App Hotkey Actions.ahk
+#Include ..\Lib\Actions\Modules\Application Actions.ahk
 
 AppHotkeyActions.Register()
 

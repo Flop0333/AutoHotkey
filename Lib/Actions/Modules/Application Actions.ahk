@@ -2,6 +2,27 @@
 
 /** Canonical action definitions for application behaviors shared by consumers. */
 class ApplicationActions {
+    static NotionSidebarToggle(execute) => Action("notion.sidebar.toggle", "Toggle Notion Sidebar", execute, {category: "Notion"})
+    static TeamsMicrophoneToggle(execute) => Action("teams.microphone.toggle", "Mute or Unmute Teams", execute, {category: "Teams"})
+    static VsCodePrimaryAction(execute) => Action("vscode.project-action.primary", "Run Primary Project Action", execute, {category: "VS Code"})
+    static VsCodeSecondaryAction(execute) => Action("vscode.project-action.secondary", "Run Secondary Project Action", execute, {category: "VS Code"})
+    static WhatsAppLaunch(execute, isAvailable := unset) => Action("whatsapp.open", "WhatsApp", execute, {
+        description: "Open or activate WhatsApp", category: "Communication",
+        profiles: ["Woonkamer Laptops"], isAvailable: IsSet(isAvailable) ? isAvailable : (*) => true
+    })
+    static SpotifyLaunch(execute) => Action("spotify.open", "Spotify", execute, {
+        description: "Open or activate Spotify", category: "Media", profiles: ["Woonkamer Laptops"]
+    })
+    static NotionLaunch(execute) => Action("notion.open", "Notion", execute, {
+        description: "Open or activate Notion", category: "Notion", profiles: ["Woonkamer Laptops"]
+    })
+    static VsCodeLaunch(execute) => Action("vscode.open", "Visual Studio Code", execute, {
+        description: "Open or activate Visual Studio Code", category: "VS Code", profiles: ["Woonkamer Laptops"]
+    })
+    static VsCodeAutoHotkey(execute) => Action("vscode.autohotkey.open", "Open AutoHotkey in VS Code", execute, {
+        description: "Open this AutoHotkey workspace in Visual Studio Code", category: "VS Code", profiles: ["Woonkamer Laptops"]
+    })
+
     static VsCodeZoomIn() => Action("vscode.zoom-in", "Zoom In", (*) => Send("{Ctrl Down}{+}{Ctrl Up}"), {
         category: "VS Code", isAvailable: (*) => WinExist("ahk_exe Code.exe")
     })

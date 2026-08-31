@@ -43,7 +43,7 @@ Class CommandExecutor {
     }
     
     static _TryMethod() {
-        if !(app := AppsState.GetByCommandOrTitle(this._command))
+        if !(app := AppsState.GetEligibleByCommandOrTitle(this._command))
             return false
 
         if !ActionRegistry.Has(app.actionId) {

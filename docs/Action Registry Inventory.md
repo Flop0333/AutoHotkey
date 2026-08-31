@@ -21,7 +21,7 @@ Usage history is excluded from version one. The registry does not persist argume
 
 Command collisions are resolved by input shape: `y` and `Maps` without an argument open their bookmarks; `y <query>` and `Maps <query>` invoke their search engines.
 
-Age of Efficiency presentation remains JSON-configurable. Its app records own the command alias and can override presentation fields, while `actionId` points to the authoritative executable behavior and safety policy.
+Age of Efficiency presentation remains JSON-configurable. Its app records own the command alias and can override presentation fields, while `actionId` points to the authoritative executable behavior and safety policy. Normal launcher and dashboard views filter out missing, profile-ineligible, and unavailable registry actions; the persisted JSON is not deleted or rewritten when an action is filtered.
 
 ## Macro Board
 
@@ -55,6 +55,8 @@ Macro Board continues to own button order, profile pages, window state, and opti
 - Notion sidebar, Teams mute, and VS Code primary/secondary app shortcuts.
 - Window drag, resize, close, and always-on-top controls.
 - Previous-desktop and pin-window-to-desktops controls.
+- Screen Snipper capture-and-copy, copy-only, save-only, and OCR modes.
+- Desktop Manager application launch callbacks for WhatsApp, Spotify, Notion, and VS Code.
 
 The earlier Woonkamer mouse-chord shortcuts were no longer present when this phase began and were not reintroduced.
 
@@ -75,7 +77,7 @@ The earlier Woonkamer mouse-chord shortcuts were no longer present when this pha
 
 - Text Speaker arrow keys are modal controls that only exist while its speaking UI is active.
 - Mouse Toys wheel swaps and media-volume chords are raw input remaps rather than discoverable commands.
-- Individual virtual-desktop keys capture configured `Desktop` instances at startup; only reusable previous/pin behavior is registered.
+- Individual virtual-desktop keys still capture configured `Desktop` instances at startup. Reusable previous/pin behavior and reusable application-launch callbacks are registered; desktop layout and key ownership remain local.
 - Caps Lock service internals remain direct because they implement the modifier itself.
 
 ## Duplicate and Canonical Behaviors
@@ -85,6 +87,16 @@ The earlier Woonkamer mouse-chord shortcuts were no longer present when this pha
 - The Macro Board’s fake-work toggle and Age of Efficiency’s start-only behavior remain distinct because they have different semantics.
 - Shared Notion, Spotify, browser, calendar, maps, weather, and ChatGPT actions will be reused by hotkeys rather than redefined during hotkey migration.
 - Low-level editing/navigation remaps may remain local bindings when they are not useful to any other consumer. The migration rule will be documented before hotkey cleanup.
+
+## Canonical Definition Modules
+
+- `System Actions.ahk` owns suite lifecycle, shutdown, Caps Lock, and safe registry-diagnostic definitions.
+- `Productivity Actions.ahk` owns timer, fake-work, spell-checker, picture-in-picture, screen capture, and OCR definitions.
+- `Application Actions.ahk` owns Notion, Spotify, browser, KeePass, VS Code, Teams, WhatsApp, and shared web-app definitions.
+- `Development Actions.ahk` owns PBI reformatting, status memes, remote desktop, and Command Storer definitions.
+- `Window Actions.ahk` owns reusable window, monitor, and virtual-desktop definitions.
+
+These modules contain factories only. Including one does not launch an app, bind a key, create a UI, or register anything until a consumer explicitly supplies its callable and registers the returned action.
 
 ## Regression Baseline
 

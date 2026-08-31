@@ -1,5 +1,6 @@
 #Include AppsDatabaseService.ahk
 #Include ../BaseState.ahk
+#Include ../../Actions/Age of Efficiency Action Adapter.ahk
 
 Class AppsState extends BaseState {
 
@@ -31,6 +32,12 @@ Class AppsState extends BaseState {
     return ""
   }
 
+  static GetEligible() => AgeOfEfficiencyActionAdapter.GetEligible(this.state.allApps)
+
+  static GetEligibleByCommandOrTitle(input) => this.GetByCommandOrTitle(input, this.GetEligible())
+
+  static GetEligibleSuggestionsByCommand(inputCommand) => this.GetSuggestionsByCommand(inputCommand, this.GetEligible())
+
   static GetSuggestionsByCommand(inputCommand, array := this.state.allApps) {
     suggestions := []
     for item in array
@@ -50,6 +57,14 @@ Class AppsState extends BaseState {
   static GetCategories() {
     uniqueCategories := []
     for item in this.state.allApps
+      if !uniqueCategories.HasValue(item.category) && item.category != ""
+        uniqueCategories.Push(item.category)
+    return uniqueCategories
+  }
+
+  static GetEligibleCategories() {
+    uniqueCategories := []
+    for item in this.GetEligible()
       if !uniqueCategories.HasValue(item.category) && item.category != ""
         uniqueCategories.Push(item.category)
     return uniqueCategories

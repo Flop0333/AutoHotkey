@@ -24,6 +24,8 @@
 #Include User Interface\Controller.ahk
 #Include Input Handler\Command Input.ahk
 #Include ..\..\Lib\Actions\Modules\System Actions.ahk
+#Include ..\..\Lib\Actions\Modules\Productivity Actions.ahk
+#Include ..\..\Lib\Actions\Modules\Development Actions.ahk
 #Include Actions\Age of Efficiency Actions.ahk
 
 AgeOfEfficiencyActions.Register()

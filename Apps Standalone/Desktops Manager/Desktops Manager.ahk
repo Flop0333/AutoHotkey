@@ -25,6 +25,7 @@
 
 #Include ..\..\Lib\Core.ahk
 #Include ..\..\Lib\Actions\Modules\Window Actions.ahk
+#Include ..\..\Lib\Actions\Modules\Application Actions.ahk
 #Include Desktop.ahk
 #Include ..\..\Lib\Apps\VsCode.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
@@ -61,28 +62,33 @@ GetDesktopsForProfile() {
         config["2"] := Desktop(desktopCounter++)
         config["3"] := Desktop(desktopCounter++)
 
-        config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",    () => WhatsApp.Launch()))
+        config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",    ActionBinding.Callback("whatsapp.open", "desktop-manager")))
         config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",    () => Browser.OpenInNewBrowser(Links.youtube))) 
         
-        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.openAutoHotkey()))
-        config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    () => Spotify.Launch()))
+        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       ActionBinding.Callback("vscode.autohotkey.open", "desktop-manager")))
+        config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    ActionBinding.Callback("spotify.open", "desktop-manager")))
         config["G"] := Desktop(desktopCounter++,   RequiredWindow("ChatGPT",    () => Run("ahk_exe ChatGPT.exe")),
                                                     RequiredWindow("Brave",    () => Browser.OpenInNewBrowser(Links.chatGpt)))
         
-        config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.Launch()))
-        config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      () => Notion.Launch()))
+        config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       ActionBinding.Callback("vscode.open", "desktop-manager")))
+        config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      ActionBinding.Callback("notion.open", "desktop-manager")))
     }
     
     return config
 }
 
 ; ===== HOTKEY CONFIGURATION =====
-desktops := GetDesktopsForProfile()
-
 ActionRegistry.RegisterAll([
     WindowActions.PreviousDesktop((*) => DesktopsDDL.GoToPrevious()),
-    WindowActions.TogglePinToDesktops((*) => DesktopsDDL.TogglePin())
+    WindowActions.TogglePinToDesktops((*) => DesktopsDDL.TogglePin()),
+    ApplicationActions.WhatsAppLaunch((*) => WhatsApp.Launch()),
+    ApplicationActions.SpotifyLaunch((*) => Spotify.Launch()),
+    ApplicationActions.NotionLaunch((*) => Notion.Launch()),
+    ApplicationActions.VsCodeLaunch((*) => VsCode.Launch()),
+    ApplicationActions.VsCodeAutoHotkey((*) => VsCode.openAutoHotkey())
 ])
+
+desktops := GetDesktopsForProfile()
 
 for key, desktopObj in desktops
     Capslock.Hotkey(key, ((d) => (*) => HandleSwitch(d))(desktopObj))

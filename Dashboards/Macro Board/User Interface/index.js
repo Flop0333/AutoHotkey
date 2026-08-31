@@ -1,7 +1,10 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-	new Buttons().render();
+	window.macroBoardButtons = new Buttons();
+	window.macroBoardButtons.render();
 });
+
+window.addEventListener('focus', () => window.macroBoardButtons?.refreshStates());
 
 // Disable right-click context menu
 document.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -54,6 +57,14 @@ class Buttons {
 		if (button.isToggle && newState !== undefined) {
 			this._updateToggleState(buttonElement, newState);
 		}
+	}
+
+	refreshStates() {
+		const latestButtons = AhkDataService.GetButtons();
+		latestButtons.filter(button => button.isToggle).forEach(button => {
+			const element = this.buttonsContainer.querySelector(`[data-action-id="${button.actionId}"]`);
+			if (element) this._updateToggleState(element, button.state);
+		});
 	}
 
 	_updateToggleState(buttonElement, state) {

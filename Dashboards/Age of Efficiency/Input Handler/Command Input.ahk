@@ -174,7 +174,7 @@ Class CommandsPreview extends DarkGui {
 		catch
 			isTypingArgument := false
 
-		currentAction := AppsState.GetByCommandOrTitle(currentInput)
+		currentAction := AppsState.GetEligibleByCommandOrTitle(currentInput)
 		if currentAction != "" {
 			isTypingArgumentForCommandWithArgument := isTypingArgument = true && currentAction.argumentRequired = true ; When typing the argument, don't show an actions without an argument
 			if isTypingArgument = false || isTypingArgumentForCommandWithArgument
@@ -189,7 +189,7 @@ Class CommandsPreview extends DarkGui {
 	}
 
 	_GetSuggestionsFromAllStates(currentInput := String) {
-		suggestions := AppsState.GetSuggestionsByCommand(currentInput)
+		suggestions := AppsState.GetEligibleSuggestionsByCommand(currentInput)
 
 		for bookmarkSuggestion in BookmarksState.GetSuggestionsByCommand(currentInput) 
 			suggestions.Push(bookmarkSuggestion)

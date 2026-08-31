@@ -4,27 +4,19 @@
 class MacroBoardActions {
     static Register() {
         ActionRegistry.RegisterAll([
-            Action("writing.spell-checker.toggle", "Spell Checker", ToggleSpellChecker, {
-                description: "Enable or disable automatic spelling corrections", category: "Writing",
-                icon: "spell checker.gif", getState: GetSpellCheckerState
-            }),
+            ProductivityActions.SpellCheckerToggle((*) => SpellChecker.Toggle(), (*) => SpellChecker.Enabled),
             SystemActions.KillAhkProcesses((*) => KillAllAHkProcesses(true)),
-            Action("development.command-storer.open", "Command Storer", CommandStorer_ShowMainGui, {
-                description: "Open the saved command collection", category: "Development", icon: "tetris.gif"
-            }),
-            Action("productivity.fake-work-mode.toggle", "Fake Work Mode", ToggleFakeWorkMode, {
-                description: "Enable or disable idle prevention", category: "Productivity",
-                icon: "ai.gif", getState: GetFakeWorkModeState
-            }),
+            DevelopmentActions.CommandStorer(CommandStorer_ShowMainGui),
+            ProductivityActions.FakeWorkToggle((*) => FakeWorkMode.Toggle(), (*) => FakeWorkMode.Enabled),
             SystemActions.ReloadStartup(RunStartup),
-            ApplicationActions.NotionShitFixen(OpenNotionShitFixen),
-            ApplicationActions.SpotifyGoodMorningJazz(StartSpotifyGoodMorningJazz),
+            ApplicationActions.NotionShitFixen((*) => Notion.OpenPage(NotionPages.shitFixen)),
+            ApplicationActions.SpotifyGoodMorningJazz((*) => Spotify.StartPlaylist(Playlist.goodMorningJazz)),
             ApplicationActions.Finances(OpenFinancien),
             ApplicationActions.Calendar(OpenCalendar),
             ApplicationActions.Maps(OpenGoogleMaps),
             ApplicationActions.Weather(OpenWeer),
             ApplicationActions.ChatGpt(OpenAI),
-            ApplicationActions.NotionWorkDashboard(OpenNotionVGZDashboard),
+            ApplicationActions.NotionWorkDashboard((*) => Notion.OpenPage(NotionPages.workDashboard)),
             ApplicationActions.CloseAllBrowsers(CloseAllBrowsers),
             Action("demo.pizza", "Pizza Default", (*) => MsgBox("Pizza Default"), {
                 category: "Demo", profiles: ["Default"]

@@ -13,6 +13,7 @@
 #Include Actions\Action Binding.ahk
 
 ActionRegistry.SetProfileProvider((*) => ProfileManager.current)
+ActionLog.Configure(true, 100)
 ActionBinding.SetFailureHandler((message) => Info(message))
 
 ; Extensions

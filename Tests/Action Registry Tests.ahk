@@ -25,6 +25,10 @@ Assert(condition, message) {
         throw Error("Assertion failed: " message)
 }
 
+ThrowTestSecret(value) {
+    throw Error(value)
+}
+
 class ProfileManager {
     static current := {displayName: "Default"}
 }
@@ -32,6 +36,8 @@ class ProfileManager {
 RunTests() {
 ActionRegistry.Reset()
 ActionRegistry.SetProfileProvider((*) => ProfileManager.current)
+ActionLog.Clear()
+ActionLog.Configure(true, 3)
 Checkpoint("registry reset")
 
 aliases := ["clock"]
@@ -58,6 +64,19 @@ result := ActionRegistry.Invoke("test.run", unset, ActionContext("tests", "Defau
 Assert(result.Succeeded, "Normal action succeeds")
 Assert(callCount = 1, "Action callable executes exactly once")
 Checkpoint("basic invocation passed")
+
+secretValue := "DO-NOT-LOG-THIS"
+secretFailure := Action("test.secret", "Secret Failure", ThrowTestSecret, {
+    argument: ActionArgument.Optional("Sensitive value")
+})
+ActionRegistry.Register(secretFailure)
+secretResult := ActionRegistry.Invoke("test.secret", secretValue, ActionContext("secret-test"))
+Assert(!InStr(secretResult.diagnostic, secretValue), "Exception diagnostics omit secret values")
+logEntry := ActionLog.GetEntries()[ActionLog.GetEntries().Length]
+serializedLogEntry := logEntry.timestamp "|" logEntry.actionId "|" logEntry.consumer "|" logEntry.status "|" logEntry.durationMs
+Assert(!InStr(serializedLogEntry, secretValue), "Invocation logs omit arguments and secret values")
+Assert(logEntry.consumer = "secret-test", "Invocation logs identify the consumer")
+Checkpoint("secret-safe logging passed")
 
 requiredAction := Action("test.echo", "Echo", (value) => value, {
     argument: ActionArgument.Required("Enter a value")
@@ -103,6 +122,9 @@ destructiveAction := Action("test.destructive", "Destructive", (*) => true, {
 })
 ActionRegistry.Register(destructiveAction)
 Assert(ActionRegistry.Invoke("test.destructive", unset, ActionContext("tests", "", 0, true)).Succeeded, "Pre-confirmed destructive action succeeds")
+Assert(ActionRegistry.GetDiscoverable(ActionContext("future-adapter", "Default")).Length > 0, "Safe actions are discoverable")
+Assert(!ArrayContainsAction(ActionRegistry.GetDiscoverable(ActionContext("future-adapter", "Default")), "test.destructive"), "Destructive actions are excluded from default discovery")
+Assert(ArrayContainsAction(ActionRegistry.GetDiscoverable(ActionContext("future-adapter", "Default"), {allowDestructive: true}), "test.destructive"), "Destructive discovery requires explicit opt-in")
 Checkpoint("confirmation passed")
 
 duplicateRejected := false
@@ -125,5 +147,20 @@ missing := ActionRegistry.ValidateReferences(["test.run", "test.missing"])
 Assert(missing.Length = 1, "Missing consumer references are reported")
 Checkpoint("references passed")
 
+ActionRegistry.Invoke("test.run", unset, ActionContext("log-bound-test"))
+ActionRegistry.Invoke("test.run", unset, ActionContext("log-bound-test"))
+ActionRegistry.Invoke("test.run", unset, ActionContext("log-bound-test"))
+ActionRegistry.Invoke("test.run", unset, ActionContext("log-bound-test"))
+Assert(ActionLog.GetEntries().Length = 3, "Invocation logging remains bounded")
+Assert(!InStr(ActionRegistry.FormatDiagnostics(), secretValue), "Registry diagnostics omit secret values")
+Checkpoint("bounded logging and diagnostics passed")
+
 FileAppend("Action Registry tests passed`n", "*")
+}
+
+ArrayContainsAction(actions, actionId) {
+    for definition in actions
+        if definition.Id = actionId
+            return true
+    return false
 }

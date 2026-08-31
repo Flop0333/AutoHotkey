@@ -5,8 +5,6 @@
 #Include ..\Lib\Core.ahk
 #Include ..\Lib\Core\UIA.ahk
 
-StartPictureInPicture() => PictureInPicture()
-
 PictureInPicture() {
     jsCode := "(()=>{const video=document.querySelector('video');if(video&&document.pictureInPictureEnabled){video.requestPictureInPicture();}})();"
     

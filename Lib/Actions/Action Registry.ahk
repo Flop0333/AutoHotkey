@@ -2,6 +2,7 @@
 #Include Action.ahk
 #Include Action Context.ahk
 #Include Action Result.ahk
+#Include Action Log.ahk
 
 /**
  * Authoritative in-memory registry for suite actions.
@@ -77,41 +78,76 @@ class ActionRegistry {
         return results
     }
 
+    /**
+     * Conservative discovery surface for remote, voice, or AI consumers.
+     * Sensitive/destructive definitions are excluded unless explicitly opted in.
+     */
+    static GetDiscoverable(context := unset, options := unset) {
+        context := IsSet(context) ? context : ActionContext("discovery")
+        options := IsSet(options) ? options : {}
+        allowSensitive := options.HasOwnProp("allowSensitive") && options.allowSensitive
+        allowDestructive := options.HasOwnProp("allowDestructive") && options.allowDestructive
+        activeProfile := context.profile != "" ? context.profile : this._profileProvider.Call()
+        results := []
+
+        for id, definition in this._actions {
+            if !this.IsEligible(definition, activeProfile) || !this.IsAvailable(definition)
+                continue
+            if definition.Confirmation.Level = ActionConfirmation.LEVEL_DESTRUCTIVE && !allowDestructive
+                continue
+            if definition.Confirmation.Level = ActionConfirmation.LEVEL_SENSITIVE && !allowSensitive
+                continue
+            if !allowSensitive {
+                sensitiveTagged := false
+                for tag in definition.Tags
+                    if StrLower(tag) = "sensitive" {
+                        sensitiveTagged := true
+                        break
+                    }
+                if sensitiveTagged
+                    continue
+            }
+            results.Push(definition)
+        }
+        return results
+    }
+
     static Invoke(id, argument := unset, context := unset) {
         startedAt := A_TickCount
         id := this._NormalizeId(id)
         context := IsSet(context) ? context : ActionContext()
 
         if !this._actions.Has(id)
-            return ActionResult.ValidationFailed(id, "Unknown action: " id)
+            return this._Complete(ActionResult.ValidationFailed(id, "Unknown action: " id), context)
 
         definition := this._actions[id]
         activeProfile := context.profile != "" ? context.profile : this._profileProvider.Call()
 
         if !this.IsEligible(definition, activeProfile)
-            return ActionResult.Unavailable(id, "Action is not available for the current profile")
+            return this._Complete(ActionResult.Unavailable(id, "Action is not available for the current profile"), context)
         if !this.IsAvailable(definition)
-            return ActionResult.Unavailable(id)
+            return this._Complete(ActionResult.Unavailable(id), context)
 
         if definition.Argument.IsRequired && (!IsSet(argument) || argument = "")
-            return ActionResult.ValidationFailed(id, definition.Argument.Prompt != "" ? definition.Argument.Prompt : "This action requires an argument")
+            return this._Complete(ActionResult.ValidationFailed(id, definition.Argument.Prompt != "" ? definition.Argument.Prompt : "This action requires an argument"), context)
         if !definition.Argument.AcceptsArgument && IsSet(argument) && argument != ""
-            return ActionResult.ValidationFailed(id, "This action does not accept an argument")
+            return this._Complete(ActionResult.ValidationFailed(id, "This action does not accept an argument"), context)
 
         if definition.Confirmation.IsRequired && !context.confirmationGranted {
             message := definition.Confirmation.Message != "" ? definition.Confirmation.Message : "Run '" definition.Title "'?"
             if MsgBox(message, "Confirm action", "YesNo Icon!") != "Yes"
-                return ActionResult.Cancelled(id)
+                return this._Complete(ActionResult.Cancelled(id), context)
         }
 
         try {
             value := IsSet(argument) && definition.Argument.AcceptsArgument
                 ? definition.Execute.Call(argument)
                 : definition.Execute.Call()
-            return ActionResult.Success(id, IsSet(value) ? value : "", A_TickCount - startedAt)
+            return this._Complete(ActionResult.Success(id, IsSet(value) ? value : "", A_TickCount - startedAt), context)
         } catch as executionError {
-            diagnostic := executionError.Message " | " executionError.What " | " executionError.File ":" executionError.Line
-            return ActionResult.ExecutionFailed(id, "Action '" definition.Title "' failed", diagnostic, A_TickCount - startedAt)
+            ; Exception messages can contain arguments or secret-backed values.
+            diagnostic := executionError.What " | " executionError.File ":" executionError.Line
+            return this._Complete(ActionResult.ExecutionFailed(id, "Action '" definition.Title "' failed", diagnostic, A_TickCount - startedAt), context)
         }
     }
 
@@ -152,6 +188,40 @@ class ActionRegistry {
         return errors
     }
 
+    /** Safe development diagnostics; output contains metadata only. */
+    static Diagnose() {
+        issues := []
+        for id, definition in this._actions {
+            if !HasMethod(definition.Execute, "Call")
+                issues.Push(id ": execute is not callable")
+
+            for allowedProfile in definition.Profiles
+                if !(allowedProfile is String) && !allowedProfile.HasOwnProp("displayName")
+                    issues.Push(id ": invalid profile entry")
+
+            if definition.IsToggle {
+                try definition.GetState.Call()
+                catch
+                    issues.Push(id ": state getter failed")
+            }
+
+            if definition.Icon != "" && (InStr(definition.Icon, "\\") || InStr(definition.Icon, "/")) && !FileExist(definition.Icon)
+                issues.Push(id ": icon file is unavailable")
+        }
+        return issues
+    }
+
+    static FormatDiagnostics() {
+        issues := this.Diagnose()
+        if issues.Length = 0
+            return "Action Registry: " this.Count " actions registered; no diagnostic issues found."
+
+        report := "Action Registry: " this.Count " actions registered; " issues.Length " issue(s):"
+        for issue in issues
+            report .= "`n- " issue
+        return report
+    }
+
     static Reset() => this._actions.Clear()
 
     static SetProfileProvider(provider) {
@@ -161,6 +231,11 @@ class ActionRegistry {
     }
     static Count {
         get => this._actions.Count
+    }
+
+    static _Complete(result, context) {
+        ActionLog.Record(result.actionId, context.consumer, result.status, result.durationMs)
+        return result
     }
 
     static _MatchesFilters(definition, filters) {
