@@ -9,6 +9,8 @@
 
 ## Personal Agent workflow
 
+If the request explicitly mentions error resilience, the error plan, error handling, supervision, or `Error Plan/`, use `Error Plan/AGENTS.md` and `Error Plan/tasks.md` instead of the Personal Agent workflow below. Keep the two projects independent.
+
 When asked `implement the feature`, `implement the agent`, or equivalent:
 
 1. Read `agent-plan.md` and every document it marks authoritative.
