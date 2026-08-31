@@ -56,6 +56,8 @@ returnedAliases.Push("also-mutated")
 Assert(basicAction.Id = "test.run", "IDs are normalized")
 Assert(basicAction.Aliases.Length = 1, "Action metadata is isolated from mutation")
 Assert(ActionRegistry.Get("TEST.RUN") = basicAction, "Lookup is case-insensitive")
+stableConsumerId := basicAction.Id
+Assert(stableConsumerId = "test.run" && basicAction.Title = "Run Test", "Consumer bindings remain stable independently of presentation metadata")
 Assert(ActionRegistry.Search("clock").Length = 1, "Aliases are searchable")
 Assert(ActionRegistry.GetAll({category: "tests", tag: "FAST"}).Length = 1, "Filters are case-insensitive")
 Checkpoint("definition and discovery passed")
@@ -98,6 +100,10 @@ ActionRegistry.Register(profileAction)
 Assert(!ActionRegistry.Invoke("test.work", unset, ActionContext("tests", "Default")).Succeeded, "Profile restrictions are enforced")
 Assert(!ActionRegistry.Invoke("test.work", unset, ActionContext("tests")).Succeeded, "The current profile is enforced when consumers omit it")
 Assert(ActionRegistry.Invoke("test.work", unset, ActionContext("tests", "Work")).Succeeded, "Eligible profiles can invoke")
+ProfileManager.current := {displayName: "Work"}
+Assert(ActionRegistry.GetDiscoverable(ActionContext("profile-restart")).Length > 0, "Discovery reads the active profile after a profile change")
+Assert(ArrayContainsAction(ActionRegistry.GetDiscoverable(ActionContext("profile-restart")), "test.work"), "Profile-specific discovery refreshes from the provider")
+ProfileManager.current := {displayName: "Default"}
 Checkpoint("profiles passed")
 
 unavailableAction := Action("test.unavailable", "Unavailable", (*) => true, {isAvailable: (*) => false})
@@ -117,11 +123,21 @@ ActionRegistry.Register(failureAction)
 Assert(ActionRegistry.Invoke("test.failure", unset, ActionContext("tests")).status = ActionResult.STATUS_EXECUTION_FAILED, "Exceptions become structured failures")
 Checkpoint("failure handling passed")
 
-destructiveAction := Action("test.destructive", "Destructive", (*) => true, {
+destructiveCallCount := 0
+destructiveAction := Action("test.destructive", "Destructive", (*) => ++destructiveCallCount, {
     confirmation: ActionConfirmation.Destructive("Confirm test")
 })
 ActionRegistry.Register(destructiveAction)
-Assert(ActionRegistry.Invoke("test.destructive", unset, ActionContext("tests", "", 0, true)).Succeeded, "Pre-confirmed destructive action succeeds")
+ActionRegistry.SetConfirmationProvider((*) => "No")
+for consumer in ["age-of-efficiency", "macro-board", "hotkey", "mouse-gesture", "future-adapter"]
+    Assert(ActionRegistry.Invoke("test.destructive", unset, ActionContext(consumer)).status = ActionResult.STATUS_CANCELLED, "Destructive action cancellation is consistent for " consumer)
+spoofedContext := ActionContext("untrusted-consumer")
+spoofedContext.confirmationGranted := true
+Assert(ActionRegistry.Invoke("test.destructive", unset, spoofedContext).status = ActionResult.STATUS_CANCELLED, "Consumers cannot spoof confirmation through invocation context")
+Assert(destructiveCallCount = 0, "Cancelled destructive actions never execute")
+ActionRegistry.SetConfirmationProvider((*) => "Yes")
+Assert(ActionRegistry.Invoke("test.destructive", unset, ActionContext("tests")).Succeeded, "Confirmed destructive action succeeds")
+Assert(destructiveCallCount = 1, "Confirmed destructive action executes exactly once")
 Assert(ActionRegistry.GetDiscoverable(ActionContext("future-adapter", "Default")).Length > 0, "Safe actions are discoverable")
 Assert(!ArrayContainsAction(ActionRegistry.GetDiscoverable(ActionContext("future-adapter", "Default")), "test.destructive"), "Destructive actions are excluded from default discovery")
 Assert(ArrayContainsAction(ActionRegistry.GetDiscoverable(ActionContext("future-adapter", "Default"), {allowDestructive: true}), "test.destructive"), "Destructive discovery requires explicit opt-in")
@@ -135,17 +151,28 @@ Assert(duplicateRejected, "Duplicate IDs are rejected case-insensitively")
 Checkpoint("duplicates passed")
 
 countBeforeBatch := ActionRegistry.Count
+registrationDiagnostic := ""
 try ActionRegistry.RegisterAll([
     Action("test.batch", "Batch", (*) => true),
     Action("test.run", "Duplicate in batch", (*) => true)
-])
+], "Test Registration Module")
+catch as registrationError
+    registrationDiagnostic := registrationError.Message
 Assert(ActionRegistry.Count = countBeforeBatch, "Failed registration batches are rolled back")
 Assert(!ActionRegistry.Has("test.batch"), "Rolled-back actions are removed")
+Assert(InStr(registrationDiagnostic, "Test Registration Module"), "Registration failures identify their source module")
 Checkpoint("batch rollback passed")
 
 missing := ActionRegistry.ValidateReferences(["test.run", "test.missing"])
 Assert(missing.Length = 1, "Missing consumer references are reported")
 Checkpoint("references passed")
+
+sharedCallCountBefore := callCount
+Assert(ActionRegistry.Invoke("test.run", unset, ActionContext("age-of-efficiency")).Succeeded, "Shared action succeeds from Age of Efficiency context")
+Assert(ActionRegistry.Invoke("test.run", unset, ActionContext("macro-board")).Succeeded, "Shared action succeeds from Macro Board context")
+Assert(callCount = sharedCallCountBefore + 2, "Shared consumers reach the same callable exactly once each")
+Assert(ActionRegistry.Invoke("test.run", unset, ActionContext("tests")).Succeeded, "An unavailable optional action does not break unrelated actions")
+Checkpoint("consumer consistency passed")
 
 ActionRegistry.Invoke("test.run", unset, ActionContext("log-bound-test"))
 ActionRegistry.Invoke("test.run", unset, ActionContext("log-bound-test"))

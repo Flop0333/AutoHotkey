@@ -30,7 +30,7 @@ ActionRegistry.RegisterAll([
     WindowActions.MoveToRightMonitor((*) => MoveWindowToMonitor("Right")),
     WindowActions.MaximizeUnderMouse(MaximizeWindow),
     WindowActions.MinimizeUnderMouse(MinimizeWindow)
-])
+], "Mouse Gestures")
 
 GestureDetector() ; Initialize the gesture detector
 

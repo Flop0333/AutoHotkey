@@ -11,6 +11,7 @@
 class ActionRegistry {
     static _actions := Map()
     static _profileProvider := (*) => ""
+    static _confirmationProvider := (message, title, options) => MsgBox(message, title, options)
 
     static Register(definition) {
         if Type(definition) != "Action"
@@ -23,9 +24,13 @@ class ActionRegistry {
         return definition
     }
 
-    static RegisterIfMissing(definition) => this.Has(definition.Id) ? this.Get(definition.Id) : this.Register(definition)
+    static RegisterIfMissing(definition, source := "unknown module") {
+        try return this.Has(definition.Id) ? this.Get(definition.Id) : this.Register(definition)
+        catch as registryError
+            throw Error("Action registration failed in " source ": " registryError.Message)
+    }
 
-    static RegisterAll(actions) {
+    static RegisterAll(actions, source := "unknown module") {
         if !(actions is Array)
             throw TypeError("ActionRegistry.RegisterAll expects an Array")
 
@@ -38,7 +43,7 @@ class ActionRegistry {
         } catch as registryError {
             for id in registeredIds
                 this._actions.Delete(id)
-            throw registryError
+            throw Error("Action registration failed in " source ": " registryError.Message)
         }
         return actions
     }
@@ -133,9 +138,9 @@ class ActionRegistry {
         if !definition.Argument.AcceptsArgument && IsSet(argument) && argument != ""
             return this._Complete(ActionResult.ValidationFailed(id, "This action does not accept an argument"), context)
 
-        if definition.Confirmation.IsRequired && !context.confirmationGranted {
+        if definition.Confirmation.IsRequired {
             message := definition.Confirmation.Message != "" ? definition.Confirmation.Message : "Run '" definition.Title "'?"
-            if MsgBox(message, "Confirm action", "YesNo Icon!") != "Yes"
+            if this._confirmationProvider.Call(message, "Confirm action", "YesNo Icon!") != "Yes"
                 return this._Complete(ActionResult.Cancelled(id), context)
         }
 
@@ -228,6 +233,11 @@ class ActionRegistry {
         if !HasMethod(provider, "Call")
             throw TypeError("ActionRegistry profile provider must be callable")
         this._profileProvider := provider
+    }
+    static SetConfirmationProvider(provider) {
+        if !HasMethod(provider, "Call")
+            throw TypeError("ActionRegistry confirmation provider must be callable")
+        this._confirmationProvider := provider
     }
     static Count {
         get => this._actions.Count

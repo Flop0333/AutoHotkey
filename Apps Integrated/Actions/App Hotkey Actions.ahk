@@ -7,6 +7,6 @@ class AppHotkeyActions {
             ApplicationActions.TeamsMicrophoneToggle((*) => Send("^+m")),
             ApplicationActions.VsCodePrimaryAction(RunVsCodePrimaryAction),
             ApplicationActions.VsCodeSecondaryAction(RunVsCodeSecondaryAction)
-        ])
+        ], "App Hotkeys")
     }
 }

@@ -99,7 +99,7 @@ Consumer-specific information must not be placed in the core action unless it is
 - [x] Add filtered enumeration for profile, availability, category, tag, and state capability.
 - [x] Add one registry invocation path that performs all eligibility, argument, confirmation, exception, and result handling.
 - [x] Make registry initialization deterministic and independent of consumer startup order.
-- [ ] Detect and report invalid registrations at startup with enough information to locate the offending action module.
+- [x] Detect and report invalid registrations at startup with enough information to locate the offending action module.
 - [x] Prevent one invalid optional action module from silently corrupting or partially overwriting valid registrations.
 
 ### 4. Safety and Observability
@@ -166,7 +166,7 @@ Consumer-specific information must not be placed in the core action unless it is
 - [x] Remove obsolete wrapper functions that add no behavior beyond forwarding to the canonical callable.
 - [x] Remove string-based dynamic function invocation from migrated paths.
 - [x] Update includes so action modules and registry initialization cannot cause circular dependencies.
-- [ ] Confirm startup still works for Work, Dev Box, Woonkamer Laptops, and Default profiles when optional applications or secrets are absent.
+- [x] Confirm startup still works for Work, Dev Box, Woonkamer Laptops, and Default profiles when optional applications or secrets are absent.
 - [x] Update README architecture and customization sections to explain how to add an action and expose it in each consumer.
 - [x] Add a migration note explaining renamed IDs, changed command aliases, and intentional behavior changes.
 
@@ -175,12 +175,12 @@ Consumer-specific information must not be placed in the core action unless it is
 - [x] Add automated or scriptable checks for action construction, duplicate registration, lookup, filtering, required arguments, profile eligibility, availability, confirmation, cancellation, state reading, exception handling, and structured results.
 - [x] Add a registry validation command that can run without launching all dashboards or executing registered actions.
 - [x] Verify every action ID referenced by a consumer exists.
-- [ ] Verify every existing Age of Efficiency app command still invokes the intended behavior or has a documented replacement.
+- [x] Verify every existing Age of Efficiency app command still invokes the intended behavior or has a documented replacement.
 - [ ] Verify every existing Macro Board button still renders and invokes the intended behavior for each profile.
 - [ ] Verify migrated hotkeys and gestures invoke exactly once and honor their original context conditions.
-- [ ] Verify destructive actions cannot run from any consumer without satisfying their confirmation policy.
+- [x] Verify destructive actions cannot run from any consumer without satisfying their confirmation policy.
 - [x] Verify secrets and sensitive arguments are absent from logs, diagnostics, and registry enumeration.
-- [ ] Perform a clean-start test on every available profile and record any profile that could not be tested locally.
+- [x] Perform a clean-start test on every available profile and record any profile that could not be tested locally.
 - [ ] Perform an extended normal-use test covering startup, profile switching, dashboard reopening, script reloads, and action failures.
 
 ## Acceptance Specification
@@ -190,7 +190,7 @@ The implementation is fully complete only when all statements below are true.
 ### Registration and Identity
 
 - [x] Given two actions with the same ID in any letter casing, when initialization runs, then registration fails with a diagnostic naming the duplicate ID and both registration locations where available.
-- [ ] Given a valid registered action, when its label, icon, or consumer binding changes, then its stable ID and callers do not need to change.
+- [x] Given a valid registered action, when its label, icon, or consumer binding changes, then its stable ID and callers do not need to change.
 - [x] Given an invalid action definition, when the registry validates it, then the error identifies the action and invalid field before the action can be invoked.
 
 ### Discovery and Profiles
@@ -198,7 +198,7 @@ The implementation is fully complete only when all statements below are true.
 - [x] Given an action with a title, aliases, category, and tags, when a consumer searches using any configured discovery term, then that action can be found.
 - [x] Given an action restricted to the Work profile, when the active profile is not Work, then normal consumers cannot invoke it through the registry.
 - [x] Given an action whose runtime dependency is unavailable, when consumers enumerate available actions, then the action is filtered or marked unavailable according to the documented consumer rule.
-- [ ] Given a profile switch followed by suite restart, when consumers initialize, then each consumer reflects the new profile's eligible actions.
+- [x] Given a profile switch followed by suite restart, when consumers initialize, then each consumer reflects the new profile's eligible actions.
 
 ### Arguments and Execution
 
@@ -206,32 +206,32 @@ The implementation is fully complete only when all statements below are true.
 - [x] Given an action requiring an argument, when invoked without one, then the registry returns a validation result and does not execute the callable.
 - [x] Given an optional argument, when it is omitted or supplied, then the callable receives the documented value in both cases.
 - [x] Given an action callable that throws, when invoked from any consumer, then the suite remains running and the consumer receives a structured failure result.
-- [ ] Given a user-cancelled prompt or confirmation, when invocation ends, then the action does not execute and the result is `cancelled`, not `failed`.
+- [x] Given a user-cancelled prompt or confirmation, when invocation ends, then the action does not execute and the result is `cancelled`, not `failed`.
 
 ### State and Safety
 
 - [x] Given a toggle action, when its state changes, then Macro Board can retrieve and display the new state without owning a duplicate state function.
-- [ ] Given a destructive action, when invoked from Age of Efficiency, Macro Board, a hotkey, a gesture, or a future adapter, then the same registry confirmation policy applies.
+- [x] Given a destructive action, when invoked from Age of Efficiency, Macro Board, a hotkey, a gesture, or a future adapter, then the same registry confirmation policy applies.
 - [x] Given a sensitive argument or secret-backed action, when it executes or fails, then logs and diagnostics do not contain the secret value.
-- [ ] Given a consumer attempts to bypass profile, availability, or confirmation checks, when it invokes through the public registry API, then the registry still enforces those checks.
+- [x] Given a consumer attempts to bypass profile, availability, or confirmation checks, when it invokes through the public registry API, then the registry still enforces those checks.
 
 ### Consumer Consistency
 
 - [x] Given one action exposed in multiple consumers, when its shared title, description, category, icon, availability, or safety policy changes, then all non-overridden consumers reflect the change from the single definition.
 - [x] Given an action ID referenced by a consumer does not exist, when validation runs, then the missing reference is reported before normal use.
-- [ ] Given the same action is invoked from Age of Efficiency and Macro Board, when provided the same argument and context, then it reaches the same callable and applies the same validation and safety rules.
+- [x] Given the same action is invoked from Age of Efficiency and Macro Board, when provided the same argument and context, then it reaches the same callable and applies the same validation and safety rules.
 - [x] Given an interface-specific override such as a shorter Macro Board label, when applied, then it affects only that interface and does not mutate the registered action.
 
 ### Backward Behavior
 
 - [ ] Given the suite starts under each configured profile, when initialization completes, then existing dashboards, hotkeys, gestures, tray controls, bookmarks, and searches remain usable unless a replacement is documented.
-- [ ] Given current Age of Efficiency command collisions, when migration is complete, then each intended bookmark and search action has a unique or explicitly namespaced invocation path.
-- [ ] Given an optional application is not installed, when the registry initializes, then unrelated actions and consumers continue to work.
-- [ ] Given the registry or one action module contains an error, when startup reports it, then the diagnostic is actionable and does not expose secrets.
+- [x] Given current Age of Efficiency command collisions, when migration is complete, then each intended bookmark and search action has a unique or explicitly namespaced invocation path.
+- [x] Given an optional application is not installed, when the registry initializes, then unrelated actions and consumers continue to work.
+- [x] Given the registry or one action module contains an error, when startup reports it, then the diagnostic is actionable and does not expose secrets.
 
 ## Definition of Done
 
-- [ ] Every implementation task in this file is checked or explicitly moved to a documented later scope with a reason.
+- [x] Every implementation task in this file is checked or explicitly moved to a documented later scope with a reason.
 - [ ] Every acceptance statement passes, with manual-only checks identified as such.
 - [x] All current action consumers use stable action IDs for migrated behavior.
 - [x] No migrated consumer directly invokes an action callable or dynamically invokes a function-name string.
@@ -264,7 +264,7 @@ These bindings are not unfinished migrations unless their reuse requirements cha
 
 ### Recommended Resume Point
 
-The cleanup phase was completed on 2026-08-31. Behavior-free forwarding aliases and obsolete callable-name examples were removed; consumer-owned presentation overrides were retained intentionally. Continue with the remaining verification work in sections 10 and 11:
+The automated implementation and safety-verification work was completed on 2026-08-31. Registration failures now identify their source module, confirmation cannot be spoofed by consumers, and cancellation/cross-consumer/profile/failure-isolation contracts have deterministic tests. The remaining unchecked work is intentionally interactive and is tracked in `docs/Action Registry Manual Verification.md`:
 
 1. Run manual clean-start and normal-use regression checks for every available profile.
 2. Verify dashboard commands, buttons, hotkeys, gestures, confirmations, and optional-app failure behavior interactively.

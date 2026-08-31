@@ -24,9 +24,9 @@
 class StartupMenuTray {
     __New() {
 		ActionRegistry.SetProfileProvider((*) => ProfileManager.current)
-		ActionRegistry.RegisterIfMissing(SystemActions.ReloadStartup(RunStartup))
-		ActionRegistry.RegisterIfMissing(SystemActions.KillAhkProcesses((*) => KillAllAHkProcesses(true)))
-		ActionRegistry.RegisterIfMissing(SystemActions.RegistryDiagnostics((*) => MsgBox(ActionRegistry.FormatDiagnostics(), "Action Registry Diagnostics", "Iconi")))
+		ActionRegistry.RegisterIfMissing(SystemActions.ReloadStartup(RunStartup), "Startup Tray")
+		ActionRegistry.RegisterIfMissing(SystemActions.KillAhkProcesses((*) => KillAllAHkProcesses(true)), "Startup Tray")
+		ActionRegistry.RegisterIfMissing(SystemActions.RegistryDiagnostics((*) => MsgBox(ActionRegistry.FormatDiagnostics(), "Action Registry Diagnostics", "Iconi")), "Startup Tray")
         A_TrayMenu.Delete()
         A_TrayMenu.Add("Reload", ActionBinding.Callback("system.reload-startup", "startup-tray"))
         this._AddProfilesToTrayMenu()

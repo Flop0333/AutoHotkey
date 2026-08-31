@@ -52,6 +52,13 @@ DetectHiddenWindows true
 SetWinDelay(0)
 ;}
 
+ActionRegistry.RegisterAll([
+	ProductivityActions.ScreenSnipAndCopy(CaptureSnipAndCopy),
+	ProductivityActions.ScreenCopyOnly(CaptureScreenCopyOnly),
+	ProductivityActions.ScreenSaveOnly(CaptureScreenSaveOnly),
+	ProductivityActions.ScreenOcr(CaptureScreenOcr)
+], "Screen Snipper")
+
 _SetupTrayMenu()
 _SetupTrayMenu() {   
 	A_TrayMenu.Delete()       
@@ -1143,10 +1150,3 @@ Class GDIp
 }
 ;}
 ;}
-
-ActionRegistry.RegisterAll([
-	ProductivityActions.ScreenSnipAndCopy(CaptureSnipAndCopy),
-	ProductivityActions.ScreenCopyOnly(CaptureScreenCopyOnly),
-	ProductivityActions.ScreenSaveOnly(CaptureScreenSaveOnly),
-	ProductivityActions.ScreenOcr(CaptureScreenOcr)
-])

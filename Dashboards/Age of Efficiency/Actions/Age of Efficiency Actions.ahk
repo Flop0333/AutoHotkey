@@ -19,6 +19,6 @@ class AgeOfEfficiencyActions {
             DevelopmentActions.RemoteDesktop((setting := "H3") => VirtualMachine.StartRemoteDesktop(setting)),
             ProductivityActions.Timer((minutes) => Timer.Start(minutes)),
             SystemActions.KillAhkProcesses((*) => KillAllAHkProcesses(true))
-        ])
+        ], "Age of Efficiency")
     }
 }

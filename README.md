@@ -53,6 +53,8 @@ To add or expose an action, follow the [Action Registry Guide](docs/Action%20Reg
 
 For validation, run `Tests/RunRegistryTests.ahk`, `Tests/ValidateActionReferences.ps1`, and the applicable `Tests/Compile*.ahk` harness.
 
+Checks that intentionally operate the real desktop are listed in the [manual verification checklist](docs/Action%20Registry%20Manual%20Verification.md).
+
 
 ## 💭 Philosophy
 Every component is modular, following OOP/SOLID principles and build with care for maximum flexibility and maintainability.

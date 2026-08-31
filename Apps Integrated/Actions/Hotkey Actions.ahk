@@ -9,6 +9,6 @@ class HotkeyActions {
             ApplicationActions.CalendarNextWeek(),
             ApplicationActions.KeePassMainPassword((*) => KeePass.InsertMainPassword()),
             ApplicationActions.KeePassSecondaryPassword((*) => KeePass.InsertSecondaryPassword())
-        ])
+        ], "Global Hotkeys")
     }
 }

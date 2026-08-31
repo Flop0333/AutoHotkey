@@ -21,6 +21,6 @@ class MacroBoardActions {
             Action("demo.pizza", "Pizza Default", (*) => MsgBox("Pizza Default"), {
                 category: "Demo", profiles: ["Default"]
             })
-        ])
+        ], "Macro Board")
     }
 }

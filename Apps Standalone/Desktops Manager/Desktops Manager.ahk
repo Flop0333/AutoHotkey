@@ -86,7 +86,7 @@ ActionRegistry.RegisterAll([
     ApplicationActions.NotionLaunch((*) => Notion.Launch()),
     ApplicationActions.VsCodeLaunch((*) => VsCode.Launch()),
     ApplicationActions.VsCodeAutoHotkey((*) => VsCode.openAutoHotkey())
-])
+], "Desktops Manager")
 
 desktops := GetDesktopsForProfile()
 

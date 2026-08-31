@@ -28,7 +28,7 @@ ActionRegistry.RegisterAll([
     WindowActions.ResizeUnderMouse(ResizeWindow),
     WindowActions.CloseUnderMouse((*) => WinClose(Win.WinUnderMouse())),
     WindowActions.ToggleAlwaysOnTop((*) => Win.ToggleAlwaysOnTop())
-])
+], "Window Manager")
 
 CapsLock.Hotkey("LButton", ActionBinding.Callback("window.drag-under-mouse", "window-hotkeys"))
 CapsLock.Hotkey("RButton", ActionBinding.Callback("window.resize-under-mouse", "window-hotkeys"))
