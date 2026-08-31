@@ -1,6 +1,6 @@
 ; Credits to https://github.com/adrian88888888/AHK-Virtual-Desktop-Library/tree/main/lib/AHK-Virtual-Desktop-Library/3rd%20party
-#Include ..\..\Core\Paths.ahk
-#Include ..\..\Extensions\Dark ToolTip.ahk
+#Include <Core\Paths>
+#Include <Extensions\Dark ToolTip>
 SetWorkingDir(A_ScriptDir)
 
 Class DesktopsDDL {

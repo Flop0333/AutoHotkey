@@ -1,5 +1,5 @@
-#Include ..\..\Extensions\Win.ahk
-#Include ..\..\Extensions\Dark Gui.ahk
+#Include <Extensions\Win>
+#Include <Extensions\Dark Gui>
 
 KeyCodeGetter() {
 

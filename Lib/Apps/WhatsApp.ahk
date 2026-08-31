@@ -1,6 +1,6 @@
-#Include App.ahk
-#Include ..\Tools\UIA-v2\Lib\UIA.ahk
-#Include ..\Tools\Info.ahk
+#Include <Apps\App>
+#Include <Tools\UIA-v2\Lib\UIA>
+#Include <Tools\Info>
 
 Class WhatsApp extends App {
     static __New() => this.Init(

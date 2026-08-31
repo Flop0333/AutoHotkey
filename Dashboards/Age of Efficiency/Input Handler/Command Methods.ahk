@@ -14,7 +14,7 @@
 #Include ..\..\..\Apps Integrated\Status Memes\Status Meme.ahk
 #Include ..\..\..\Apps Integrated\Picture In Picture.ahk
 #Include ..\..\..\Startup\Startup.ahk
-#Include ..\..\..\Lib\Apps\Notion.ahk
+#Include <Apps\Notion>
 
 StartPBIReformat() => PBIReformat.Start()
 

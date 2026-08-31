@@ -18,7 +18,7 @@
 ; Note: Requires Capslock Service to be running
 ; ============================================================================
 
-#Include ..\Lib\Core.ahk
+#Include <Core>
 SetWinDelay(0)
 CoordMode("Mouse")
 

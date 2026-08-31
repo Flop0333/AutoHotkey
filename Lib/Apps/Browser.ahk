@@ -1,5 +1,5 @@
-#Include ..\Core.ahk
-#Include App.ahk
+#Include <Core>
+#Include <Apps\App>
 
 Class Browser extends App {
     static defaultBrowser := ProfileManager.Is(Profiles.work) || ProfileManager.Is(Profiles.devbox) ? Edge : Brave

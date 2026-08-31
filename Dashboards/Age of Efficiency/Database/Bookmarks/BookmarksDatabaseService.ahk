@@ -1,4 +1,4 @@
-#Include ..\..\..\..\Lib\Core.ahk
+#Include <Core>
 #Include Bookmark.ahk
 #Include BookmarksState.ahk
 #Include ../BaseDatabaseService.ahk

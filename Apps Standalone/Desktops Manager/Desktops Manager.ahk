@@ -23,7 +23,7 @@
 ;   - Multiple RequiredWindow() per desktop supported
 ; ============================================================================
 
-#Include ..\..\Lib\Core.ahk
+#Include <Core>
 #Include Desktop.ahk
 #Include <Apps\VsCode>
 #Include <Apps\Notion>

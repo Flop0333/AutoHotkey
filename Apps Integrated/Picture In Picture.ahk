@@ -2,8 +2,8 @@
 ; === Picture In Picture - Enables picture-in-picture mode for videos ========
 ; ============================================================================
 
-#Include ..\Lib\Core.ahk
-#Include ..\Lib\Core\UIA.ahk
+#Include <Core>
+#Include <Core\UIA>
 
 PictureInPicture() {
     jsCode := "(()=>{const video=document.querySelector('video');if(video&&document.pictureInPictureEnabled){video.requestPictureInPicture();}})();"

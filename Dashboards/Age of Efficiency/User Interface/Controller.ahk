@@ -1,5 +1,5 @@
-#Include ..\..\..\Lib\Core.ahk
-#Include ..\..\..\Lib\Core\WebView.ahk
+#Include <Core>
+#Include <Core\WebView>
 #Include Items\Items.ahk	
 
 Class UserInterface extends WebViewToo {

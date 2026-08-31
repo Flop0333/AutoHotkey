@@ -1,5 +1,5 @@
-#Include ..\..\Extensions\Dark Gui.ahk
-#Include ..\Info.ahk
+#Include <Extensions\Dark Gui>
+#Include <Tools\Info>
 i::WindowInfo()
 class WindowInfo {
 

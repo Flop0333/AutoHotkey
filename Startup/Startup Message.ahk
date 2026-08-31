@@ -1,5 +1,5 @@
-#Include ..\Lib\Core\Paths.ahk
-#Include ..\Lib\Tools\Info.ahk
+#Include <Core\Paths>
+#Include <Tools\Info>
 
 class StartupMessage extends Gui {
     BACKGROUND_PATH := Paths.startup "\background.gif"

@@ -1,8 +1,8 @@
 #SingleInstance Force
-#Include ..\Lib\Tools\Info.ahk
-#Include ..\Lib\Helpers\ClipSend.ahk
-#Include ..\Lib\Extensions\Dark Gui.ahk
-#Include ..\Lib\Core\Paths.ahk
+#Include <Tools\Info>
+#Include <Helpers\ClipSend>
+#Include <Extensions\Dark Gui>
+#Include <Core\Paths>
 
 class Timer extends DarkGui {
 

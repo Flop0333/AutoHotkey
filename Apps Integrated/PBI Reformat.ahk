@@ -2,7 +2,7 @@
 ; === PBI Reformat - Reformats copied Product Backlog Items for dev use ======
 ; ============================================================================
 
-#Include ..\Lib\Core.ahk
+#Include <Core>
 
 Class PBIReformat {
 

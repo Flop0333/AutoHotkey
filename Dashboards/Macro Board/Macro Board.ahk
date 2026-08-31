@@ -13,15 +13,15 @@
 ;   - Put img/gif files in the icons folder (stream deck icons can be used)
 ; ============================================================================
 
-#Include ..\..\Lib\Tools\Info.ahk
-#Include ..\..\Lib\Core.ahk
+#Include <Tools\Info>
+#Include <Core>
 #Include Button.ahk
 #Include Controller.ahk
 #Include "..\..\Apps Integrated\Command Storer\Command Storer.ahk"
 #Include ..\..\Apps Integrated\Spell Checker.ahk
 #Include ..\..\Apps Integrated\Fake Working Mode.ahk
-#Include ..\..\Lib\Apps\Spotify.ahk
-#Include ..\..\Lib\Apps\Notion.ahk
+#Include <Apps\Spotify>
+#Include <Apps\Notion>
 #Include ..\..\Startup\Startup.ahk
 #Include <Apps\Browser>
 

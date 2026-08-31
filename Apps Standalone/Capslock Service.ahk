@@ -18,7 +18,7 @@
 ; - Integration with Desktops Manager for seamless VM workflows
 ; ============================================================================
 
-#Include ..\Lib\Tools\Info.ahk
+#Include <Tools\Info>
 #SingleInstance Force
 #NoTrayIcon
 

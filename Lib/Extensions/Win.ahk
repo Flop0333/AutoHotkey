@@ -1,5 +1,5 @@
-#Include ..\Tools\Desktops DLL Library\Desktops DLL Library.ahk
-#Include Dark ToolTip.ahk
+#Include <Tools\Desktops DLL Library\Desktops DLL Library>
+#Include <Extensions\Dark ToolTip>
 
 class Win {
 

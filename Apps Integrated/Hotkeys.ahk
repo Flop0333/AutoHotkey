@@ -20,10 +20,10 @@
 ;   Profile: LButton+N opens Notion on home laptops only
 ; ============================================================================
 
-#Include ..\Lib\Core.ahk
-#Include ..\Lib\Apps\Notion.ahk
-#Include ..\Lib\Apps\Spotify.ahk
-#Include ..\Lib\Apps\KeePass.ahk
+#Include <Core>
+#Include <Apps\Notion>
+#Include <Apps\Spotify>
+#Include <Apps\KeePass>
 
 ; ================================
 ; Generic Hotkeys

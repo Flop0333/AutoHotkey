@@ -20,7 +20,7 @@
 ; ============================================================================
 
 #Include Secrets.ahk
-#Include ..\lib\Helpers\ClipSend.ahk
+#Include <Helpers\ClipSend>
 
 class Secret {
     __New(name, description, value := "", propName := "") {

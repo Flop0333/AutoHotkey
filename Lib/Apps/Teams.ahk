@@ -1,4 +1,4 @@
-#Include App.ahk
+#Include <Apps\App>
 
 class Teams extends App {
 	static __New() => this.Init(

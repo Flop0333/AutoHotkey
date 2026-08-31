@@ -5,7 +5,7 @@
 
 
 #SingleInstance
-#Include Gdip_All.ahk
+#Include <Tools\Gdip\Gdip_All>
 
 class ScreenDrawer {
     static PenColor := 0xFF0099FF

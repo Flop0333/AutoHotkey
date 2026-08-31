@@ -28,7 +28,7 @@
 ;///////////////////////////////////////////////////////////////////////////////////////////
 
 #Requires AutoHotkey v2
-#Include WebView2.ahk
+#Include <Tools\WebView\WebView2>
 
 class WebViewToo {
     static Template := {}

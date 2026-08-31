@@ -13,7 +13,7 @@
 ;   - Switch profiles using tray menu
 ; ============================================================================
 
-#Include ..\Lib\Core\Paths.ahk
+#Include <Core\Paths>
 #Include ..\Profiles\Profile Manager.ahk
 #Include Startup Message.ahk
 #Include Startup Menu Tray.ahk

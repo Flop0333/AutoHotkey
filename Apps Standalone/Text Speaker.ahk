@@ -9,7 +9,7 @@
 ;   - Adjust speech speed with Left/Right arrow keys during playback
 ; ============================================================================
 
-#Include ..\Lib\Core.ahk
+#Include <Core>
 
 ^Space::TextSpeaker.TogglePlay()
 

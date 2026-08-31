@@ -45,7 +45,7 @@
 #Warn All, Off
 #SingleInstance force
 #Include Screen Snipper OCR.ahk
-#Include ..\..\Lib\Tools\Info.ahk
+#Include <Tools\Info>
 DetectHiddenWindows true
 SetWinDelay(0)
 ;}

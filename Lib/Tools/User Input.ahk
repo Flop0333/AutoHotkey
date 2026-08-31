@@ -6,7 +6,7 @@
 ;	result := UserInput().WaitForInput()
 ; ============================================================================
 
-#Include ..\Extensions\Dark Gui.ahk
+#Include <Extensions\Dark Gui>
 
 class UserInput extends DarkGui {
 	FONT_SIZE := 30

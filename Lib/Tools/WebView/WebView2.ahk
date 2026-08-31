@@ -7,7 +7,7 @@
  * @webview2version 1.0.2478.35
  ***********************************************************************/
 
-#Include ComVar.ahk
+#Include <Tools\WebView\ComVar>
 class WebView2 {
 	/**
 	 * create Edge WebView2 control.
