@@ -18,7 +18,7 @@ class MacroBoardActions {
             ApplicationActions.ChatGpt(OpenAI),
             ApplicationActions.NotionWorkDashboard((*) => Notion.OpenPage(NotionPages.workDashboard)),
             ApplicationActions.CloseAllBrowsers(CloseAllBrowsers),
-            Action("demo.pizza", "Pizza Default", (*) => MsgBox("Pizza Default"), {
+            Action(ActionIds.Demo.Pizza, "Pizza Default", (*) => MsgBox("Pizza Default"), {
                 category: "Demo", profiles: ["Default"]
             })
         ], "Macro Board")

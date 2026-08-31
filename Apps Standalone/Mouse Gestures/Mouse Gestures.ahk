@@ -47,10 +47,10 @@ class Gestures {
 ;=============================================================
 ;=== GESTURES REGISTRATION ===================================
 ;=============================================================
-Gestures.Add("L", "window.move-to-left-monitor")
-Gestures.Add("R", "window.move-to-right-monitor")
-Gestures.Add("U", "window.maximize-under-mouse")
-Gestures.Add("D", "window.minimize-under-mouse")
+Gestures.Add("L", ActionIds.Window.MoveToLeftMonitor)
+Gestures.Add("R", ActionIds.Window.MoveToRightMonitor)
+Gestures.Add("U", ActionIds.Window.MaximizeUnderMouse)
+Gestures.Add("D", ActionIds.Window.MinimizeUnderMouse)
 
 
 ;=============================================================

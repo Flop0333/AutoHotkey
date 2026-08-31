@@ -161,7 +161,7 @@ Try DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
 ; 		SnipArea(Area, false, true, SnipVisible, &guiSnips)
 ; }
 
-#Lbutton::ActionRegistry.Invoke("productivity.screen-snip.copy", unset, ActionContext("screen-snipper-hotkey"))
+#Lbutton::ActionRegistry.Invoke(ActionIds.Productivity.ScreenSnipCopy, unset, ActionContext("screen-snipper-hotkey"))
 CaptureSnipAndCopy() {
 	Global guiSnips
 	Area := SelectScreenRegion('LButton')
@@ -169,21 +169,21 @@ CaptureSnipAndCopy() {
 		SnipArea(Area, true, false, true, SnipVisible, &guiSnips)
 }
 
-^#Lbutton::ActionRegistry.Invoke("productivity.screen-snip.copy-only", unset, ActionContext("screen-snipper-hotkey"))
+^#Lbutton::ActionRegistry.Invoke(ActionIds.Productivity.ScreenSnipCopyOnly, unset, ActionContext("screen-snipper-hotkey"))
 CaptureScreenCopyOnly() {
 	Area := SelectScreenRegion('LButton')
 	SnipArea(Area, true, false, false)
 	Info("Copied to clipboard")
 }
 
-!#Lbutton::ActionRegistry.Invoke("productivity.screen-snip.save", unset, ActionContext("screen-snipper-hotkey"))
+!#Lbutton::ActionRegistry.Invoke(ActionIds.Productivity.ScreenSnipSave, unset, ActionContext("screen-snipper-hotkey"))
 CaptureScreenSaveOnly() {
 	Area := SelectScreenRegion('LButton')
 	SnipArea(Area, false, true, false, false)
 	Info("Saved snippet to file")
 }
 
-+#Lbutton::ActionRegistry.Invoke("productivity.screen-ocr.capture", unset, ActionContext("screen-snipper-hotkey"))
++#Lbutton::ActionRegistry.Invoke(ActionIds.Productivity.ScreenOcrCapture, unset, ActionContext("screen-snipper-hotkey"))
 CaptureScreenOcr() {
 	Global guiSnips
 	Area := SelectScreenRegion('LButton')

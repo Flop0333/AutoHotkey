@@ -30,10 +30,10 @@ ActionRegistry.RegisterAll([
     WindowActions.ToggleAlwaysOnTop((*) => Win.ToggleAlwaysOnTop())
 ], "Window Manager")
 
-CapsLock.Hotkey("LButton", ActionBinding.Callback("window.drag-under-mouse", "window-hotkeys"))
-CapsLock.Hotkey("RButton", ActionBinding.Callback("window.resize-under-mouse", "window-hotkeys"))
-CapsLock.Hotkey("MButton", ActionBinding.Callback("window.close-under-mouse", "window-hotkeys"))
-CapsLock.Hotkey("Up", ActionBinding.Callback("window.always-on-top.toggle", "window-hotkeys"))
+CapsLock.Hotkey("LButton", ActionBinding.Callback(ActionIds.Window.DragUnderMouse, "window-hotkeys"))
+CapsLock.Hotkey("RButton", ActionBinding.Callback(ActionIds.Window.ResizeUnderMouse, "window-hotkeys"))
+CapsLock.Hotkey("MButton", ActionBinding.Callback(ActionIds.Window.CloseUnderMouse, "window-hotkeys"))
+CapsLock.Hotkey("Up", ActionBinding.Callback(ActionIds.Window.ToggleAlwaysOnTop, "window-hotkeys"))
 
 DragWindow() {
     MouseGetPos(&origionalMouseX, &origionalMouseY, &winId)

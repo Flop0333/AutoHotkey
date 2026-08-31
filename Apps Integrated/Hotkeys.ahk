@@ -34,18 +34,18 @@ HotkeyActions.Register()
 ; ================================
 ; VS Code
 #HotIf WinActive("ahk_exe Code.exe")
-^WheelUp::ActionBinding.Invoke("vscode.zoom-in", unset, "global-hotkeys")
-^WheelDown::ActionBinding.Invoke("vscode.zoom-out", unset, "global-hotkeys")
+^WheelUp::ActionBinding.Invoke(ActionIds.Application.VsCodeZoomIn, unset, "global-hotkeys")
+^WheelDown::ActionBinding.Invoke(ActionIds.Application.VsCodeZoomOut, unset, "global-hotkeys")
 
 ; Google Calendar
 #HotIf WinActive("Google Calendar")
-^Left::ActionBinding.Invoke("calendar.previous-week", unset, "global-hotkeys")
-^Right::ActionBinding.Invoke("calendar.next-week", unset, "global-hotkeys")
+^Left::ActionBinding.Invoke(ActionIds.Application.CalendarPreviousWeek, unset, "global-hotkeys")
+^Right::ActionBinding.Invoke(ActionIds.Application.CalendarNextWeek, unset, "global-hotkeys")
 
 
 ; ================================
 ; Profile-specific Hotkeys
 ; ================================
 #HotIf ProfileManager.Is(Profiles.work)
-CapsLock.Hotkey("D", ActionBinding.Callback("keepass.main-password.insert", "global-hotkeys"))
-CapsLock.Hotkey("!D", ActionBinding.Callback("keepass.secondary-password.insert", "global-hotkeys"))
+CapsLock.Hotkey("D", ActionBinding.Callback(ActionIds.Application.KeePassMainPassword, "global-hotkeys"))
+CapsLock.Hotkey("!D", ActionBinding.Callback(ActionIds.Application.KeePassSecondaryPassword, "global-hotkeys"))

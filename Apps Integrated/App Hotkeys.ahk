@@ -6,9 +6,9 @@
 
 AppHotkeyActions.Register()
 
-AppSpecificHotkey.Set("ahk_exe Notion.exe", "notion.sidebar.toggle", AppSpecificHotkey.PRIMARY_SHORTCUT)
+AppSpecificHotkey.Set("ahk_exe Notion.exe", ActionIds.Application.NotionSidebarToggle, AppSpecificHotkey.PRIMARY_SHORTCUT)
 
-AppSpecificHotkey.Set("ahk_exe ms-teams.exe", "teams.microphone.toggle", AppSpecificHotkey.PRIMARY_SHORTCUT)
+AppSpecificHotkey.Set("ahk_exe ms-teams.exe", ActionIds.Application.TeamsMicrophoneToggle, AppSpecificHotkey.PRIMARY_SHORTCUT)
 
 ; ============================================================================
 ; === Visual Studio Code ===
@@ -25,8 +25,8 @@ RunVsCodeSecondaryAction() => (
 	MsgBox("Not implemented")
 )
 
-AppSpecificHotkey.Set("ahk_exe Code.exe", "vscode.project-action.primary", AppSpecificHotkey.PRIMARY_SHORTCUT)
-AppSpecificHotkey.Set("ahk_exe Code.exe", "vscode.project-action.secondary", AppSpecificHotkey.SECONDARY_SHORTCUT)
+AppSpecificHotkey.Set("ahk_exe Code.exe", ActionIds.Application.VsCodePrimaryAction, AppSpecificHotkey.PRIMARY_SHORTCUT)
+AppSpecificHotkey.Set("ahk_exe Code.exe", ActionIds.Application.VsCodeSecondaryAction, AppSpecificHotkey.SECONDARY_SHORTCUT)
 
 
 

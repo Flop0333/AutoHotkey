@@ -1,4 +1,5 @@
 #Requires AutoHotkey v2
+#Include Action Ids.ahk
 #Include Action Argument.ahk
 #Include Action Confirmation.ahk
 

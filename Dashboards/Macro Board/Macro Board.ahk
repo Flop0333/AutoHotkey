@@ -37,32 +37,32 @@ MacroBoardActions.Register()
 ; ============================================================================
 
 buttons := [
-    Button("writing.spell-checker.toggle"),
-    Button("system.kill-ahk-processes"),
-    Button("development.command-storer.open"),
-    Button("productivity.fake-work-mode.toggle"),
-    Button("system.reload-startup")
+    Button(ActionIds.Writing.SpellCheckerToggle),
+    Button(ActionIds.System.KillAhkProcesses),
+    Button(ActionIds.Development.CommandStorerOpen),
+    Button(ActionIds.Productivity.FakeWorkToggle),
+    Button(ActionIds.System.ReloadStartup)
 ] 
 
 profileButtons := Map(
     Profiles.woonkamerLaptops, [
-        Button("notion.shit-fixen.open"),
-        Button("spotify.good-morning-jazz.start"),
-        Button("personal.finances.open"),
-        Button("calendar.open"),
-        Button("maps.open"),
-        Button("weather.open"),
-        Button("chatgpt.open"),
+        Button(ActionIds.Application.NotionShitFixenOpen),
+        Button(ActionIds.Application.SpotifyGoodMorningJazz),
+        Button(ActionIds.Application.FinancesOpen),
+        Button(ActionIds.Application.CalendarOpen),
+        Button(ActionIds.Application.MapsOpen),
+        Button(ActionIds.Application.WeatherOpen),
+        Button(ActionIds.Application.ChatGptOpen),
     ],
     Profiles.work, [
-        Button("notion.work-dashboard.open"),
-        Button("browser.close-all"),
+        Button(ActionIds.Application.NotionWorkDashboardOpen),
+        Button(ActionIds.Application.BrowserCloseAll),
     ],
     Profiles.devbox, [
-        Button("notion.work-dashboard.open")
+        Button(ActionIds.Application.NotionWorkDashboardOpen)
     ],
     Profiles.default, [
-        Button("demo.pizza")
+        Button(ActionIds.Demo.Pizza)
     ]
 )
 

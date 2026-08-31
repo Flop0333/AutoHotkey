@@ -6,7 +6,7 @@
 ;   Reference one registered action ID. Tooltip and image are optional
 ;   Macro Board-specific overrides of shared action metadata.
 ;
-;   btn := Button("browser.open", "Open Chrome", "chrome.gif")
+;   btn := Button(ActionIds.Application.BrowserCloseAll, "Close Browsers", "chrome.gif")
 ; ============================================================================
 
 class Button {

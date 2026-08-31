@@ -5,7 +5,7 @@ class AgeOfEfficiencyActions {
     static Register() {
         ActionRegistry.RegisterAll([
             ProductivityActions.FakeWorkStart((*) => FakeWorkMode.Start()),
-            Action("ui.age-of-efficiency.open", "Age of Efficiency", (*) => aoeWindow.Show(), {
+            Action(ActionIds.Ui.AgeOfEfficiencyOpen, "Age of Efficiency", (*) => aoeWindow.Show(), {
                 description: "Open the Age of Efficiency dashboard",
                 category: "PC Management",
                 icon: "AoE"

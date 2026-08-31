@@ -4,15 +4,15 @@ The Action Registry gives dashboards, hotkeys, gestures, tray menus, and future 
 
 ## Add an Action
 
-1. Choose a stable namespaced ID such as `productivity.timer.start`.
+1. Choose a stable namespaced ID such as `productivity.timer.start` and add it once to `ActionIds` in `Lib/Actions/Action Ids.ahk`.
 2. Add a factory to the appropriate file in `Lib/Actions/Modules`. A factory describes behavior but does not execute or register it.
 3. In the consumer that owns the real callable, include the module and register the returned `Action`.
-4. Reference only the action ID from buttons, hotkeys, gestures, menu items, or saved dashboard data.
+4. Use the `ActionIds` constant from buttons, hotkeys, gestures, and menu items. Serialized JSON keeps the string value because it cannot contain AHK constants.
 5. Add the reference to the validation coverage and run the tests.
 
 ```ahk
 ; Lib/Actions/Modules/Productivity Actions.ahk
-static FocusMode(execute, getState) => Action("productivity.focus-mode.toggle", "Focus Mode", execute, {
+static FocusMode(execute, getState) => Action(ActionIds.Productivity.FocusModeToggle, "Focus Mode", execute, {
     description: "Toggle distraction-free mode",
     category: "Productivity",
     getState: getState
@@ -28,8 +28,8 @@ Module files must stay inert: including one must not launch an app, create a UI,
 
 ## Expose It to a Consumer
 
-- Hotkey, gesture, or tray: use `ActionBinding.Callback("productivity.focus-mode.toggle", "my-consumer")`.
-- Macro Board: add `Button("productivity.focus-mode.toggle")`; layout-only label or image overrides may remain on the button.
+- Hotkey, gesture, or tray: use `ActionBinding.Callback(ActionIds.Productivity.FocusModeToggle, "my-consumer")`.
+- Macro Board: add `Button(ActionIds.Productivity.FocusModeToggle)`; layout-only label or image overrides may remain on the button.
 - Age of Efficiency: store the stable `actionId` and command alias in `Apps.json`. Its adapter filters unavailable and profile-ineligible actions.
 - Another UI: use the adapter pattern below. Do not call `definition.Execute` directly.
 
@@ -75,6 +75,6 @@ Do not serialize callables, arguments, result values, exception messages, Secret
 ## Validation
 
 - Run `Tests/RunRegistryTests.ahk` for registry behavior.
-- Run `Tests/ValidateActionReferences.ps1` to detect duplicate canonical IDs and consumer references without a definition.
+- Run `Tests/ValidateActionReferences.ps1` to detect duplicate canonical IDs, invalid persisted references, and action ID strings used instead of `ActionIds` in production AHK files.
 - Compile the relevant `Tests/Compile*.ahk` harness after changing a consumer.
 - Perform manual interaction checks when changing hotkeys, confirmations, profiles, or external applications.

@@ -62,16 +62,16 @@ GetDesktopsForProfile() {
         config["2"] := Desktop(desktopCounter++)
         config["3"] := Desktop(desktopCounter++)
 
-        config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",    ActionBinding.Callback("whatsapp.open", "desktop-manager")))
+        config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",    ActionBinding.Callback(ActionIds.Application.WhatsAppOpen, "desktop-manager")))
         config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",    () => Browser.OpenInNewBrowser(Links.youtube))) 
         
-        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       ActionBinding.Callback("vscode.autohotkey.open", "desktop-manager")))
-        config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    ActionBinding.Callback("spotify.open", "desktop-manager")))
+        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       ActionBinding.Callback(ActionIds.Application.VsCodeAutoHotkeyOpen, "desktop-manager")))
+        config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    ActionBinding.Callback(ActionIds.Application.SpotifyOpen, "desktop-manager")))
         config["G"] := Desktop(desktopCounter++,   RequiredWindow("ChatGPT",    () => Run("ahk_exe ChatGPT.exe")),
                                                     RequiredWindow("Brave",    () => Browser.OpenInNewBrowser(Links.chatGpt)))
         
-        config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       ActionBinding.Callback("vscode.open", "desktop-manager")))
-        config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      ActionBinding.Callback("notion.open", "desktop-manager")))
+        config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       ActionBinding.Callback(ActionIds.Application.VsCodeOpen, "desktop-manager")))
+        config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      ActionBinding.Callback(ActionIds.Application.NotionOpen, "desktop-manager")))
     }
     
     return config
@@ -94,8 +94,8 @@ for key, desktopObj in desktops
     Capslock.Hotkey(key, ((d) => (*) => HandleSwitch(d))(desktopObj))
 
 ; Foreward & Backward
-Capslock.Hotkey("Tab", ActionBinding.Callback("desktop.previous", "desktop-hotkeys"))
-Capslock.Hotkey("P", ActionBinding.Callback("desktop.pin-window.toggle", "desktop-hotkeys"))
+Capslock.Hotkey("Tab", ActionBinding.Callback(ActionIds.Desktop.Previous, "desktop-hotkeys"))
+Capslock.Hotkey("P", ActionBinding.Callback(ActionIds.Desktop.TogglePinWindow, "desktop-hotkeys"))
 
 ; ===== HELPER FUNCTIONS =====
 global onLeaveAction := ""
