@@ -4,7 +4,7 @@
 #Include Action Confirmation.ahk
 
 /**
- * Immutable shared definition for one executable suite action.
+ * Read-only-by-convention shared definition for one executable suite action.
  * Consumer-specific bindings and layout do not belong in this model.
  *
  * Example:

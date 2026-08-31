@@ -99,11 +99,15 @@ profileAction := Action("test.work", "Work only", (*) => true, {profiles: ["Work
 ActionRegistry.Register(profileAction)
 Assert(!ActionRegistry.Invoke("test.work", unset, ActionContext("tests", "Default")).Succeeded, "Profile restrictions are enforced")
 Assert(!ActionRegistry.Invoke("test.work", unset, ActionContext("tests")).Succeeded, "The current profile is enforced when consumers omit it")
-Assert(ActionRegistry.Invoke("test.work", unset, ActionContext("tests", "Work")).Succeeded, "Eligible profiles can invoke")
+Assert(!ActionRegistry.Invoke("test.work", unset, ActionContext("tests", "Work")).Succeeded, "Consumers cannot override the authoritative profile")
 ProfileManager.current := {displayName: "Work"}
+Assert(ActionRegistry.Invoke("test.work", unset, ActionContext("tests", "Default")).Succeeded, "The authoritative eligible profile can invoke")
 Assert(ActionRegistry.GetDiscoverable(ActionContext("profile-restart")).Length > 0, "Discovery reads the active profile after a profile change")
 Assert(ArrayContainsAction(ActionRegistry.GetDiscoverable(ActionContext("profile-restart")), "test.work"), "Profile-specific discovery refreshes from the provider")
 ProfileManager.current := {displayName: "Default"}
+ActionRegistry.SetProfileProvider((*) => "")
+Assert(!ActionRegistry.Invoke("test.work", unset, ActionContext("tests", "Work")).Succeeded, "Restricted actions fail closed when no profile is available")
+ActionRegistry.SetProfileProvider((*) => ProfileManager.current)
 Checkpoint("profiles passed")
 
 unavailableAction := Action("test.unavailable", "Unavailable", (*) => true, {isAvailable: (*) => false})
@@ -116,6 +120,10 @@ toggleAction := Action("test.toggle", "Toggle", (*) => state := !state, {getStat
 ActionRegistry.Register(toggleAction)
 ActionRegistry.Invoke("test.toggle", unset, ActionContext("tests"))
 Assert(ActionRegistry.GetState("test.toggle"), "Toggle state is read centrally")
+failedStateAction := Action("test.toggle-failure", "Broken Toggle", (*) => true, {getState: (*) => ({}).missing})
+ActionRegistry.Register(failedStateAction)
+Assert(ActionRegistry.TryGetState("test.toggle-failure", ActionContext("tests")).status = ActionResult.STATUS_EXECUTION_FAILED, "State getter exceptions become structured failures")
+Assert(ActionRegistry.TryGetState("test.missing-toggle", ActionContext("tests")).status = ActionResult.STATUS_VALIDATION_FAILED, "Unknown state references become structured failures")
 Checkpoint("state passed")
 
 failureAction := Action("test.failure", "Failure", (*) => ({}).missing)

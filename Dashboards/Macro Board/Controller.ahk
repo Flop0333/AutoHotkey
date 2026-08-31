@@ -58,7 +58,8 @@ Class MacroBoard extends WebViewToo {
 			}
 			
 			if action.IsToggle {
-				serializedBtn.state := ActionRegistry.GetState(action.Id)
+				stateResult := ActionRegistry.TryGetState(action.Id, ActionContext("macro-board-state"))
+				serializedBtn.state := stateResult.Succeeded ? stateResult.value : false
 			}
 			
 			serializedButtons.Push(serializedBtn)
@@ -84,6 +85,12 @@ TriggerButtonFunction(jsonButton) {
 	if result.status != ActionResult.STATUS_SUCCESS && result.status != ActionResult.STATUS_CANCELLED
 		Info(result.message)
 
-	if button.isToggle && result.Succeeded
-		return ActionRegistry.GetState(button.actionId)
+	if button.isToggle && result.Succeeded {
+		stateResult := ActionRegistry.TryGetState(button.actionId, ActionContext("macro-board-state"))
+		if !stateResult.Succeeded {
+			Info(stateResult.message)
+			return false
+		}
+		return stateResult.value
+	}
 }

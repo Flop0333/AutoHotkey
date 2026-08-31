@@ -24,12 +24,6 @@ class ActionRegistry {
         return definition
     }
 
-    static RegisterIfMissing(definition, source := "unknown module") {
-        try return this.Has(definition.Id) ? this.Get(definition.Id) : this.Register(definition)
-        catch as registryError
-            throw Error("Action registration failed in " source ": " registryError.Message)
-    }
-
     static RegisterAll(actions, source := "unknown module") {
         if !(actions is Array)
             throw TypeError("ActionRegistry.RegisterAll expects an Array")
@@ -92,7 +86,7 @@ class ActionRegistry {
         options := IsSet(options) ? options : {}
         allowSensitive := options.HasOwnProp("allowSensitive") && options.allowSensitive
         allowDestructive := options.HasOwnProp("allowDestructive") && options.allowDestructive
-        activeProfile := context.profile != "" ? context.profile : this._profileProvider.Call()
+        activeProfile := this._profileProvider.Call()
         results := []
 
         for id, definition in this._actions {
@@ -126,7 +120,7 @@ class ActionRegistry {
             return this._Complete(ActionResult.ValidationFailed(id, "Unknown action: " id), context)
 
         definition := this._actions[id]
-        activeProfile := context.profile != "" ? context.profile : this._profileProvider.Call()
+        activeProfile := this._profileProvider.Call()
 
         if !this.IsEligible(definition, activeProfile)
             return this._Complete(ActionResult.Unavailable(id, "Action is not available for the current profile"), context)
@@ -166,8 +160,10 @@ class ActionRegistry {
     static IsEligible(actionOrId, profile := "") {
         definition := Type(actionOrId) = "Action" ? actionOrId : this.Get(actionOrId)
         allowedProfiles := definition.Profiles
-        if allowedProfiles.Length = 0 || profile = ""
+        if allowedProfiles.Length = 0
             return true
+        if profile = ""
+            return false
 
         currentName := profile is String ? profile : profile.displayName
         for allowedProfile in allowedProfiles {
@@ -178,11 +174,36 @@ class ActionRegistry {
         return false
     }
 
-    static GetState(id) {
-        definition := this.Get(id)
+    static TryGetState(id, context := unset) {
+        startedAt := A_TickCount
+        id := this._NormalizeId(id)
+        context := IsSet(context) ? context : ActionContext("state")
+
+        if !this._actions.Has(id)
+            return this._Complete(ActionResult.ValidationFailed(id, "Unknown action: " id), context)
+
+        definition := this._actions[id]
         if !definition.IsToggle
-            throw ValueError("Action is not state-aware: " definition.Id)
-        return definition.GetState.Call()
+            return this._Complete(ActionResult.ValidationFailed(id, "Action is not state-aware: " id), context)
+        if !this.IsEligible(definition, this._profileProvider.Call())
+            return this._Complete(ActionResult.Unavailable(id, "Action state is not available for the current profile"), context)
+        if !this.IsAvailable(definition)
+            return this._Complete(ActionResult.Unavailable(id, "Action state is unavailable"), context)
+
+        try {
+            value := definition.GetState.Call()
+            return this._Complete(ActionResult.Success(id, value, A_TickCount - startedAt), context)
+        } catch as stateError {
+            diagnostic := stateError.What " | " stateError.File ":" stateError.Line
+            return this._Complete(ActionResult.ExecutionFailed(id, "Could not read state for '" definition.Title "'", diagnostic, A_TickCount - startedAt), context)
+        }
+    }
+
+    static GetState(id, context := unset) {
+        result := this.TryGetState(id, IsSet(context) ? context : ActionContext("state"))
+        if !result.Succeeded
+            throw Error(result.message)
+        return result.value
     }
 
     static ValidateReferences(ids) {

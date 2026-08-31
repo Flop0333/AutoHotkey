@@ -26,6 +26,8 @@ ActionRegistry.Register(
 
 Module files must stay inert: including one must not launch an app, create a UI, bind a key, or register an action.
 
+Inject implementations that depend on a particular application, service, script, or global object. A tiny dependency-free AHK operation may live directly in a definition factory, but use that exception sparingly and consistently.
+
 ## Expose It to a Consumer
 
 - Hotkey, gesture, or tray: use `ActionBinding.Callback(ActionIds.Productivity.FocusModeToggle, "my-consumer")`.
@@ -38,10 +40,10 @@ Module files must stay inert: including one must not launch an app, create a UI,
 ```ahk
 class ExampleActionAdapter {
     static List(query := "") {
-        context := ActionContext("example-adapter", ProfileManager.current)
+        context := ActionContext("example-adapter")
         actions := query = ""
             ? ActionRegistry.GetDiscoverable(context)
-            : ActionRegistry.Search(query, {profile: context.profile, available: true})
+            : ActionRegistry.Search(query, {profile: ProfileManager.current, available: true})
 
         result := []
         for definition in actions
@@ -50,13 +52,13 @@ class ExampleActionAdapter {
                 title: definition.Title,
                 category: definition.Category,
                 isToggle: definition.IsToggle,
-                state: definition.IsToggle ? ActionRegistry.GetState(definition.Id) : ""
+                state: definition.IsToggle ? ActionRegistry.TryGetState(definition.Id, context).value : ""
             })
         return result
     }
 
     static Invoke(actionId, argument := unset) {
-        context := ActionContext("example-adapter", ProfileManager.current)
+        context := ActionContext("example-adapter")
         return IsSet(argument)
             ? ActionRegistry.Invoke(actionId, argument, context)
             : ActionRegistry.Invoke(actionId, unset, context)
@@ -65,6 +67,10 @@ class ExampleActionAdapter {
 ```
 
 The adapter owns presentation only. The registry continues to enforce arguments, profile eligibility, availability, confirmation, exception handling, and structured results.
+
+`ActionContext.profile` is informational only. Profile eligibility always uses the registry's trusted profile provider and fails closed when a restricted action has no authoritative current profile. Use `TryGetState()` in UI adapters so unavailable or failing state providers produce an `ActionResult` instead of interrupting the UI.
+
+Every action ID has one registration owner per process. Duplicate registration is an error, even when two definitions appear similar; this prevents startup order from silently selecting an implementation.
 
 ## Remote, Voice, and AI Safety
 
