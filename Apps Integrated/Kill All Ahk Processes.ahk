@@ -1,9 +1,11 @@
 ; KillAllAHkProcesses()
 
-KillAllAHkProcesses() {
-    result := MsgBox("Kill all AutoHotkey processes?", "Kill AutoHotkey", "YesNo")
-    if (result = "No")
-        return
+KillAllAHkProcesses(skipConfirmation := false) {
+    if !skipConfirmation {
+        result := MsgBox("Kill all AutoHotkey processes?", "Kill AutoHotkey", "YesNo")
+        if (result = "No")
+            return
+    }
 
     DetectHiddenWindows true
 	SetTitleMatchMode 'RegEx'

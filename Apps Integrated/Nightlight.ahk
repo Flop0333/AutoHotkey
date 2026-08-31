@@ -4,11 +4,6 @@
 
 A_MaxHotkeysPerInterval := 100
 
-ShowNightLight() => NightLight.Show()
-SetNightLight(amount) => NightLight.Set(amount)
-DimNightLight() => NightLight.Dim()
-BrightenNightLight() => NightLight.Brighten()
-
 
 class NightLight {
     

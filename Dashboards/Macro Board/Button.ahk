@@ -3,37 +3,16 @@
 ; ============================================================================
 ;
 ; [USAGE]
-;   Use the function names (as strings) to define button actions and states.
+;   Reference one registered action ID. Tooltip and image are optional
+;   Macro Board-specific overrides of shared action metadata.
 ;
-;   Example simple action button
-;       btn := Button("OpenBrowser", "Open Chrome", "chrome.gif")
-;   
-;   Example toggle button with state
-;       toggleBtn := ToggleButton(
-;           "ToggleNightlight",
-;           () => Nightlight.IsEnabled(),
-;           "Night Light",
-;           "moon.png"
-;       )
-;
-; [BUTTON TYPES]
-;   - Button: Standard action button that triggers a function
-;   - ToggleButton: Button with on/off state, displays current state in UI
+;   btn := Button(ActionIds.Application.BrowserCloseAll, "Close Browsers", "chrome.gif")
 ; ============================================================================
 
 class Button {
-    __New(funcName, tooltip, image := "") {
-        this.funcName := funcName
+    __New(actionId, tooltip := "", image := "") {
+        this.actionId := actionId
         this.tooltip := tooltip
         this.image := image
-        this.isToggle := false
-    }
-}
-
-class ToggleButton extends Button {
-    __New(funcName, getStateFunc, tooltip, image := "") {
-        super.__New(funcName, tooltip, image?)
-        this.getStateFunc := getStateFunc
-        this.isToggle := true
     }
 }

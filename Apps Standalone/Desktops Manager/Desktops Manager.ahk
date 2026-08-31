@@ -24,11 +24,13 @@
 ; ============================================================================
 
 #Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Actions\Modules\Window Actions.ahk
+#Include ..\..\Lib\Actions\Modules\Application Actions.ahk
 #Include Desktop.ahk
-#Include <Apps\VsCode>
-#Include <Apps\Notion>
-#Include <Apps\Spotify>
-#Include <Apps\WhatsApp>
+#Include ..\..\Lib\Apps\VsCode.ahk
+#Include ..\..\Lib\Apps\Notion.ahk
+#Include ..\..\Lib\Apps\Spotify.ahk
+#Include ..\..\Lib\Apps\WhatsApp.ahk
 
 
 GetDesktopsForProfile() {
@@ -60,30 +62,40 @@ GetDesktopsForProfile() {
         config["2"] := Desktop(desktopCounter++)
         config["3"] := Desktop(desktopCounter++)
 
-        config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",    () => WhatsApp.Launch()))
+        config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",    ActionBinding.Callback(ActionIds.Application.WhatsAppOpen, "desktop-manager")))
         config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",    () => Browser.OpenInNewBrowser(Links.youtube))) 
         
-        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.openAutoHotkey()))
-        config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    () => Spotify.Launch()))
+        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       ActionBinding.Callback(ActionIds.Application.VsCodeAutoHotkeyOpen, "desktop-manager")))
+        config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    ActionBinding.Callback(ActionIds.Application.SpotifyOpen, "desktop-manager")))
         config["G"] := Desktop(desktopCounter++,   RequiredWindow("ChatGPT",    () => Run("ahk_exe ChatGPT.exe")),
                                                     RequiredWindow("Brave",    () => Browser.OpenInNewBrowser(Links.chatGpt)))
         
-        config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.Launch()))
-        config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      () => Notion.Launch()))
+        config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       ActionBinding.Callback(ActionIds.Application.VsCodeOpen, "desktop-manager")))
+        config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      ActionBinding.Callback(ActionIds.Application.NotionOpen, "desktop-manager")))
     }
     
     return config
 }
 
 ; ===== HOTKEY CONFIGURATION =====
+ActionRegistry.RegisterAll([
+    WindowActions.PreviousDesktop((*) => DesktopsDDL.GoToPrevious()),
+    WindowActions.TogglePinToDesktops((*) => DesktopsDDL.TogglePin()),
+    ApplicationActions.WhatsAppLaunch((*) => WhatsApp.Launch()),
+    ApplicationActions.SpotifyLaunch((*) => Spotify.Launch()),
+    ApplicationActions.NotionLaunch((*) => Notion.Launch()),
+    ApplicationActions.VsCodeLaunch((*) => VsCode.Launch()),
+    ApplicationActions.VsCodeAutoHotkey((*) => VsCode.openAutoHotkey())
+], "Desktops Manager")
+
 desktops := GetDesktopsForProfile()
 
 for key, desktopObj in desktops
     Capslock.Hotkey(key, ((d) => (*) => HandleSwitch(d))(desktopObj))
 
 ; Foreward & Backward
-Capslock.Hotkey("Tab", (*) => DesktopsDDL.GoToPrevious())
-Capslock.Hotkey("P", (*) => DesktopsDDL.TogglePin())
+Capslock.Hotkey("Tab", ActionBinding.Callback(ActionIds.Desktop.Previous, "desktop-hotkeys"))
+Capslock.Hotkey("P", ActionBinding.Callback(ActionIds.Desktop.TogglePinWindow, "desktop-hotkeys"))
 
 ; ===== HELPER FUNCTIONS =====
 global onLeaveAction := ""

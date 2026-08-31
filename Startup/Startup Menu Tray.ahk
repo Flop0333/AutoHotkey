@@ -18,13 +18,23 @@
 ; ============================================================================
 
 #Include ..\Apps Integrated\Kill All Ahk Processes.ahk
+#Include ..\Lib\Actions\Action Binding.ahk
+#Include ..\Lib\Actions\Modules\System Actions.ahk
 
 class StartupMenuTray {
     __New() {
+		ActionRegistry.SetProfileProvider((*) => ProfileManager.current)
+		ActionRegistry.RegisterAll([
+			SystemActions.ReloadStartup(RunStartup),
+			SystemActions.KillAhkProcesses((*) => KillAllAHkProcesses(true)),
+			SystemActions.RegistryDiagnostics((*) => MsgBox(ActionRegistry.FormatDiagnostics(), "Action Registry Diagnostics", "Iconi"))
+		], "Startup Tray")
         A_TrayMenu.Delete()
-        A_TrayMenu.Add("Reload", (*) => Reload())
+        A_TrayMenu.Add("Reload", ActionBinding.Callback(ActionIds.System.ReloadStartup, "startup-tray"))
         this._AddProfilesToTrayMenu()
-        A_TrayMenu.Add("Exit", (*) => KillAllAHkProcesses())
+        if ProfileManager.Is(Profiles.devbox)
+            A_TrayMenu.Add("Action Registry Diagnostics", ActionBinding.Callback(ActionIds.System.RegistryDiagnostics, "startup-tray"))
+        A_TrayMenu.Add("Exit", ActionBinding.Callback(ActionIds.System.KillAhkProcesses, "startup-tray"))
     }
 
     _AddProfilesToTrayMenu() {

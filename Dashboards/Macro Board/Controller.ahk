@@ -31,7 +31,11 @@ Class MacroBoard extends WebViewToo {
 		WindowPositionTracker(this.Gui, this.settingsService)
 	}
 
-	Show() => super.Show(this.showOptions, MacroBoard.WIN_TITLE)
+	Show() {
+		super.Show(this.showOptions, MacroBoard.WIN_TITLE)
+		; Refresh state changed by hotkeys or other consumers while the board was hidden.
+		try this.ExecuteScript("window.macroBoardButtons?.refreshStates();")
+	}
 	
 	; Keep the GUI at the bottom persistently by re-applying Z-order periodically.
 	PlaceOnBottom() {
@@ -45,17 +49,17 @@ Class MacroBoard extends WebViewToo {
 		serializedButtons := []
 		
 		for button in buttons {
+			action := ActionRegistry.Get(button.actionId)
 			serializedBtn := {
-				funcName: button.funcName.Name,
-				tooltip: button.tooltip,
-				isToggle: button.isToggle,
-				image: button.image
+				actionId: action.Id,
+				tooltip: button.tooltip != "" ? button.tooltip : (action.Description != "" ? action.Description : action.Title),
+				isToggle: action.IsToggle,
+				image: button.image != "" ? button.image : action.Icon
 			}
 			
-			; For toggle buttons, add state function name and current state
-			if button.isToggle {
-				serializedBtn.getStateFunc := button.getStateFunc.Name
-				serializedBtn.state := button.getStateFunc.Call()
+			if action.IsToggle {
+				stateResult := ActionRegistry.TryGetState(action.Id, ActionContext("macro-board-state"))
+				serializedBtn.state := stateResult.Succeeded ? stateResult.value : false
 			}
 			
 			serializedButtons.Push(serializedBtn)
@@ -76,11 +80,17 @@ ConvertToObject(jsonString, objectType := {}) {
 
 TriggerButtonFunction(jsonButton) {
 	button := JSON.ToObject(jsonButton)
+	context := ActionContext("macro-board", ProfileManager.current)
+	result := ActionRegistry.Invoke(button.actionId, unset, context)
+	if result.status != ActionResult.STATUS_SUCCESS && result.status != ActionResult.STATUS_CANCELLED
+		Info(result.message)
 
-	; Execute the button's function
-	%button.funcName%()
-	
-	; If it's a toggle button, return the new state
-	if button.isToggle
-		return %button.getStateFunc%()
+	if button.isToggle && result.Succeeded {
+		stateResult := ActionRegistry.TryGetState(button.actionId, ActionContext("macro-board-state"))
+		if !stateResult.Succeeded {
+			Info(stateResult.message)
+			return false
+		}
+		return stateResult.value
+	}
 }

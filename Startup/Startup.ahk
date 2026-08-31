@@ -18,9 +18,10 @@
 #Include Startup Message.ahk
 #Include Startup Menu Tray.ahk
 
-RunStartup(profile?) {
+RunStartup(profile?, showMessage := true) {
     IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetByComputerName()
-    StartupMessage()
+    if showMessage
+        StartupMessage()
     StartupMenuTray()
     
     Run(Paths.appsStandalone "\Capslock Service.ahk") ; Run this before scripts that set a capslock hotkey

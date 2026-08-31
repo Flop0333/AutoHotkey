@@ -4,8 +4,6 @@
 #Include ..\Lib\Extensions\Dark Gui.ahk
 #Include ..\Lib\Core\Paths.ahk
 
-LaunchTimer() => Timer.Startup()
-
 class Timer extends DarkGui {
 
 	static minutes := 0

@@ -23,8 +23,8 @@ Class UserInterface extends WebViewToo {
 		this.AddCallbackToScript("GetBookmarksCategories",	(WebView) => json.Dump(BookmarksState.GetCategories()))
 		this.AddCallbackToScript("GetSearchState", 			(WebView) => json.Dump(SearchEnginesState.state))
 		this.AddCallbackToScript("GetSearchCategories", 	(WebView) => json.Dump(SearchEnginesState.GetCategories()))
-		this.AddCallbackToScript("GetAppsState", 			(WebView) => json.Dump(AppsState.state.allApps))
-		this.AddCallbackToScript("GetAppsCategories", 		(WebView) => json.Dump(AppsState.GetCategories()))
+		this.AddCallbackToScript("GetAppsState", 			(WebView) => json.Dump(AppsState.GetEligible()))
+		this.AddCallbackToScript("GetAppsCategories", 		(WebView) => json.Dump(AppsState.GetEligibleCategories()))
 		
 		this.AddCallbackToScript("ClearBrowsingData", 		(WebView) => this.Profile.ClearBrowsingDataAll(WebView2.Handler(Handler.Bind(this))))
 		Handler(hresult) {

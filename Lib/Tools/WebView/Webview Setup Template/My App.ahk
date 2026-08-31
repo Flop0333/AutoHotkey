@@ -36,7 +36,7 @@ Class MyApp extends WebViewToo {
 		for object in myObjects
 			object.funcName := object.funcName.Name
 
-		return json.Dump(myObjects) ; Example output: [{"funcName":"OpenNotionShitFixen","image":"notion.gif","tooltip":"S H I T  F I X E N"},{"funcName":"OpenFinancien","image":"tetris.gif","tooltip":"Financiën Sheet"}}]
+		return json.Dump(myObjects) ; Prefer stable actionId fields when adapting this template to an action consumer.
 	}
 
 	TriggerButtonFunction(WebView, button) => %button.funcName%()

@@ -46,9 +46,18 @@
 #SingleInstance force
 #Include Screen Snipper OCR.ahk
 #Include ..\..\Lib\Tools\Info.ahk
+#Include ..\..\Lib\Actions\Action Registry.ahk
+#Include ..\..\Lib\Actions\Modules\Productivity Actions.ahk
 DetectHiddenWindows true
 SetWinDelay(0)
 ;}
+
+ActionRegistry.RegisterAll([
+	ProductivityActions.ScreenSnipAndCopy(CaptureSnipAndCopy),
+	ProductivityActions.ScreenCopyOnly(CaptureScreenCopyOnly),
+	ProductivityActions.ScreenSaveOnly(CaptureScreenSaveOnly),
+	ProductivityActions.ScreenOcr(CaptureScreenOcr)
+], "Screen Snipper")
 
 _SetupTrayMenu()
 _SetupTrayMenu() {   
@@ -152,30 +161,30 @@ Try DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
 ; 		SnipArea(Area, false, true, SnipVisible, &guiSnips)
 ; }
 
-#Lbutton::	;	<-- Snip Image and Copy to Clipboard
-{
+#Lbutton::ActionRegistry.Invoke(ActionIds.Productivity.ScreenSnipCopy, unset, ActionContext("screen-snipper-hotkey"))
+CaptureSnipAndCopy() {
 	Global guiSnips
 	Area := SelectScreenRegion('LButton')
 	If (Area.W > 8 and Area.H > 8)
 		SnipArea(Area, true, false, true, SnipVisible, &guiSnips)
 }
 
-^#Lbutton::	;	<-- CTRL, WIN + Mouse => Copy to Clipboard Only
-{
+^#Lbutton::ActionRegistry.Invoke(ActionIds.Productivity.ScreenSnipCopyOnly, unset, ActionContext("screen-snipper-hotkey"))
+CaptureScreenCopyOnly() {
 	Area := SelectScreenRegion('LButton')
 	SnipArea(Area, true, false, false)
 	Info("Copied to clipboard")
 }
 
-!#Lbutton::	; 	<-- ALT, WIN + Mouse => Save to Clipboard Only
-{
+!#Lbutton::ActionRegistry.Invoke(ActionIds.Productivity.ScreenSnipSave, unset, ActionContext("screen-snipper-hotkey"))
+CaptureScreenSaveOnly() {
 	Area := SelectScreenRegion('LButton')
 	SnipArea(Area, false, true, false, false)
 	Info("Saved snippet to file")
 }
 
-+#Lbutton::	;	<-- OCR Only
-{
++#Lbutton::ActionRegistry.Invoke(ActionIds.Productivity.ScreenOcrCapture, unset, ActionContext("screen-snipper-hotkey"))
+CaptureScreenOcr() {
 	Global guiSnips
 	Area := SelectScreenRegion('LButton')
 	If (Area.W > 8 and Area.H > 8) {

@@ -23,6 +23,12 @@
 #Include ..\..\Lib\Core.ahk
 #Include User Interface\Controller.ahk
 #Include Input Handler\Command Input.ahk
+#Include ..\..\Lib\Actions\Modules\System Actions.ahk
+#Include ..\..\Lib\Actions\Modules\Productivity Actions.ahk
+#Include ..\..\Lib\Actions\Modules\Development Actions.ahk
+#Include Actions\Age of Efficiency Actions.ahk
+
+AgeOfEfficiencyActions.Register()
 
 USER_INTERFACE_PATH := Paths.dashboards "\Age of Efficiency\User Interface"
 TraySetIcon(USER_INTERFACE_PATH "\Library\Icons\Icon.png")

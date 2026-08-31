@@ -17,23 +17,3 @@
 #Include ..\..\..\Apps Integrated\Picture In Picture.ahk
 #Include ..\..\..\Startup\Startup.ahk
 #Include ..\..\..\Lib\Apps\Notion.ahk
-
-StartPBIReformat() => PBIReformat.Start()
-
-OpenAgeOfEfficiency() => aoeWindow.Show()
-
-StartFakeWorkMode() => FakeWorkMode.Start()
-
-ShutPcDown() => System.PowerDown()
-
-RerunStartup() => RunStartup()
-
-ShowStatusMeme(meme) => StatusMeme(meme)
-
-OpenKeePass() => Run(A_MyDocuments "\Database.kdbx")
-
-CapsOff() => SetCapsLockState('OFF')
-
-StartRemoteDesktop(setting := "H3") => VirtualMachine.StartRemoteDesktop(setting)
-
-StartTimer(time) => Timer.Start(time)

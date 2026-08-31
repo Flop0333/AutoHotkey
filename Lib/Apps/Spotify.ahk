@@ -2,8 +2,6 @@
 #Include ..\Tools\UIA-v2\Lib\UIA.ahk
 #Include ..\Tools\Info.ahk
 
-StartSpotifyGoodMorningJazz() => Spotify.StartPlaylist(Playlist.goodMorningJazz)
-
 Class Playlist {
     static goodMorningJazz := "37i9dQZF1DX71VcjjnyaBQ"
 }

@@ -71,8 +71,8 @@ class GestureDetector {
         if (this.activeGesture = "")
             SendInput("{" GestureConfig.Hotkey "}")
         ; Execute the action associated with the detected gesture
-        else
-            try Gestures.GetAction(this.activeGesture).Call()
+        else if actionId := Gestures.GetActionId(this.activeGesture)
+            ActionBinding.Invoke(actionId, unset, "mouse-gesture")
     }
  
     SetStartCoordinates() {

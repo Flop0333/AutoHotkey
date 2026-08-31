@@ -229,7 +229,7 @@ class AddUpdateModal {
         break;
         
       case TAB_OPTIONS.Apps:
-        document.getElementById('action').value = updateItem.action;
+        document.getElementById('actionId').value = updateItem.actionId;
         
         const argumentRequiredCheckbox = document.getElementById('argumentRequired');
         argumentRequiredCheckbox.checked = updateItem.argumentRequired

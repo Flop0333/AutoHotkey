@@ -8,6 +8,14 @@
 #Include Core\Paths.ahk
 #Include Core\Links.ahk
 
+; Actions
+#Include Actions\Action Registry.ahk
+#Include Actions\Action Binding.ahk
+
+ActionRegistry.SetProfileProvider((*) => ProfileManager.current)
+ActionLog.Configure(true, 100)
+ActionBinding.SetFailureHandler((message) => Info(message))
+
 ; Extensions
 #Include Extensions\Array.ahk
 #Include Extensions\Dark Gui.ahk
