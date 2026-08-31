@@ -17,14 +17,14 @@
 ;   - All profile changes are persisted to current_profile.ini
 ; ============================================================================
 
-#Include ..\Apps Integrated\Kill All Ahk Processes.ahk
+#Include <Helpers\System>
 
 class StartupMenuTray {
     __New() {
         A_TrayMenu.Delete()
         A_TrayMenu.Add("Reload", (*) => Reload())
         this._AddProfilesToTrayMenu()
-        A_TrayMenu.Add("Exit", (*) => KillAllAHkProcesses())
+        A_TrayMenu.Add("Exit", (*) => System.KillAllAHkProcesses())
     }
 
     _AddProfilesToTrayMenu() {

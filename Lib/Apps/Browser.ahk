@@ -1,13 +1,6 @@
 #Include ..\Core.ahk
 #Include App.ahk
 
-OpenFinancien() =>  (Info("Open Financiën"), Run(Secrets.FinanceUrl.GetOrSet()))
-OpenCalendar() =>   (Info("Open Calendar"), Run("https://calendar.google.com/calendar/u/1"))
-OpenAI() =>         (Info("Open AI"), Run("https://chatgpt.com/"))
-OpenWeer() =>       (Info("Open Weer"), Run(Secrets.WeatherUrl.GetOrSet()))
-OpenGoogleMaps() => (Info("Open Google Maps"), Run(Secrets.GooglemapsUrl.GetOrSet()))
-CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
-
 Class Browser extends App {
     static defaultBrowser := ProfileManager.Is(Profiles.work) || ProfileManager.Is(Profiles.devbox) ? Edge : Brave
     static browsers := [Brave,Edge,Chrome]

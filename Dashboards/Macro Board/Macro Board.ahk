@@ -19,11 +19,23 @@
 #Include Controller.ahk
 #Include "..\..\Apps Integrated\Command Storer\Command Storer.ahk"
 #Include ..\..\Apps Integrated\Spell Checker.ahk
-#Include ..\..\Apps Integrated\Kill All Ahk Processes.ahk
 #Include ..\..\Apps Integrated\Fake Working Mode.ahk
 #Include ..\..\Lib\Apps\Spotify.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
 #Include ..\..\Startup\Startup.ahk
+#Include <Apps\Browser>
+
+; ===========================================================================
+; === ACTIONS REGISTRATION ==================================================
+; ===========================================================================
+ToggleSpellChecker() => SpellChecker.Toggle()
+GetSpellCheckerState() => SpellChecker.Enabled
+KillAllAHkProcesses() => System.KillAllAHkProcesses()
+ToggleFakeWorkMode() => FakeWorkMode.Toggle()
+GetFakeWorkModeState() => FakeWorkMode.Enabled
+
+OpenNotionShitFixen() => Notion.OpenPage(NotionPages.shitFixen)
+CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 
 ; ============================================================================
 ; === BUTTONS REGISTRATION ======================---==========================
@@ -41,18 +53,9 @@ profileButtons := Map(
     Profiles.woonkamerLaptops, [
         Button(OpenNotionShitFixen, "S H I T  F I X E N", "notion.gif"),
         Button(StartSpotifyGoodMorningJazz, "Start Spotify Playlist", "spotify.gif"),
-        Button(OpenFinancien, "Financiën Sheet", "tetris.gif"),
-        Button(OpenCalendar, "Calendar", "calendar.gif"),
-        Button(OpenGoogleMaps, "Maps", "maps.gif"),
-        Button(OpenWeer, "Weer", "weer.gif"),
-        Button(OpenAI, "ChatGpt", "ai.gif"),
     ],
     Profiles.work, [
-        Button(OpenNotionVGZDashboard, "VGZ Dashboard", "notion.gif"),
         Button(CloseAllBrowsers, "Kill Browsers", "game over.gif"),
-    ],
-    Profiles.devbox, [
-        Button(OpenNotionVGZDashboard, "VGZ Dashboard", "notion.gif")
     ],
     Profiles.default, [
         Button(MsgBox, "Pizza Default")

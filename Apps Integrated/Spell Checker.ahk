@@ -4,9 +4,6 @@
 
 #Include ..\Lib\Core.ahk
 
-ToggleSpellChecker() => SpellChecker.Toggle()
-GetSpellCheckerState() => SpellChecker.Enabled
-
 class SpellChecker {
     static Enabled := true
 

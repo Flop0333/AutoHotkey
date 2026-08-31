@@ -4,10 +4,6 @@
 
 #Include ..\Lib\Core.ahk
 
-ToggleFakeWorkMode() => FakeWorkMode.Toggle()
-GetFakeWorkModeState() => FakeWorkMode.Enabled
-
-
 ; Set default state for profile
 if ProfileManager.Is(Profiles.devbox)
     FakeWorkMode.Toggle(true)

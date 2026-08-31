@@ -9,11 +9,9 @@
 #Include Internet Searcher.ahk
 #Include ..\User Interface\Controller.ahk
 #Include ..\..\..\Apps Integrated\Fake Working Mode.ahk
-#Include ..\..\..\Apps Integrated\Kill All Ahk Processes.ahk
 #Include ..\..\..\Apps Integrated\PBI Reformat.ahk
 #Include ..\..\..\Apps Integrated\Timer.ahk
 #Include ..\..\..\Apps Integrated\Status Memes\Status Meme.ahk
-#Include ..\..\..\Apps Integrated\Virtual Machine.ahk
 #Include ..\..\..\Apps Integrated\Picture In Picture.ahk
 #Include ..\..\..\Startup\Startup.ahk
 #Include ..\..\..\Lib\Apps\Notion.ahk
@@ -34,6 +32,6 @@ OpenKeePass() => Run(A_MyDocuments "\Database.kdbx")
 
 CapsOff() => SetCapsLockState('OFF')
 
-StartRemoteDesktop(setting := "H3") => VirtualMachine.StartRemoteDesktop(setting)
-
 StartTimer(time) => Timer.Start(time)
+
+StartPictureInPicture() => PictureInPicture()
