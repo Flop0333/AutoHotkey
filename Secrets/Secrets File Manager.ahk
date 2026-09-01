@@ -123,8 +123,13 @@ class SecretsFileManager {
 
         ; Validate the narrow secrets-file format before using the permissive JSON helper.
         jsonText := FileRead(filePath, "UTF-8")
-        if !this._IsValidSecretsJson(jsonText)
-            throw Error("Invalid secrets JSON. Expected one object containing only string keys and values. The original file was left untouched: " . filePath)
+        validationResult := this._IsValidSecretsJson(jsonText)
+        if validationResult !== true {
+            message := "Invalid secrets JSON "
+            if Type(validationResult) = "String"
+                message .= validationResult
+            throw Error(message . ". Expected one object containing only string keys and values. The original file was left untouched: " . filePath)
+        }
 
         try {
             values := JSON.parse(jsonText)
@@ -155,7 +160,8 @@ class SecretsFileManager {
         }
 
         loop {
-            if !this._ConsumeJsonString(jsonText, &position)
+            key := this._ConsumeJsonString(jsonText, &position)
+            if key = false
                 return false
             this._SkipJsonWhitespace(jsonText, &position)
             if SubStr(jsonText, position, 1) != ":"
@@ -163,8 +169,9 @@ class SecretsFileManager {
 
             position += 1
             this._SkipJsonWhitespace(jsonText, &position)
-            if !this._ConsumeJsonString(jsonText, &position)
-                return false
+            value := this._ConsumeJsonString(jsonText, &position)
+            if value = false
+                return "for property: " . key . " (expected string only)"
             this._SkipJsonWhitespace(jsonText, &position)
 
             delimiter := SubStr(jsonText, position, 1)
@@ -189,27 +196,45 @@ class SecretsFileManager {
             return false
 
         position += 1
+        result := ""
         while position <= StrLen(jsonText) {
             character := SubStr(jsonText, position, 1)
             if character = quote {
                 position += 1
-                return true
+                return result
             }
             if Ord(character) < 0x20
                 return false
             if character = "\" {
                 position += 1
                 escapeCode := SubStr(jsonText, position, 1)
-                if InStr('"\/bfnrt', escapeCode) {
+                if InStr('"\\/bfnrt', escapeCode) {
+                    ; Map common escapes
+                    mapped := escapeCode
+                    if escapeCode = 'b'
+                        mapped := Chr(8)
+                    else if escapeCode = 'f'
+                        mapped := Chr(12)
+                    else if escapeCode = 'n'
+                        mapped := "`n"
+                    else if escapeCode = 'r'
+                        mapped := "`r"
+                    else if escapeCode = 't'
+                        mapped := "`t"
+                    result .= mapped
                     position += 1
                     continue
                 }
                 if escapeCode = "u" && RegExMatch(SubStr(jsonText, position + 1, 4), "i)^[0-9a-f]{4}$") {
+                    hex := SubStr(jsonText, position + 1, 4)
+                    chrCode := "0x" . hex
+                    result .= Chr(chrCode)
                     position += 5
                     continue
                 }
                 return false
             }
+            result .= character
             position += 1
         }
         return false
