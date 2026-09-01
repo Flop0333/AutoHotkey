@@ -18,7 +18,7 @@ SafeCall(operationId, callable, context := unset, args := unset) {
 
         value := callable.Call(args*)
         return {status: "success", value: value, durationMs: A_TickCount - startedAt}
-    } catch as executionError {
+    } catch Any as executionError {
         duration := A_TickCount - startedAt
         serviceId := HasProp(context, "serviceId") ? context.serviceId : ""
         record := ErrorRecord.FromThrown(executionError, {
