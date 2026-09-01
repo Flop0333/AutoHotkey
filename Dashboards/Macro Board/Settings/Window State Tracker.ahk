@@ -9,6 +9,8 @@
 ;   - Validates window position to prevent saving invalid states
 ; ============================================================================
 
+#Include ..\..\..\Lib\Core\CallbackAdapters.ahk
+
 class WindowPositionTracker {
 	DEBOUNCE_INTERVAL := 1000  ; ms
 	gui := Gui

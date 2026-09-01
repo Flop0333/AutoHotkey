@@ -3,6 +3,7 @@
 #Include ../../Database/Apps/AppsState.ahk
 #Include ../../Input Handler/Command Executor.ahk
 #Include ..\..\..\..\Secrets\Secrets Service.ahk
+#Include ..\..\..\..\Lib\Core\CallbackAdapters.ahk
 
 Global TAB_OPTIONS := {Bookmarks: "Bookmarks", Apps: "Apps", Search: "Search"}
 

@@ -1,7 +1,7 @@
 #SingleInstance Force
-#Include <Apps\App>
-#Include <Tools\UIA-v2\Lib\UIA>
-#Include <Tools\Info>
+#Include App.ahk
+#Include ..\Tools\UIA-v2\Lib\UIA.ahk
+#Include ..\Tools\Info.ahk
 
 class NotionPages {
     static shitFixen := { title: "S H I T    F I X E N", link: Secrets.NotionShitFixenUrl.Get() }

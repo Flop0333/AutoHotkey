@@ -20,8 +20,8 @@
 ;   - Configure items through the user interface
 ; ============================================================================
 
-#Include <Core>
-#Include <Core\ErrorReporter>
+#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\ErrorReporter.ahk
 #Include User Interface\Controller.ahk
 #Include Input Handler\Command Input.ahk
 

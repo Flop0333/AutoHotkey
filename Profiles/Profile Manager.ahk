@@ -13,7 +13,7 @@
 ;   - Manually set profile if needed using tray menu (from startup.ahk) or function call
 ; ============================================================================
 
-#Include <Core\Paths>
+#Include ..\Lib\Core\Paths.ahk
 #Include ..\Secrets\Secrets Service.ahk
 
 Class Profile {

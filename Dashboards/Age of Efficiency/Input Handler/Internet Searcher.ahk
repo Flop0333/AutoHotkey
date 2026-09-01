@@ -8,12 +8,12 @@
 ;   - Supports custom search engines via command, title, or URL
 ; ============================================================================
 
-#Include <Apps\Browser>
-#Include <Helpers\Number Convertor>
-#Include <Extensions\String>
+#Include ..\..\..\Lib\Apps\Browser.ahk
+#Include ..\..\..\Lib\Helpers\Number Convertor.ahk
+#Include ..\..\..\Lib\Extensions\String.ahk
 #Include ../Database/Internet Search/SearchEngine.ahk
 #Include ../Database/Internet Search/SearchEnginesState.ahk
-#Include <Core\ErrorReporter>
+#Include ..\..\..\Lib\Core\ErrorReporter.ahk
 
 Class InternetSearcher {
 

@@ -1,7 +1,8 @@
 #Requires AutoHotkey v2
 #SingleInstance Force
-#Include <Core>
-#Include <Core\WebView>
+#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\WebView.ahk
+#Include ..\..\Lib\Core\CallbackAdapters.ahk
 #Include Settings\Settings Service.ahk
 #Include Settings\Window State Tracker.ahk
 

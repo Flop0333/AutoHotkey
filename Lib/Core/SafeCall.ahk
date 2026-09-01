@@ -1,36 +1,35 @@
-; Minimal SafeCall implementation — catches thrown values and reports unexpected errors
-#Include <Core\ErrorRecord>
-#Include <Core\ErrorReporter>
+#Requires AutoHotkey v2
+#Include ErrorRecord.ahk
+#Include ErrorReporter.ahk
 
-; SafeCall(operationId, callable, context?, args?) => Object
-; Usage: result := SafeCall(operationId, Func, context?, ArgsArray?)
-; Returns an object: { status: "success" | "cancelled" | "validation-failed" | "execution-failed", value: ..., errorRecord: ... }
+/** Runs one callable inside an error boundary. */
 SafeCall(operationId, callable, context := unset, args := unset) {
-    start := A_TickCount
-    if (IsSet(context) = false || context = unset)
-    context := {}
-    if (IsSet(args) = false || args = unset)
+    startedAt := A_TickCount
+    if !IsSet(context)
+        context := {}
+    if !IsSet(args)
         args := []
-    try {
-        ; Support both function references and bound-callable closures
-        try {
-            value := callable(args*)
-        } catch inner {
-            try {
-                value := callable.Call(args*)
-            } catch {
-                throw inner
-            }
-        }
 
-        duration := A_TickCount - start
-        return { status: "success", value: value, durationMs: duration }
-    } catch _ex {
-        duration := A_TickCount - start
-        ; Determine if this is an expected outcome — heuristic: special error types or messages
-        ; For now treat everything as unexpected execution-failed; classification refinement later
-        rec := ErrorRecord.FromThrown(_ex, { serviceId: (context.serviceId != unset ? context.serviceId : ""), operationId: operationId, category: "invocation", severity: "error", durationMs: duration, safeMessage: "Unexpected error in operation" })
-        ErrorReporter.Report(rec)
-        return { status: "execution-failed", errorRecord: rec, durationMs: duration }
+    try {
+        if !HasMethod(callable, "Call")
+            throw TypeError("SafeCall expects a callable", -1)
+        if !(args is Array)
+            throw TypeError("SafeCall args must be an Array", -1)
+
+        value := callable.Call(args*)
+        return {status: "success", value: value, durationMs: A_TickCount - startedAt}
+    } catch as executionError {
+        duration := A_TickCount - startedAt
+        serviceId := HasProp(context, "serviceId") ? context.serviceId : ""
+        record := ErrorRecord.FromThrown(executionError, {
+            serviceId: serviceId,
+            operationId: operationId,
+            category: "invocation",
+            severity: "error",
+            durationMs: duration,
+            safeMessage: "Unexpected error in operation"
+        })
+        ErrorReporter.Report(record)
+        return {status: "execution-failed", errorRecord: record, durationMs: duration}
     }
 }

@@ -1,7 +1,7 @@
-; Minimal ErrorRecord model for Error Resilience (initial implementation)
-#Include <Extensions\Json>
+#Requires AutoHotkey v2
 
-Class ErrorRecord {
+/** Sanitizable diagnostic data for a single failure. */
+class ErrorRecord {
     __New() {
         this.time := A_Now
         this.severity := "error"
@@ -20,55 +20,90 @@ Class ErrorRecord {
         this.fingerprint := ""
     }
 
-    static FromThrown(thrown, params := {}) {
-        r := ErrorRecord()
-        ; copy optional params
-        for k, v in params
-            r[k] := v
+    static FromThrown(thrown, params := unset) {
+        record := ErrorRecord()
+        record.errorType := Type(thrown)
 
-        try {
-            if IsObject(thrown) {
-                if (thrown.HasOwnProp && thrown.HasOwnProp('message'))
-                    r.errorMessage := thrown.message
-                else if (IsFunc(thrown.ToString))
-                    r.errorMessage := thrown.ToString()
-                else
-                    r.errorMessage := thrown
-                if (thrown.HasOwnProp && thrown.HasOwnProp('stack'))
-                    r.stack := thrown.stack
-            } else {
-                r.errorMessage := thrown
-            }
-        } catch {
-            r.errorMessage := "<unserializable thrown value>"
+        if IsObject(thrown) {
+            record.errorMessage := this._ReadProperty(thrown, "Message", "<object thrown>")
+            record.what := this._ReadProperty(thrown, "What")
+            record.file := this._ReadProperty(thrown, "File")
+            record.line := this._ReadProperty(thrown, "Line", 0)
+            record.stack := this._ReadProperty(thrown, "Stack")
+        } else {
+            try record.errorMessage := String(thrown)
+            catch
+                record.errorMessage := "<unserializable thrown value>"
         }
 
-        r.fingerprint := r._Fingerprint()
-        return r
+        if IsSet(params)
+            this._ApplyParams(record, params)
+
+        record.fingerprint := record._Fingerprint()
+        return record
     }
 
     _Fingerprint() {
-        ; Simple deterministic fingerprint: 32-bit additive hash over key fields
-        s := this.errorMessage "|" this.errorType "|" this.serviceId
+        ; 32-bit FNV-1a over stable fields.
+        source := this.errorMessage "|" this.errorType "|" this.serviceId "|" this.operationId
         hash := 2166136261
-        for i, ch in StrSplit(s, '')
-            hash := (hash * 16777619) ^ Asc(ch)
-        return Format("%08X", hash & 0xFFFFFFFF)
+        Loop Parse source
+            hash := ((hash ^ Ord(A_LoopField)) * 16777619) & 0xFFFFFFFF
+        return Format("{:08X}", hash)
     }
 
     ToJson() {
-        try {
-            return Json.Stringify(this)
-        } catch {
-            ; Fallback naive serializer
-            props := []
-            for k, v in this
-                try {
-                    props.Push('"' k '": "' StrReplace(v, '"', '\\"') '"')
-                } catch {
-                    ; ignore property if it fails
-                }
-            return "{" StrJoin(props, ',') "}"
+        properties := []
+        for name, value in this.OwnProps()
+            properties.Push(ErrorRecord._JsonString(name) ":" ErrorRecord._JsonValue(value))
+        return "{" ErrorRecord._Join(properties, ",") "}"
+    }
+
+    static _ApplyParams(record, params) {
+        if params is Map {
+            for name, value in params
+                record.%name% := value
+            return
         }
+
+        if IsObject(params)
+            for name, value in params.OwnProps()
+                record.%name% := value
+    }
+
+    static _ReadProperty(value, name, fallback := "") {
+        try {
+            if HasProp(value, name)
+                return value.%name%
+        }
+        return fallback
+    }
+
+    static _JsonValue(value) {
+        switch Type(value) {
+            case "Integer", "Float":
+                return String(value)
+            case "String":
+                return this._JsonString(value)
+            default:
+                return this._JsonString("<" Type(value) ">")
+        }
+    }
+
+    static _JsonString(value) {
+        value := String(value)
+        value := StrReplace(value, "\", "\\")
+        value := StrReplace(value, '"', '\"')
+        value := StrReplace(value, "`r", "\r")
+        value := StrReplace(value, "`n", "\n")
+        value := StrReplace(value, "`t", "\t")
+        return '"' value '"'
+    }
+
+    static _Join(values, separator) {
+        result := ""
+        for index, value in values
+            result .= (index = 1 ? "" : separator) value
+        return result
     }
 }

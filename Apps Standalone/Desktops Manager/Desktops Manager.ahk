@@ -23,13 +23,13 @@
 ;   - Multiple RequiredWindow() per desktop supported
 ; ============================================================================
 
-#Include <Core>
-#Include <Core\CallbackAdapters>
+#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\CallbackAdapters.ahk
 #Include Desktop.ahk
-#Include <Apps\VsCode>
-#Include <Apps\Notion>
-#Include <Apps\Spotify>
-#Include <Apps\WhatsApp>
+#Include ..\..\Lib\Apps\VsCode.ahk
+#Include ..\..\Lib\Apps\Notion.ahk
+#Include ..\..\Lib\Apps\Spotify.ahk
+#Include ..\..\Lib\Apps\WhatsApp.ahk
 
 
 GetDesktopsForProfile() {

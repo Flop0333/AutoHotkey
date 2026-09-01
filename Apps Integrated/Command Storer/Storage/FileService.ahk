@@ -1,3 +1,5 @@
+#Include ..\..\..\Lib\Core\ErrorReporter.ahk
+
 GetScript() {
   return FileOpen(Paths.appsStandalone "\Command Storer\Storage\Command Sets\" selectedSet, "rw")
 }

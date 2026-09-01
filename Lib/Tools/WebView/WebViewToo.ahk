@@ -28,9 +28,9 @@
 ;///////////////////////////////////////////////////////////////////////////////////////////
 
 #Requires AutoHotkey v2
-#Include <Tools\WebView\WebView2>
-#Include <Core\ErrorReporter>
-#Include <Core\ErrorRecord>
+#Include WebView2.ahk
+#Include ..\..\Core\ErrorReporter.ahk
+#Include ..\..\Core\ErrorRecord.ahk
 
 class WebViewToo {
     static Template := {}

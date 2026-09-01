@@ -9,11 +9,11 @@
 ;	note: this class works, but could use an update
 ; ============================================================================
 
-#Include <Helpers\Number Convertor>
-#Include <Tools\User Input>
-#Include <Extensions\String>
-#Include <Helpers\ClipSend>
-#Include <Apps\Browser>
+#Include ..\Helpers\Number Convertor.ahk
+#Include User Input.ahk
+#Include ..\Extensions\String.ahk
+#Include ..\Helpers\ClipSend.ahk
+#Include ..\Apps\Browser.ahk
 
 class InternetSearch extends UserInput {
 

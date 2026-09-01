@@ -1,33 +1,30 @@
-; Callback adapters for safely invoking callbacks using SafeCall and ErrorReporter
-#Include <Core\SafeCall>
-#Include <Core\ErrorReporter>
+#Requires AutoHotkey v2
+#Include SafeCall.ahk
 
-Class CallbackAdapters {
-
-    static MakeHotkeyHandler(operationId, callable, context := {}) {
-            res := SafeCall(operationId, callable, context, [])
-            if (res.status != "success")
-                ErrorReporter.Notify("Operation '" operationId "' failed", (context.serviceId ?? operationId), "error")
+/** Produces callbacks which preserve the arguments supplied by AutoHotkey. */
+class CallbackAdapters {
+    static MakeHotkeyHandler(operationId, callable, context := unset) {
+        return (callbackArgs*) => this._Invoke("Operation", operationId, callable, context?, callbackArgs)
     }
 
-    static MakeTimerHandler(operationId, callable, context := {}) {
-            res := SafeCall(operationId, callable, context, [])
-            if (res.status != "success")
-                ErrorReporter.Notify("Timer '" operationId "' failed", (context.serviceId ?? operationId), "error")
+    static MakeTimerHandler(operationId, callable, context := unset) {
+        return (callbackArgs*) => this._Invoke("Timer", operationId, callable, context?, callbackArgs)
     }
 
-    static MakeGuiEventHandler(operationId, callable, context := {}) {
-            args := p*
-            res := SafeCall(operationId, callable, context, args)
-            if (res.status != "success")
-                ErrorReporter.Notify("GUI event '" operationId "' failed", (context.serviceId ?? operationId), "error")
-
+    static MakeGuiEventHandler(operationId, callable, context := unset) {
+        return (callbackArgs*) => this._Invoke("GUI event", operationId, callable, context?, callbackArgs)
     }
 
-    static MakeMenuHandler(operationId, callable, context := {}) {
-            ; Menu callbacks usually don't receive args, but forward any provided
-            res := SafeCall(operationId, callable, context, [])
-            if (res.status != "success")
-                ErrorReporter.Notify("Menu action '" operationId "' failed", (context.serviceId ?? operationId), "error")
+    static MakeMenuHandler(operationId, callable, context := unset) {
+        return (callbackArgs*) => this._Invoke("Menu action", operationId, callable, context?, callbackArgs)
+    }
+
+    static _Invoke(kind, operationId, callable, context := unset, args := unset) {
+        result := SafeCall(operationId, callable, context?, args?)
+        if result.status != "success" {
+            serviceId := IsSet(context) && HasProp(context, "serviceId") ? context.serviceId : operationId
+            ErrorReporter.Notify(kind " '" operationId "' failed", serviceId, "error")
+        }
+        return result
     }
 }

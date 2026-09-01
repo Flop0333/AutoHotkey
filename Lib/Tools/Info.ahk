@@ -8,8 +8,8 @@
 ; 	Info("test 1").ReplaceText("new text for test 1")
 ;  	Info.DestroyAll()
 
-#Include <Extensions\Dark Gui>
-#Include <Extensions\String>
+#Include ..\Extensions\Dark Gui.ahk
+#Include ..\Extensions\String.ahk
 
 class Info {
 

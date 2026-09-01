@@ -1,3 +1,3 @@
-#Include <Tools\WebView\WebView2>
-#Include <Tools\WebView\WebViewToo>
-#Include <Tools\WebView\ComVar>
+#Include WebView2.ahk
+#Include WebViewToo.ahk
+#Include ComVar.ahk

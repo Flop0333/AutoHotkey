@@ -8,7 +8,7 @@
 ;SetBatchLines -1
 
 ; Uncomment if Gdip.ahk is not in your standard library
-#Include <Tools\Gdip\Gdip_All>
+#Include ..\Gdip_All.ahk
 
 ; Specify both of the files we are going to use
 File1 := "needle.png"

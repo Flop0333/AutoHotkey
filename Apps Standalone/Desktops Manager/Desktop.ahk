@@ -8,7 +8,7 @@
 ; Internal implementation - see Desktops Manager.ahk for user setup guide.
 ; ============================================================================
 
-#Include <Core\SafeCall>
+#Include ..\..\Lib\Core\SafeCall.ahk
 
 Class Desktop {
 
@@ -26,7 +26,7 @@ Class Desktop {
   
   SwitchTo(onLeaveAction) {
     ; Run on-leave action safely so it doesn't block the switch
-    if IsFunc(onLeaveAction)
+    if HasMethod(onLeaveAction, "Call")
         SafeCall("desktops.onleave." this._number, onLeaveAction, { serviceId: "desktops_manager" })
     DesktopsDDL.desktopsHistory.Push(this._number)
     DesktopsDDL.GotoDesktop(this._number)
@@ -40,7 +40,7 @@ Class Desktop {
     for window in this._requiredWindows {
 
       if !WinExist(window.title) {
-        if IsFunc(window.launchMethod)
+        if HasMethod(window.launchMethod, "Call")
             SafeCall("desktops.launch." this._number, window.launchMethod, { serviceId: "desktops_manager", meta: { title: window.title } })
         ; NOTE: if launchMethod is not callable we skip silently
       } 

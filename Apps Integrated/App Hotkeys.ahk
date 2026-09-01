@@ -1,6 +1,6 @@
 #SingleInstance Force
 #NoTrayIcon
-#Include <Core\ErrorReporter>
+#Include ..\Lib\Core\ErrorReporter.ahk
 
 AppSpecificHotkey.Set("ahk_exe Notion.exe", (*) => Send("^\"), AppSpecificHotkey.PRIMARY_SHORTCUT) ; Toggle sidebar
 

@@ -1,156 +1,122 @@
-; Minimal ErrorReporter skeleton (non-recursive, safe fallback)
-#Include <Core\ErrorRecord>
+#Requires AutoHotkey v2
+#Include ErrorRecord.ahk
 
-; Log rotation + redaction defaults
-MAX_LOG_BYTES := 2 * 1024 * 1024 ; rotate at ~2 MiB
-LOG_KEEP_FILES := 5
+/** Writes sanitized diagnostics and shows non-modal notifications. */
+class ErrorReporter {
+    static MAX_LOG_BYTES := 2 * 1024 * 1024
+    static LOG_KEEP_FILES := 5
 
-Class ErrorReporter {
     static GetLogDir() {
-        localApp := EnvGet("LOCALAPPDATA")
-        if (localApp = "")
-            localApp := A_Temp
-        return RTrim(localApp, "\\/") "\\AutoHotkey Workflow\\Logs"
+        localAppData := EnvGet("LOCALAPPDATA")
+        if localAppData = ""
+            localAppData := A_Temp
+        return RTrim(localAppData, "\/") "\AutoHotkey Workflow\Logs"
     }
 
-    static Report(rec) {
+    static Report(record) {
         try {
-            if (!IsObject(rec))
-                rec := ErrorRecord.FromThrown(rec)
+            if !(record is ErrorRecord)
+                record := ErrorRecord.FromThrown(record)
 
             logDir := this.GetLogDir()
-            FileCreateDir(logDir)
-            logFile := logDir "\\error.log.jsonl"
+            DirCreate(logDir)
+            logFile := logDir "\error.log.jsonl"
 
-            ; Rotate if needed
-            try size := FileGetSize(logFile) 
-            catch {
+            try size := FileGetSize(logFile)
+            catch
                 size := 0
-                }
-            if (size > MAX_LOG_BYTES)
-                this._RotateLogs(logDir, "error.log.jsonl", LOG_KEEP_FILES)
 
-            ; Redact sensitive fields before writing
-            redacted := this._Redact(rec)
-            FileAppend(redacted "`n", logFile, "utf-8")
-            return { ok: true, path: logFile }
-        } catch {
-            ; Fallback: try temp file and avoid recursion
-            try {
-                tmp := A_Temp "\\error-reporter-fallback.jsonl"
-                FileAppend((IsObject(rec) ? rec.ToJson() : "{\\message\\:\\\report-failed\\\}") "`n", tmp, "utf-8")
-                return { ok: false, fallback: tmp, error: e.Message }
-            } catch e2 {
-                ; Last resort: swallow and return failure
-                return { ok: false, error: e2.Message }
-            }
+            if size > this.MAX_LOG_BYTES
+                this._RotateLogs(logDir, "error.log.jsonl", this.LOG_KEEP_FILES)
+
+            json := this._Redact(record).ToJson()
+            FileAppend(json "`n", logFile, "UTF-8")
+            return {ok: true, path: logFile}
+        } catch as reportError {
+            return this._WriteFallback(reportError)
         }
     }
 
     static Notify(message, title := "AutoHotkey", severity := "info", seconds := 5) {
         try {
-            ; Non-modal native tray notification fallback
-            ; Use TrayTip if available, otherwise ToolTip
-            if (IsFunc(&TrayTip)) {
-                TrayTip(title, message, seconds)
-            } else {
-                ToolTip(message)
-                SetTimer(() => ToolTip(), - seconds * 1000)
-            }
+            TrayTip(message, title)
+            if seconds > 0
+                SetTimer((*) => TrayTip(), -seconds * 1000)
 
-            ; Also write a short log entry
-            rec := ErrorRecord.FromThrown(message, { serviceId: "", severity: severity, category: "notification", safeMessage: message })
-            this.Report(rec)
-            return { ok: true }
-        } catch {
-            return { ok: false, error: e.Message }
+            record := ErrorRecord.FromThrown(message, {
+                severity: severity,
+                category: "notification",
+                safeMessage: message
+            })
+            this.Report(record)
+            return {ok: true}
+        } catch as notifyError {
+            result := this.Report(ErrorRecord.FromThrown(notifyError, {
+                category: "notification",
+                safeMessage: "Unable to show notification"
+            }))
+            return {ok: false, error: notifyError.Message, report: result}
         }
     }
 
-    static _Redact(rec) {
-        ; Create a shallow copy and redact fields containing URLs or clipboard
+    static _Redact(record) {
+        copy := ErrorRecord()
+        for name, value in record.OwnProps()
+            copy.%name% := value
+
+        clipboardText := ""
+        try clipboardText := A_Clipboard
+
+        for name, value in copy.OwnProps() {
+            if Type(value) != "String"
+                continue
+
+            value := RegExReplace(value, "i)\b(?:https?|ftp|file)://\S+", "[REDACTED_URL]")
+            value := RegExReplace(value, "i)Secrets\.[A-Za-z0-9_]+", "[REDACTED_SECRET]")
+            if clipboardText != "" && StrLen(clipboardText) >= 4
+                value := StrReplace(value, clipboardText, "[REDACTED_CLIPBOARD]")
+            copy.%name% := value
+        }
+
+        return copy
+    }
+
+    static _WriteFallback(reportError) {
         try {
-            copy := {}
-            for k, v in rec
-                copy[k] := v
-
-            ; redact common URL patterns in string fields
-            urlPattern := "https?://\S+|ftp://\S+|file://\S+"
-            for field in ["errorMessage", "safeMessage", "stack", "what"] {
-                var := copy[field]
-                if (IsSet(var) && var != "")
-                    copy[field] := RegExReplace(var, urlPattern, "[REDACTED_URL]")
-            }
-
-            ; Redact clipboard contents if present
-            try clip := A_Clipboard 
-            catch {
-                clip := ""
-            }
-            if (clip != "") {
-                for k, v in copy
-                    if IsString(v) && InStr(v, clip)
-                        copy[k] := StrReplace(v, clip, "[REDACTED_CLIPBOARD]")
-            }
-
-            ; Redact simple secret token patterns (Secrets.PropertyName)
-            for k, v in copy
-                if IsString(v)
-                    copy[k] := RegExReplace(copy[k], "Secrets\.[A-Za-z0-9_]+", "[REDACTED_SECRET]")
-
-            ; Serialize
-            return IsObject(copy) ? Json.Stringify(copy) : (IsFunc(copy.ToJson) ? copy.ToJson() : "{\\message\\:\\ redaction-failed}")
-        } catch {
-            return "redaction-error"
-            ; return "{\"message\":\"redaction-error\"}"zz
+            fallbackPath := A_Temp "\error-reporter-fallback.jsonl"
+            fallbackRecord := ErrorRecord.FromThrown(reportError, {
+                category: "reporter",
+                safeMessage: "Primary error reporting failed"
+            })
+            FileAppend(fallbackRecord.ToJson() "`n", fallbackPath, "UTF-8")
+            return {ok: false, fallback: fallbackPath, error: reportError.Message}
+        } catch as fallbackError {
+            return {ok: false, error: fallbackError.Message}
         }
     }
 
     static _RotateLogs(logDir, baseName, keepCount := 5) {
         try {
-            src := logDir "\\" baseName
-            if !FileExist(src)
+            source := logDir "\" baseName
+            if !FileExist(source)
                 return
 
-            timestamp := A_Now
-            dest := logDir "\\" StrReplace(baseName, ".jsonl", "") "." timestamp ".jsonl"
-            FileMove(src, dest)
+            destination := logDir "\" StrReplace(baseName, ".jsonl", "") "." A_Now ".jsonl"
+            FileMove(source, destination)
 
-            ; Prune older rotated files, keep latest `keepCount` files
             files := []
-            Loop Files, logDir "\\" StrReplace(baseName, ".jsonl", "") ".*.jsonl", "D"
-                files.Push(A_LoopFileFullPath)
+            Loop Files, logDir "\" StrReplace(baseName, ".jsonl", "") ".*.jsonl", "F"
+                files.Push({path: A_LoopFileFullPath, modified: A_LoopFileTimeModified})
 
-            ; If more than keepCount, delete oldest by modified time
-            if (files.Length > keepCount) {
-                ; find files to delete until length == keepCount
-                while (files.Length > keepCount) {
-                    oldest := ""
-                    oldestTime := ""
-                    for index, f in files {
-                        try t := FileGetTime(f, "M") 
-                        catch {
-                            t := ""
-                        }
-                        if (oldest = "" || t < oldestTime) {
-                            oldest := f
-                            oldestTime := t
-                        }
-                    }
-                    if (oldest != "") {
-                        FileDelete(oldest)
-                        ; remove from array
-                        newFiles := []
-                        for index, f in files
-                            if (f != oldest)
-                                newFiles.Push(f)
-                        files := newFiles
-                    } else
-                        break
-                }
+            while files.Length > keepCount {
+                oldestIndex := 1
+                for index, fileInfo in files
+                    if fileInfo.modified < files[oldestIndex].modified
+                        oldestIndex := index
+                try FileDelete(files[oldestIndex].path)
+                files.RemoveAt(oldestIndex)
             }
-        } catch {
-            ; swallow rotation errors to avoid cascading failures
         }
+        ; Rotation is best-effort and must never prevent the current log write.
     }
 }

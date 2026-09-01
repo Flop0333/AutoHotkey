@@ -11,7 +11,7 @@
 ; ============================================================================
 
 
- #Include <Core\ErrorReporter>
+ #Include ..\Core\ErrorReporter.ahk
 
 class IniService {
 
@@ -83,7 +83,7 @@ class IniService {
         try FileDelete this.filePath
         try {
             FileAppend fileContent, this.filePath
-        } catch {
+        } catch as e {
             ErrorReporter.Notify("could not append " this.filePath, "IniService", "error")
             ErrorReporter.Report(ErrorRecord.FromThrown(e, { serviceId: "ini_service", category: "io", severity: "error", safeMessage: "Failed to write ini file" }))
         }

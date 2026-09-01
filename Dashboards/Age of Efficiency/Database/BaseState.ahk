@@ -1,7 +1,7 @@
 ; Base class for in memorystate management of database entities
 ; Provides common CRUD operations and ID management
 
-#Include <Extensions\Singleton>
+#Include ..\..\..\Lib\Extensions\Singleton.ahk
 
 Class BaseState extends Singleton {
 

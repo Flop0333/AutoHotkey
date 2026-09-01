@@ -18,8 +18,8 @@
 ; Note: Requires Capslock Service to be running
 ; ============================================================================
 
-#Include <Core>
-#Include <Core\CallbackAdapters>
+#Include ..\Lib\Core.ahk
+#Include ..\Lib\Core\CallbackAdapters.ahk
 SetWinDelay(0)
 CoordMode("Mouse")
 

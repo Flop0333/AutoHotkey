@@ -1,6 +1,6 @@
-#Include <Tools\Desktops DLL Library\Desktops DLL Library>
-#Include <Extensions\Dark ToolTip>
-#Include <Core\ErrorReporter>
+#Include ..\Tools\Desktops DLL Library\Desktops DLL Library.ahk
+#Include Dark ToolTip.ahk
+#Include ..\Core\ErrorReporter.ahk
 
 class Win {
 

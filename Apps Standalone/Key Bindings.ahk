@@ -1,5 +1,5 @@
-﻿#Include <Core>
-#Include <Core\SafeCall>
+﻿#Include ..\Lib\Core.ahk
+#Include ..\Lib\Core\SafeCall.ahk
 
 ; Base
 :X:\fl:: SafeCall("keybindings.fl", (*) => Secrets.PersonalMail.Send(), { serviceId: "key_bindings" })

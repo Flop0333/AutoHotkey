@@ -19,10 +19,10 @@
 ;      If you want the user to be prompted to set it if it's not set yet, use Secrets.NewSecret.GetOrSet() instead.
 ; ============================================================================
 
-#Include <Tools\Info>
-#Include <Helpers\ClipSend>
-#Include <Extensions\Json>
-#Include <Core\Paths>
+#Include ..\Lib\Tools\Info.ahk
+#Include ..\Lib\Helpers\ClipSend.ahk
+#Include ..\Lib\Extensions\Json.ahk
+#Include ..\Lib\Core\Paths.ahk
 #Include Secrets User Interface.ahk
 #Include Secret.ahk
 #Include Secrets Catalog.ahk

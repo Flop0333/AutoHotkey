@@ -7,7 +7,7 @@
 ; #NoEnv
 
 ; Uncomment if Gdip.ahk is not in your standard library
-#Include <Tools\Gdip\Gdip_All>
+#Include ..\Gdip_All.ahk
 
 ; Start gdi+
 If !pToken := Gdip_Startup()

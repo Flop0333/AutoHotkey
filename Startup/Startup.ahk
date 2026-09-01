@@ -12,9 +12,9 @@
 ;   - Switch profiles using tray menu
 ; ============================================================================
 
-#Include <Core\Paths>
-#Include <..\Profiles\Profile Manager>
-#Include <..\Secrets\Secrets File Manager>
+#Include ..\Lib\Core\Paths.ahk
+#Include ..\Profiles\Profile Manager.ahk
+#Include ..\Secrets\Secrets File Manager.ahk
 #Include Startup Message.ahk
 #Include Startup Menu Tray.ahk
 

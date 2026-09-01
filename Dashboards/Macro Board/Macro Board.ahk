@@ -13,19 +13,19 @@
 ;   - Put img/gif files in the icons folder (stream deck icons can be used)
 ; ============================================================================
 
-#Include <Tools\Info>
-#Include <Core>
+#Include ..\..\Lib\Tools\Info.ahk
+#Include ..\..\Lib\Core.ahk
 #Include Button.ahk
 #Include Controller.ahk
 #Include "..\..\Apps Integrated\Command Storer\Command Storer.ahk"
 #Include ..\..\Apps Integrated\Spell Checker.ahk
 #Include ..\..\Apps Integrated\Fake Working Mode.ahk
-#Include <Apps\Spotify>
-#Include <Apps\Notion>
-#Include <Core\ErrorReporter>
+#Include ..\..\Lib\Apps\Spotify.ahk
+#Include ..\..\Lib\Apps\Notion.ahk
+#Include ..\..\Lib\Core\ErrorReporter.ahk
 #Include ..\..\Startup\Startup.ahk
-#Include <Apps\Browser>
-#Include <Core\CallbackAdapters>
+#Include ..\..\Lib\Apps\Browser.ahk
+#Include ..\..\Lib\Core\CallbackAdapters.ahk
 
 ; ===========================================================================
 ; === ACTIONS REGISTRATION ==================================================
@@ -45,7 +45,7 @@ CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 
 buttons := [
     ToggleButton(ToggleSpellChecker, GetSpellCheckerState, "Spell Checker", "spell checker.gif"),
-        Button((*) => ErrorReporter.Notify("Pizza Default", "Macro Board", "info"), "Pizza Default")
+    Button(KillAllAHkProcesses, "Kill All AHK Processes", "game over.gif"),
     Button(CommandStorer_ShowMainGui, "Command Storer", "tetris.gif"),
     ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),
     Button(RunStartup, "Reload Startup")

@@ -45,9 +45,9 @@
 #Warn All, Off
 #SingleInstance force
 #Include Screen Snipper OCR.ahk
-#Include <Tools\Info>
-#Include <Core\ErrorReporter>
-#Include <Core\SafeCall>
+#Include ..\..\Lib\Tools\Info.ahk
+#Include ..\..\Lib\Core\ErrorReporter.ahk
+#Include ..\..\Lib\Core\SafeCall.ahk
 DetectHiddenWindows true
 SetWinDelay(0)
 ;}
@@ -153,57 +153,41 @@ Try DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
 ; 	If (Area.W > 8 and Area.H > 8)
 ; 		SnipArea(Area, false, true, SnipVisible, &guiSnips)
 ; }
-#Include <Core\SafeCall>
- #Lbutton::	; 	<-- Snip Image and Copy to Clipboard
+#Lbutton::	; 	<-- Snip Image and Copy to Clipboard
 {
-	function() {
-		Global guiSnips
-		Area := SelectScreenRegion('LButton')
-		If (Area.W > 8 and Area.H > 8)
-			SnipArea(Area, true, false, true, SnipVisible, &guiSnips)
-	}
-	
-	SafeCall("snipper.snip_copy", (*) => function(), { serviceId: "screen_snipper" })
+	Global guiSnips
+	Area := SelectScreenRegion('LButton')
+	If (Area.W > 8 and Area.H > 8)
+		SnipArea(Area, true, false, true, SnipVisible, &guiSnips)
 }
 
 ^#Lbutton::	; 	<-- CTRL, WIN + Mouse => Copy to Clipboard Only
 {
-	function() {
-		{
 		Area := SelectScreenRegion('LButton')
 		SnipArea(Area, true, false, false)
 		Info("Copied to clipboard")
-	}
-	}
-	SafeCall("snipper.copy_only", (*) => function, { serviceId: "screen_snipper" })
 }
 
 !#Lbutton::	; 	<-- ALT, WIN + Mouse => Save to Clipboard Only
 {
-	function() {
 		Area := SelectScreenRegion('LButton')
 		SnipArea(Area, false, true, false, false)
 		Info("Saved snippet to file")
-	}
-	SafeCall("snipper.save_only", (*) => function(), { serviceId: "screen_snipper" })
 }
 
 +#Lbutton::	; 	<-- OCR Only
 {
-	function() {
-		Global guiSnips
-		Area := SelectScreenRegion('LButton')
-		If (Area.W > 8 and Area.H > 8) {
-			hwnd := SnipArea(Area, true, false, true, SnipVisible, &guiSnips)
-			Sleep 50
-			Snip2Clipboard(false, hwnd)
-			Sleep 50
-			CloseSnip(hwnd)
-			Sleep 80
-			OCR.GetOcrFromClipboard()
-		}
+	Global guiSnips
+	Area := SelectScreenRegion('LButton')
+	If (Area.W > 8 and Area.H > 8) {
+		hwnd := SnipArea(Area, true, false, true, SnipVisible, &guiSnips)
+		Sleep 50
+		Snip2Clipboard(false, hwnd)
+		Sleep 50
+		CloseSnip(hwnd)
+		Sleep 80
+		OCR.GetOcrFromClipboard()
 	}
-	SafeCall("snipper.ocr_only", (*) => function(), { serviceId: "screen_snipper" })
 }
 
 

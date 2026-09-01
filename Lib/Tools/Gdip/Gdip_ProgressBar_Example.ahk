@@ -1,4 +1,4 @@
-#Include <Tools\Gdip\Gdip_Toolbox>
+#Include Gdip_Toolbox.ahk
 
 ; Example: Gdip Progress Bar in AHK v2
 ; This script creates a custom progress bar using Gdip and updates it in a loop.

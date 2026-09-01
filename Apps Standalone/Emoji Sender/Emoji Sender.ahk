@@ -19,9 +19,9 @@
 
 #SingleInstance Force
 #NoTrayIcon
-#Include <Extensions\Dark Gui>
-#Include <Core\Paths>
-#Include <Core\CallbackAdapters>
+#Include ..\..\Lib\Extensions\Dark Gui.ahk
+#Include ..\..\Lib\Core\Paths.ahk
+#Include ..\..\Lib\Core\CallbackAdapters.ahk
 SetTitleMatchMode 3 ; Match the title exactly (for editing this script)
 CoordMode "Mouse", "Screen"
 
