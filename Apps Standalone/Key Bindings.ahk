@@ -1,16 +1,17 @@
 ﻿#Include <Core>
+#Include <Core\SafeCall>
 
 ; Base
-:X:\fl::Secrets.PersonalMail.Send()
-:X:\fe::Secrets.FamilyMail.Send()
-:X:\06::Secrets.TelNumber.Send()
-:X:\adres::Secrets.Address.Send()
-:X:\d::Send(FormatTime(, "dd-MM-yy"))
+:X:\fl:: SafeCall("keybindings.fl", (*) => Secrets.PersonalMail.Send(), { serviceId: "key_bindings" })
+:X:\fe:: SafeCall("keybindings.fe", (*) => Secrets.FamilyMail.Send(), { serviceId: "key_bindings" })
+:X:\06:: SafeCall("keybindings.tel", (*) => Secrets.TelNumber.Send(), { serviceId: "key_bindings" })
+:X:\adres:: SafeCall("keybindings.address", (*) => Secrets.Address.Send(), { serviceId: "key_bindings" })
+:X:\d:: SafeCall("keybindings.date", (*) => Send(FormatTime(, "dd-MM-yy")), { serviceId: "key_bindings" })
 
 ; Work
-:X:\f::Secrets.WorkMail.Send()
-:X:\f2::Secrets.SecondWorkMail.Send()
-:X:\b::Secrets.WorkAdminMail.Send()
+:X:\f:: SafeCall("keybindings.workmail", (*) => Secrets.WorkMail.Send(), { serviceId: "key_bindings" })
+:X:\f2:: SafeCall("keybindings.workmail2", (*) => Secrets.SecondWorkMail.Send(), { serviceId: "key_bindings" })
+:X:\b:: SafeCall("keybindings.workadmin", (*) => Secrets.WorkAdminMail.Send(), { serviceId: "key_bindings" })
 :O:\r::6916009000
 :O:\l0::localhost:4200
 :O:\l1::localhost:4201
@@ -30,4 +31,4 @@
 :O:\yay::＼(＾O＾)／
 :O:\lenny::( ͡° ͜ʖ ͡°)
 :O:\dance::♪   ┏(･o･)┛     ┗ ( ･o･) ┓   ♪
-:X:\emo::Send((emojis := ["¯\\_(ツ)_/¯", "(⌐■_■)", "ಠ_ಠ", "(╯°□°）╯  ┻━┻", "＼(＾O＾)／", "( ͡° ͜ʖ ͡°)", "♪   ┏(･o･)┛     ┗ ( ･o･) ┓   ♪"])[Random(1, emojis.Length)])
+:X:\emo:: SafeCall("keybindings.emo", (*) => Send((emojis := ["¯\\_(ツ)_/¯", "(⌐■_■)", "ಠ_ಠ", "(╯°□°）╯  ┻━┻", "＼(＾O＾)／", "( ͡° ͜ʖ ͡°)", "♪   ┏(･o･)┛     ┗ ( ･o･) ┓   ♪"])[Random(1, emojis.Length)]), { serviceId: "key_bindings" })

@@ -20,6 +20,7 @@
 #Include <Tools\User Input>
 #Include <Extensions\Dark Gui>
 #Include Storage\FileService.ahk
+#Include <Core\ErrorReporter>
 
 scriptName := StrSplit(A_ScriptName, '.ahk')[1]
 
@@ -55,8 +56,10 @@ CreateSet(*) {
 
 DeleteSet(*) {
     fileName := StrReplace(selectedSet, ".txt", "")
-    if (!IsSet(selectedSet))
-      return MsgBox("Select a set", "Error", "Iconi T1")
+        if (!IsSet(selectedSet)) {
+            ErrorReporter.Notify("Select a set", "Command Storer", "error")
+            return
+        }
   
     Result := MsgBox("Delete " fileName " set?", "Warning", "YesNo")
     if Result = "No"
@@ -112,11 +115,15 @@ AddItem(*) {
 }
 
 ShowMessageOnInvalidNewItemInput() {
-    if (newDescription.Text = "description" || newCommand.Text = "command") 
-        return MsgBox("Insert a description and command", "Error", "Iconi T1")
+    if (newDescription.Text = "description" || newCommand.Text = "command") {
+        ErrorReporter.Notify("Insert a description and command", "Command Storer", "error")
+        return
+    }
     
-    if (!IsSet(selectedSet))
-        return MsgBox("Select a set", "Error", "Iconi T1")
+    if (!IsSet(selectedSet)) {
+        ErrorReporter.Notify("Select a set", "Command Storer", "error")
+        return
+    }
 }
 
 DeleteItemCommand(*) {

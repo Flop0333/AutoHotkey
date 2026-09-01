@@ -35,7 +35,7 @@ class Timer extends DarkGui {
 		myText.SetFont("s18")
 		timerGui.OnEvent("Size", Gui_Move)
 		timerGui.OnEvent("Close", Gui_Close)
-		SetTimer(update, 1000)
+		SetTimer(CallbackAdapters.MakeTimerHandler("timer.update", update, { serviceId: "timer" }), 1000)
 		
 		update() {
 			currentTime--
@@ -77,7 +77,7 @@ class Timer extends DarkGui {
 		finishedGui.Show("w340 h215")
 		finishedGui.OnEvent("Close", (*) => ExitApp)
 
-		SetTimer update, 1000
+		SetTimer(CallbackAdapters.MakeTimerHandler("timer.finished.update", update, { serviceId: "timer" }), 1000)
 		
 		counter := 1
 		update() {
@@ -107,7 +107,7 @@ class Timer extends DarkGui {
 			timeChoiceGui.AddButton("x150 y130", "40m").OnEvent("Click", start40m)
 			timeChoiceGui.AddButton("x270 y130", "50m").OnEvent("Click", start50m)
 			timeChoiceGui.AddButton("x390 y130", "60m").OnEvent("Click", start60m)
-			timeChoiceGui.OnEvent("Close", (*) => ExitApp)
+			timeChoiceGui.OnEvent("Close", CallbackAdapters.MakeHotkeyHandler("timer.timechoice.close", (*) => ExitApp, { serviceId: "timer" }))
 			timeChoiceGui.Show()
 		}
 	}

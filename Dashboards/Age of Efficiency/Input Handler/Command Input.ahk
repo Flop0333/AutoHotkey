@@ -14,6 +14,7 @@
 #Include ../Database/Internet Search/SearchEnginesState.ahk
 #Include Command Executor.ahk
 #Include <Core\Paths>
+#Include <Core\CallbackAdapters>
 
 Class CommandInput extends DarkGui {
 
@@ -91,10 +92,10 @@ Class CommandInput extends DarkGui {
 
 	_ActivateHotkeys() {
 		HotIfWinActive(CommandInput._WIN_TITLE)
-			Hotkey("Enter", (*) => this._Finish())
-			Hotkey("Escape", (*) => WinClose(CommandInput._WIN_TITLE))
-			Hotkey("^Backspace", (*) =>  Send("^+{Left}{Backspace}"))
-			Hotkey("Down", (*) =>  this._InsertNextCommandFromPreview())
+			Hotkey("Enter", CallbackAdapters.MakeHotkeyHandler("cmdinput.finish", (*) => this._Finish(), { serviceId: "age_of_efficiency" }))
+			Hotkey("Escape", CallbackAdapters.MakeHotkeyHandler("cmdinput.close", (*) => WinClose(CommandInput._WIN_TITLE), { serviceId: "age_of_efficiency" }))
+			Hotkey("^Backspace", CallbackAdapters.MakeHotkeyHandler("cmdinput.delete_word", (*) => Send("^+{Left}{Backspace}"), { serviceId: "age_of_efficiency" }))
+			Hotkey("Down", CallbackAdapters.MakeHotkeyHandler("cmdinput.next_suggestion", (*) => this._InsertNextCommandFromPreview(), { serviceId: "age_of_efficiency" }))
 	}
 
 	_Finish() {

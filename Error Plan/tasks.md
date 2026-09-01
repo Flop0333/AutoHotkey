@@ -16,7 +16,7 @@ Copilot executes one `READY` task per run according to `Error Plan/AGENTS.md`.
 
 ### TASK-ERR-001 — Production service inventory
 
-**Status:** READY  
+**Status:** DONE  
 **Implements:** REQ-ENTRY-001, DEC-ERR-001  
 **Dependencies:** None
 
@@ -26,11 +26,11 @@ Copilot executes one `READY` task per run according to `Error Plan/AGENTS.md`.
 
 **Verification:** Cross-check inventory paths against repository files and startup launch graph.
 
-**Evidence:** Files — | Checks — | Result — | Assumptions —
+**Evidence:** Files — `Error Plan/service-inventory.md` | Checks — script paths present in repository and match `Startup/Startup.ahk` | Result — PASS | Assumptions — criticality/profile/callback types are inferred and require per-script confirmation in TASK-ERR-002
 
 ### TASK-ERR-002 — Error-path and dependency audit
 
-**Status:** PENDING  
+**Status:** READY  
 **Implements:** REQ-MIG-001 through REQ-MIG-003, REQ-DEP-005  
 **Dependencies:** TASK-ERR-001
 

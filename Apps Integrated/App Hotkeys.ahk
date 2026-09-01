@@ -1,5 +1,6 @@
 #SingleInstance Force
 #NoTrayIcon
+#Include <Core\ErrorReporter>
 
 AppSpecificHotkey.Set("ahk_exe Notion.exe", (*) => Send("^\"), AppSpecificHotkey.PRIMARY_SHORTCUT) ; Toggle sidebar
 
@@ -10,14 +11,14 @@ AppSpecificHotkey.Set("ahk_exe ms-teams.exe", (*) => Send("^+m"), AppSpecificHot
 ; ============================================================================
 AppSpecificHotkey.Set("ahk_exe Code.exe", (*) => (
 	WinActive(".ahk") ? Send("^{F5}") : ; AutoHotkey 
-	WinActive(".py") ? MsgBox("Not implemented") : ; Python
+	WinActive(".py") ? ErrorReporter.Notify("Not implemented", "App Hotkeys", "info") : ; Python
 	WinActive("Angular") ? Send('^+``') Sleep(1000) Send('ng serve{enter}') : ; Angular 'ng serve'
-	MsgBox("Not implemented")
+	ErrorReporter.Notify("Not implemented", "App Hotkeys", "info")
 ), AppSpecificHotkey.PRIMARY_SHORTCUT)
 
 AppSpecificHotkey.Set("ahk_exe Code.exe", (*) => (
 	WinActive(".ahk") ? Send("{F5}") : ; AutoHotkey 
-	MsgBox("Not implemented")
+	ErrorReporter.Notify("Not implemented", "App Hotkeys", "info")
 ), AppSpecificHotkey.SECONDARY_SHORTCUT)
 
 

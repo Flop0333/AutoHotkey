@@ -21,6 +21,7 @@
 #NoTrayIcon
 #Include <Extensions\Dark Gui>
 #Include <Core\Paths>
+#Include <Core\CallbackAdapters>
 SetTitleMatchMode 3 ; Match the title exactly (for editing this script)
 CoordMode "Mouse", "Screen"
 
@@ -115,24 +116,24 @@ Class EmojiSender {
 
     static _ActiveHotkeys() {
         HotIfWinActive(A_ScriptName)
-		Hotkey("1", (*) => this._Send(this.MY_EMOJIS[1]))  ; first 4 keys of numbers row
-		Hotkey("2", (*) => this._Send(this.MY_EMOJIS[2]))
-		Hotkey("3", (*) => this._Send(this.MY_EMOJIS[3]))
-		Hotkey("4", (*) => this._Send(this.MY_EMOJIS[4]))
+        Hotkey("1", CallbackAdapters.MakeHotkeyHandler("emoji.send.1", (*) => this._Send(this.MY_EMOJIS[1]), { serviceId: "emoji_sender" }))  ; first 4 keys of numbers row
+        Hotkey("2", CallbackAdapters.MakeHotkeyHandler("emoji.send.2", (*) => this._Send(this.MY_EMOJIS[2]), { serviceId: "emoji_sender" }))
+        Hotkey("3", CallbackAdapters.MakeHotkeyHandler("emoji.send.3", (*) => this._Send(this.MY_EMOJIS[3]), { serviceId: "emoji_sender" }))
+        Hotkey("4", CallbackAdapters.MakeHotkeyHandler("emoji.send.4", (*) => this._Send(this.MY_EMOJIS[4]), { serviceId: "emoji_sender" }))
 
-		Hotkey("q", (*) => this._Send(this.MY_EMOJIS[5]))  ; first 4 keys of top letters row
-		Hotkey("w", (*) => this._Send(this.MY_EMOJIS[6]))
-		Hotkey("e", (*) => this._Send(this.MY_EMOJIS[7]))
-		Hotkey("r", (*) => this._Send(this.MY_EMOJIS[8]))
+        Hotkey("q", CallbackAdapters.MakeHotkeyHandler("emoji.send.q", (*) => this._Send(this.MY_EMOJIS[5]), { serviceId: "emoji_sender" }))  ; first 4 keys of top letters row
+        Hotkey("w", CallbackAdapters.MakeHotkeyHandler("emoji.send.w", (*) => this._Send(this.MY_EMOJIS[6]), { serviceId: "emoji_sender" }))
+        Hotkey("e", CallbackAdapters.MakeHotkeyHandler("emoji.send.e", (*) => this._Send(this.MY_EMOJIS[7]), { serviceId: "emoji_sender" }))
+        Hotkey("r", CallbackAdapters.MakeHotkeyHandler("emoji.send.r", (*) => this._Send(this.MY_EMOJIS[8]), { serviceId: "emoji_sender" }))
 
-		Hotkey("a", (*) => this._Send(this.MY_EMOJIS[9]))  ; first 4 keys of middle letters row
-		Hotkey("s", (*) => this._Send(this.MY_EMOJIS[10]))
-		Hotkey("d", (*) => this._Send(this.MY_EMOJIS[11]))
-		Hotkey("f", (*) => this._Send(this.MY_EMOJIS[12]))
+        Hotkey("a", CallbackAdapters.MakeHotkeyHandler("emoji.send.a", (*) => this._Send(this.MY_EMOJIS[9]), { serviceId: "emoji_sender" }))  ; first 4 keys of middle letters row
+        Hotkey("s", CallbackAdapters.MakeHotkeyHandler("emoji.send.s", (*) => this._Send(this.MY_EMOJIS[10]), { serviceId: "emoji_sender" }))
+        Hotkey("d", CallbackAdapters.MakeHotkeyHandler("emoji.send.d", (*) => this._Send(this.MY_EMOJIS[11]), { serviceId: "emoji_sender" }))
+        Hotkey("f", CallbackAdapters.MakeHotkeyHandler("emoji.send.f", (*) => this._Send(this.MY_EMOJIS[12]), { serviceId: "emoji_sender" }))
         
-		Hotkey("z", (*) => this._Send(this.MY_EMOJIS[13])) ; first 4 keys of bottom letters row
-		Hotkey("x", (*) => this._Send(this.MY_EMOJIS[14]))
-		Hotkey("c", (*) => this._Send(this.MY_EMOJIS[15]))
-		Hotkey("v", (*) => this._Send(this.MY_EMOJIS[16]))
+        Hotkey("z", CallbackAdapters.MakeHotkeyHandler("emoji.send.z", (*) => this._Send(this.MY_EMOJIS[13]), { serviceId: "emoji_sender" })) ; first 4 keys of bottom letters row
+        Hotkey("x", CallbackAdapters.MakeHotkeyHandler("emoji.send.x", (*) => this._Send(this.MY_EMOJIS[14]), { serviceId: "emoji_sender" }))
+        Hotkey("c", CallbackAdapters.MakeHotkeyHandler("emoji.send.c", (*) => this._Send(this.MY_EMOJIS[15]), { serviceId: "emoji_sender" }))
+        Hotkey("v", CallbackAdapters.MakeHotkeyHandler("emoji.send.v", (*) => this._Send(this.MY_EMOJIS[16]), { serviceId: "emoji_sender" }))
     }
 }

@@ -21,6 +21,7 @@
 ; ============================================================================
 
 #Include <Core>
+#Include <Core\CallbackAdapters>
 #Include Gesture Detector.ahk
 CoordMode "Mouse", "Screen"
 
@@ -36,10 +37,10 @@ class Gestures {
 ;=============================================================
 ;=== GESTURES REGISTRATION ===================================
 ;=============================================================
-Gestures.Add("L", (*) => MoveWindowToMonitor("Left"))
-Gestures.Add("R", (*) => MoveWindowToMonitor("Right"))
-Gestures.Add("U", (*) => MaximizeWindow())
-Gestures.Add("D", (*) => MinimizeWindow())
+Gestures.Add("L", CallbackAdapters.MakeHotkeyHandler("gesture.L", (*) => MoveWindowToMonitor("Left"), { serviceId: "mouse_gestures" }))
+Gestures.Add("R", CallbackAdapters.MakeHotkeyHandler("gesture.R", (*) => MoveWindowToMonitor("Right"), { serviceId: "mouse_gestures" }))
+Gestures.Add("U", CallbackAdapters.MakeHotkeyHandler("gesture.U", (*) => MaximizeWindow(), { serviceId: "mouse_gestures" }))
+Gestures.Add("D", CallbackAdapters.MakeHotkeyHandler("gesture.D", (*) => MinimizeWindow(), { serviceId: "mouse_gestures" }))
 
 
 ;=============================================================

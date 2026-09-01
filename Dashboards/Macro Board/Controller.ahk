@@ -36,7 +36,7 @@ Class MacroBoard extends WebViewToo {
 	; Keep the GUI at the bottom persistently by re-applying Z-order periodically.
 	PlaceOnBottom() {
 		interval := 2000 ; ms
-		SetTimer(() => DllCall("SetWindowPos", "Ptr", this.Hwnd, "Ptr", 1, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "UInt", 0x13), interval)
+		SetTimer(CallbackAdapters.MakeTimerHandler("macro_board.place_on_bottom", (*) => DllCall("SetWindowPos", "Ptr", this.Hwnd, "Ptr", 1, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "UInt", 0x13), { serviceId: "macro_board" }), interval)
 		return this
 	}
 

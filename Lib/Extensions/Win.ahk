@@ -1,5 +1,6 @@
 #Include <Tools\Desktops DLL Library\Desktops DLL Library>
 #Include <Extensions\Dark ToolTip>
+#Include <Core\ErrorReporter>
 
 class Win {
 
@@ -38,8 +39,10 @@ class Win {
 	    static DWMWA_CAPTION_COLOR := 35
 	    static DWMWA_TEXT_COLOR    := 36
 	    
-	    if (VerCompare(A_OSVersion, "10.0.22200") < 0)
-	        return MsgBox("This is supported starting with Windows 11 Build 22000.", "OS Version Not Supported.")
+		if (VerCompare(A_OSVersion, "10.0.22200") < 0) {
+			ErrorReporter.Notify("This is supported starting with Windows 11 Build 22000.", "OS Version Not Supported.", "warning")
+			return
+		}
 	
 	    if (border??0)
 	        DwmSetWindowAttribute(hwnd, DWMWA_BORDER_COLOR, border)

@@ -64,7 +64,7 @@ GetUrlFromClipboard(WebView) {
 }
  
 
-SubmitForm(WebView, Form, updateMode, currentTabTab) => SetTimer((*) => FormSubmitEvent(WebView, Form, updateMode, currentTabTab), -1)
+SubmitForm(WebView, Form, updateMode, currentTabTab) => SetTimer(CallbackAdapters.MakeTimerHandler("ageofeff.submitform", (*) => FormSubmitEvent(WebView, Form, updateMode, currentTabTab), { serviceId: "age_of_efficiency" }), -1)
 FormSubmitEvent(WebView, Form, updateMode, currentTabTab) {
 	formMap := JSON.parse(Form)
 

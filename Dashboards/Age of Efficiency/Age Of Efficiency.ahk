@@ -21,6 +21,7 @@
 ; ============================================================================
 
 #Include <Core>
+#Include <Core\ErrorReporter>
 #Include User Interface\Controller.ahk
 #Include Input Handler\Command Input.ahk
 
@@ -34,7 +35,7 @@ NumpadIns::	CommandInput().WaitForInputAndExecute() ; Laptop
 aoeWindow := UserInterface()
 
 A_TrayMenu.Delete()
-A_TrayMenu.Add("Reload", (*) => Reload())
+A_TrayMenu.Add("Reload", (*) => ErrorReporter.Notify("Reloading Age of Efficiency", "Age of Efficiency", "info") Reload())
 A_TrayMenu.Add()
 A_TrayMenu.Add("Open Terminal: Insert", (*) => CommandInput().WaitForInputAndExecute())
 A_TrayMenu.Disable("Open Terminal: Insert")

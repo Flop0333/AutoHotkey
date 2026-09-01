@@ -24,6 +24,7 @@
 ; ============================================================================
 
 #Include <Core>
+#Include <Core\CallbackAdapters>
 #Include Desktop.ahk
 #Include <Apps\VsCode>
 #Include <Apps\Notion>
@@ -78,12 +79,15 @@ GetDesktopsForProfile() {
 ; ===== HOTKEY CONFIGURATION =====
 desktops := GetDesktopsForProfile()
 
-for key, desktopObj in desktops
-    Capslock.Hotkey(key, ((d) => (*) => HandleSwitch(d))(desktopObj))
+for key, desktopObj in desktops {
+    operationId := "desktops.switch." key
+    handler := CallbackAdapters.MakeHotkeyHandler(operationId, ((d) => (*) => HandleSwitch(d))(desktopObj), { serviceId: "desktops_manager" })
+    Capslock.Hotkey(key, handler)
+}
 
 ; Foreward & Backward
-Capslock.Hotkey("Tab", (*) => DesktopsDDL.GoToPrevious())
-Capslock.Hotkey("P", (*) => DesktopsDDL.TogglePin())
+Capslock.Hotkey("Tab", CallbackAdapters.MakeHotkeyHandler("desktops.previous", (*) => DesktopsDDL.GoToPrevious(), { serviceId: "desktops_manager" }))
+Capslock.Hotkey("P", CallbackAdapters.MakeHotkeyHandler("desktops.toggle_pin", (*) => DesktopsDDL.TogglePin(), { serviceId: "desktops_manager" }))
 
 ; ===== HELPER FUNCTIONS =====
 global onLeaveAction := ""

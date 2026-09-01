@@ -11,6 +11,8 @@
 ; ============================================================================
 
 
+ #Include <Core\ErrorReporter>
+
 class IniService {
 
     __New(filePath) {
@@ -82,7 +84,8 @@ class IniService {
         try {
             FileAppend fileContent, this.filePath
         } catch {
-            MsgBox("could not append " this.filePath)
+            ErrorReporter.Notify("could not append " this.filePath, "IniService", "error")
+            ErrorReporter.Report(ErrorRecord.FromThrown(e, { serviceId: "ini_service", category: "io", severity: "error", safeMessage: "Failed to write ini file" }))
         }
     }
 

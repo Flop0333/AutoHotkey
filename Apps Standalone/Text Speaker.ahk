@@ -10,6 +10,8 @@
 ; ============================================================================
 
 #Include <Core>
+#Include <Core\ErrorReporter>
+#Include <Core\CallbackAdapters>
 
 ^Space::TextSpeaker.TogglePlay()
 
@@ -35,7 +37,8 @@ class TextSpeaker {
         if voice = "" {
             voice := this.voices.david
             if voice = "" {
-                MsgBox("No voice found", "Error", "Iconi T1")
+                ErrorReporter.Notify("No voice found", "Text Speaker", "error")
+                ErrorReporter.Report(ErrorRecord.FromThrown("No voice found", { serviceId: "text_speaker", category: "validation", severity: "error", safeMessage: "No voice available" }))
                 return
             }
         }
@@ -96,16 +99,16 @@ class TextSpeaker {
         Sleep(700) ; Wait until speaking starts
         if onOff = ""
             onOff := this._IsSpeaking() ? "On" : "Off"
-        Hotkey("Up", (*) => this._VolumeUp(), onOff)
-        Hotkey("Down", (*) => this._VolumeDown(), onOff)
-        Hotkey("Left", (*) => this._SpeedDown(), onOff)
-        Hotkey("Right", (*) => this._SpeedUp(), onOff)
+        Hotkey("Up", CallbackAdapters.MakeHotkeyHandler("text_speaker.volume_up", (*) => this._VolumeUp(), { serviceId: "text_speaker" }), onOff)
+        Hotkey("Down", CallbackAdapters.MakeHotkeyHandler("text_speaker.volume_down", (*) => this._VolumeDown(), { serviceId: "text_speaker" }), onOff)
+        Hotkey("Left", CallbackAdapters.MakeHotkeyHandler("text_speaker.speed_down", (*) => this._SpeedDown(), { serviceId: "text_speaker" }), onOff)
+        Hotkey("Right", CallbackAdapters.MakeHotkeyHandler("text_speaker.speed_up", (*) => this._SpeedUp(), { serviceId: "text_speaker" }), onOff)
     }
 
     static _DisplayVoiceOptions() {
         allVoices := this._spVoice.GetVoices()
         for voice in allVoices {
-            MsgBox(voice.GetDescription())
+            ErrorReporter.Notify(voice.GetDescription(), "Text Speaker", "info", 3)
         }
     }
 }

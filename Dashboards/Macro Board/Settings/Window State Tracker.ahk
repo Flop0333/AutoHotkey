@@ -28,7 +28,7 @@ class WindowPositionTracker {
 		if (this.gui.Hwnd != hwnd)
 			return
 
-		SetTimer(this.saveTimer, -this.DEBOUNCE_INTERVAL) ; Negative = run once after delay
+		SetTimer(CallbackAdapters.MakeTimerHandler("windowpos.save", this.saveTimer, { serviceId: "macro_board" }), -this.DEBOUNCE_INTERVAL) ; Negative = run once after delay
 	}
 	
 	SaveSettings() {

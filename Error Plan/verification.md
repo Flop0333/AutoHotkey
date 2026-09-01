@@ -6,7 +6,7 @@ This file is populated as tasks complete. Do not record secrets, raw clipboard c
 
 | Requirement | Automated test or manual record | Result | Date | Notes |
 |---|---|---|---|---|
-| _pending_ | | | | |
+| REQ-ENTRY-001 | `Error Plan/service-inventory.md` — entries cross-checked against `Startup/Startup.ahk` | PASS | 2026-09-01 | Inventory populated; some metadata inferred and pending per-script confirmation in TASK-ERR-002 |
 
 ## Manual runs
 

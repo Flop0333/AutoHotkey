@@ -5,7 +5,7 @@ GetScript() {
 WriteItemToFile() {
   script := GetScript()
   script.Seek(0, 2)
-  MsgBox(selectedSet)
+  ErrorReporter.Notify("Added to set: " selectedSet, "Command Storer", "info")
   script.WriteLine(newKeybinding.Text "|" newCommand.Text "|" newDescription.Text)
 }
 

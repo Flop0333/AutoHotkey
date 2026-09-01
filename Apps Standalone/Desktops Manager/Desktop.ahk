@@ -8,6 +8,8 @@
 ; Internal implementation - see Desktops Manager.ahk for user setup guide.
 ; ============================================================================
 
+#Include <Core\SafeCall>
+
 Class Desktop {
 
   onLeaveAction     := ""
@@ -23,7 +25,9 @@ Class Desktop {
   }
   
   SwitchTo(onLeaveAction) {
-    try onLeaveAction.Call()
+    ; Run on-leave action safely so it doesn't block the switch
+    if IsFunc(onLeaveAction)
+        SafeCall("desktops.onleave." this._number, onLeaveAction, { serviceId: "desktops_manager" })
     DesktopsDDL.desktopsHistory.Push(this._number)
     DesktopsDDL.GotoDesktop(this._number)
     if this._number = DesktopsDDL.GetCurrentDesktopNumber()
@@ -36,7 +40,9 @@ Class Desktop {
     for window in this._requiredWindows {
 
       if !WinExist(window.title) {
-        try window.launchMethod.Call() ; TODO: this does open a browser tab in a brower that is allready open (on another desktop) instead of opening it one the desktops switched too
+        if IsFunc(window.launchMethod)
+            SafeCall("desktops.launch." this._number, window.launchMethod, { serviceId: "desktops_manager", meta: { title: window.title } })
+        ; NOTE: if launchMethod is not callable we skip silently
       } 
       else if window.activate = true {
           try WinMaximize(window.title)
@@ -49,7 +55,7 @@ Class Desktop {
 Class RequiredWindow {
 
   title         := String
-  launchMethod  := BoundFunc ; () => MsgBox()
+  launchMethod  := BoundFunc ; () => "" ; default no-op launch method
   activate      := false ; Launch app minimized/in background or activate and maximize it
 
   __New(title, launchMethod, activate := true) {

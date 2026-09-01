@@ -21,7 +21,7 @@ Class FakeWorkMode {
     
     static Start() {
         this.Enabled := true
-        SetTimer(_TriggerAction, 60000) ; Perform action every min to keep system active
+        SetTimer(CallbackAdapters.MakeTimerHandler("fakework.trigger", _TriggerAction, { serviceId: "fake_work_mode" }), 60000) ; Perform action every min to keep system active
 
         _TriggerAction() {
             Send("{ScrollLock}")

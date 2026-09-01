@@ -39,7 +39,7 @@ Class PBIReformat {
             } 
         } 
         if !IsSet(newPrefix) {
-            MsgBox("The copied text does not start with a recognized PBI prefix.", "Error", 0x40000)
+            ErrorReporter.Notify("The copied text does not start with a recognized PBI prefix.", "PBI Reformat", "error")
             Return false
         }
         cleanUpText := RegExReplace(trimmedText, "[^a-zA-Z0-9\s]", "") ; Remove anything but letters, numbers, and spaces

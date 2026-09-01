@@ -29,6 +29,8 @@
 
 #Requires AutoHotkey v2
 #Include <Tools\WebView\WebView2>
+#Include <Core\ErrorReporter>
+#Include <Core\ErrorRecord>
 
 class WebViewToo {
     static Template := {}
@@ -265,11 +267,12 @@ class WebViewToo {
 		return QueryResult ?? ""
 	}
 
-    SimplePrintToPdf(Orientation := "portrait") {
+	SimplePrintToPdf(Orientation := "portrait") {
 		Loop {
 			FileName := FileSelect("S", tFileName := IsSet(FileName) ? FileName : "",, "*.pdf")
 			if (FileName = "") {
-				return (MsgBox("Print Canceled", "Print to PDF", "262144"))
+				ErrorReporter.Notify("Print Canceled", "Print to PDF", "info")
+				return
 			}
 
 			SplitPath(FileName, &OutFileName, &OutDir, &OutExt)
@@ -295,11 +298,10 @@ class WebViewToo {
 		SimplePrintToPdfHandler(HandlerPtr, pWebviewWindow, Success) {
 			pWebviewWindow := simpleWebviewWindow
 			if (!Success) {
-				MsgBox("An error occurred while attempting to save the file.`n" OutFileName, "Simple Print To Pdf", "262144")
+				ErrorReporter.Notify("An error occurred while attempting to save the file: " OutFileName, "Simple Print To Pdf", "error")
+				ErrorReporter.Report(ErrorRecord.FromThrown("PrintToPdf failed: " OutFileName, { serviceId: "webview", category: "print", safeMessage: "Failed to save PDF" }))
 			} else {
-				if (MsgBox("Would you like to open this PDF?", "Print to PDF", "262148") = "Yes") {
-					Run(FileName)
-				}
+				ErrorReporter.Notify("Saved PDF: " FileName, "Print to PDF", "info")
 			}
 		}
 	}

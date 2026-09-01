@@ -46,6 +46,8 @@
 #SingleInstance force
 #Include Screen Snipper OCR.ahk
 #Include <Tools\Info>
+#Include <Core\ErrorReporter>
+#Include <Core\SafeCall>
 DetectHiddenWindows true
 SetWinDelay(0)
 ;}
@@ -53,15 +55,15 @@ SetWinDelay(0)
 _SetupTrayMenu()
 _SetupTrayMenu() {   
 	A_TrayMenu.Delete()       
-    A_TrayMenu.Add("Close All Snips", (*) => Reload())
+	A_TrayMenu.Add("Close All Snips", (*) => ErrorReporter.Notify("Closing all snips", "Screen Snipper", "info") Reload())
     A_TrayMenu.Add()
-    A_TrayMenu.Add("Snip && Copy:    Win + LButton",   (*) => MsgBox())
+	A_TrayMenu.Add("Snip && Copy:    Win + LButton",   (*) => ErrorReporter.Notify("Snip and copy is not available in this context", "Screen Snipper", "info"))
     A_TrayMenu.Add()
-    A_TrayMenu.Add("Copy Only:       Ctrl + Win + LButton",   (*) => MsgBox())
+	A_TrayMenu.Add("Copy Only:       Ctrl + Win + LButton",   (*) => ErrorReporter.Notify("Copy only is not available in this context", "Screen Snipper", "info"))
     A_TrayMenu.Add()
-    A_TrayMenu.Add("Save  Only:        Alt  + Win + LButton",   (*) => MsgBox())
+	A_TrayMenu.Add("Save  Only:        Alt  + Win + LButton",   (*) => ErrorReporter.Notify("Save only is not available in this context", "Screen Snipper", "info"))
     A_TrayMenu.Add()
-    A_TrayMenu.Add("OCR Only:         Shift + Win + LButton",   (*) => MsgBox())
+	A_TrayMenu.Add("OCR Only:         Shift + Win + LButton",   (*) => ErrorReporter.Notify("OCR only is not available in this context", "Screen Snipper", "info"))
     A_TrayMenu.Disable("Snip && Copy:    Win + LButton")
     A_TrayMenu.Disable("Copy Only:       Ctrl + Win + LButton")
     A_TrayMenu.Disable("Save  Only:        Alt  + Win + LButton")
@@ -151,42 +153,57 @@ Try DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
 ; 	If (Area.W > 8 and Area.H > 8)
 ; 		SnipArea(Area, false, true, SnipVisible, &guiSnips)
 ; }
-
-#Lbutton::	;	<-- Snip Image and Copy to Clipboard
+#Include <Core\SafeCall>
+ #Lbutton::	; 	<-- Snip Image and Copy to Clipboard
 {
-	Global guiSnips
-	Area := SelectScreenRegion('LButton')
-	If (Area.W > 8 and Area.H > 8)
-		SnipArea(Area, true, false, true, SnipVisible, &guiSnips)
+	function() {
+		Global guiSnips
+		Area := SelectScreenRegion('LButton')
+		If (Area.W > 8 and Area.H > 8)
+			SnipArea(Area, true, false, true, SnipVisible, &guiSnips)
+	}
+	
+	SafeCall("snipper.snip_copy", (*) => function(), { serviceId: "screen_snipper" })
 }
 
-^#Lbutton::	;	<-- CTRL, WIN + Mouse => Copy to Clipboard Only
+^#Lbutton::	; 	<-- CTRL, WIN + Mouse => Copy to Clipboard Only
 {
-	Area := SelectScreenRegion('LButton')
-	SnipArea(Area, true, false, false)
-	Info("Copied to clipboard")
+	function() {
+		{
+		Area := SelectScreenRegion('LButton')
+		SnipArea(Area, true, false, false)
+		Info("Copied to clipboard")
+	}
+	}
+	SafeCall("snipper.copy_only", (*) => function, { serviceId: "screen_snipper" })
 }
 
 !#Lbutton::	; 	<-- ALT, WIN + Mouse => Save to Clipboard Only
 {
-	Area := SelectScreenRegion('LButton')
-	SnipArea(Area, false, true, false, false)
-	Info("Saved snippet to file")
+	function() {
+		Area := SelectScreenRegion('LButton')
+		SnipArea(Area, false, true, false, false)
+		Info("Saved snippet to file")
+	}
+	SafeCall("snipper.save_only", (*) => function(), { serviceId: "screen_snipper" })
 }
 
-+#Lbutton::	;	<-- OCR Only
++#Lbutton::	; 	<-- OCR Only
 {
-	Global guiSnips
-	Area := SelectScreenRegion('LButton')
-	If (Area.W > 8 and Area.H > 8) {
-		hwnd := SnipArea(Area, true, false, true, SnipVisible, &guiSnips)
-		Sleep 50
-		Snip2Clipboard(false, hwnd)
-		Sleep 50
-		CloseSnip(hwnd)
-		Sleep 80
-		OCR.GetOcrFromClipboard()
+	function() {
+		Global guiSnips
+		Area := SelectScreenRegion('LButton')
+		If (Area.W > 8 and Area.H > 8) {
+			hwnd := SnipArea(Area, true, false, true, SnipVisible, &guiSnips)
+			Sleep 50
+			Snip2Clipboard(false, hwnd)
+			Sleep 50
+			CloseSnip(hwnd)
+			Sleep 80
+			OCR.GetOcrFromClipboard()
+		}
 	}
+	SafeCall("snipper.ocr_only", (*) => function(), { serviceId: "screen_snipper" })
 }
 
 

@@ -19,13 +19,14 @@
 ; ============================================================================
 
 #Include <Core>
+#Include <Core\CallbackAdapters>
 SetWinDelay(0)
 CoordMode("Mouse")
 
-CapsLock.Hotkey("LButton",  (*) => DragWindow())
-CapsLock.Hotkey("RButton",  (*) => ResizeWindow())
-CapsLock.Hotkey("MButton",  (*) => WinClose(Win.WinUnderMouse()))
-CapsLock.Hotkey("Up",       (*) => Win.ToggleAlwaysOnTop())
+CapsLock.Hotkey("LButton",  CallbackAdapters.MakeHotkeyHandler("winmgr.drag", (*) => DragWindow(), { serviceId: "window_manager" }))
+CapsLock.Hotkey("RButton",  CallbackAdapters.MakeHotkeyHandler("winmgr.resize", (*) => ResizeWindow(), { serviceId: "window_manager" }))
+CapsLock.Hotkey("MButton",  CallbackAdapters.MakeHotkeyHandler("winmgr.close", (*) => WinClose(Win.WinUnderMouse()), { serviceId: "window_manager" }))
+CapsLock.Hotkey("Up",       CallbackAdapters.MakeHotkeyHandler("winmgr.toggle_always_on_top", (*) => Win.ToggleAlwaysOnTop(), { serviceId: "window_manager" }))
 
 DragWindow() {
     MouseGetPos(&origionalMouseX, &origionalMouseY, &winId)

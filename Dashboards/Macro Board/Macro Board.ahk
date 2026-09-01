@@ -22,8 +22,10 @@
 #Include ..\..\Apps Integrated\Fake Working Mode.ahk
 #Include <Apps\Spotify>
 #Include <Apps\Notion>
+#Include <Core\ErrorReporter>
 #Include ..\..\Startup\Startup.ahk
 #Include <Apps\Browser>
+#Include <Core\CallbackAdapters>
 
 ; ===========================================================================
 ; === ACTIONS REGISTRATION ==================================================
@@ -43,7 +45,7 @@ CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 
 buttons := [
     ToggleButton(ToggleSpellChecker, GetSpellCheckerState, "Spell Checker", "spell checker.gif"),
-    Button(KillAllAHkProcesses, "Kill All AHK Processes", "game over.gif"),
+        Button((*) => ErrorReporter.Notify("Pizza Default", "Macro Board", "info"), "Pizza Default")
     Button(CommandStorer_ShowMainGui, "Command Storer", "tetris.gif"),
     ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),
     Button(RunStartup, "Reload Startup")
@@ -58,11 +60,11 @@ profileButtons := Map(
         Button(CloseAllBrowsers, "Kill Browsers", "game over.gif"),
     ],
     Profiles.default, [
-        Button(MsgBox, "Pizza Default")
+        Button((*) => ErrorReporter.Notify("Pizza Default", "Macro Board", "info"), "Pizza Default")
     ]
 )
 
 buttons.Push(profileButtons.Get(ProfileManager.Current, [])*)
 myMacroBoard := MacroBoard(buttons)
 DesktopsDDL.PinApp(myMacroBoard.Hwnd)
-CapsLock.Hotkey("Space", (*) => myMacroBoard.Show())
+CapsLock.Hotkey("Space", CallbackAdapters.MakeHotkeyHandler("macro_board.show", (*) => myMacroBoard.Show(), { serviceId: "macro_board" }))
