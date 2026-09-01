@@ -13,7 +13,8 @@
 ; ============================================================================
 
 #Include <Core\Paths>
-#Include ..\Profiles\Profile Manager.ahk
+#Include <..\Profiles\Profile Manager>
+#Include <..\Secrets\Secrets File Manager>
 #Include Startup Message.ahk
 #Include Startup Menu Tray.ahk
 
