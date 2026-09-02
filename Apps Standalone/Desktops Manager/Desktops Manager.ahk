@@ -66,8 +66,8 @@ GetDesktopsForProfile() {
         
         config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.openAutoHotkey()))
         config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    () => Spotify.Launch()))
-        config["G"] := Desktop(desktopCounter++,   RequiredWindow("ChatGPT",    () => Run("ahk_exe ChatGPT.exe")),
-                                                    RequiredWindow("Brave",    () => Browser.OpenInNewBrowser(Links.chatGpt)))
+        config["G"] := Desktop(desktopCounter++,   RequiredWindow("ChatGPT",    () => Run("ahk_exe ChatGPT.exe"),false),
+                                                    RequiredWindow("Brave",    () => Browser.OpenInNewBrowser(Links.chatGpt),false))
         
         config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.Launch()))
         config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      () => Notion.Launch()))
