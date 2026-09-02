@@ -9,7 +9,7 @@
 ;   - Validates window position to prevent saving invalid states
 ; ============================================================================
 
-#Include ..\..\..\Lib\Core\CallbackAdapters.ahk
+#Include ..\..\..\Lib\Core\SafeCall.ahk
 
 class WindowPositionTracker {
 	DEBOUNCE_INTERVAL := 1000  ; ms
@@ -30,7 +30,7 @@ class WindowPositionTracker {
 		if (this.gui.Hwnd != hwnd)
 			return
 
-		SetTimer(CallbackAdapters.MakeTimerHandler("windowpos.save", this.saveTimer, { serviceId: "macro_board" }), -this.DEBOUNCE_INTERVAL) ; Negative = run once after delay
+		SetTimer(SafeCallback(this.saveTimer, "Could not save the Macro Board window position"), -this.DEBOUNCE_INTERVAL) ; Negative = run once after delay
 	}
 	
 	SaveSettings() {

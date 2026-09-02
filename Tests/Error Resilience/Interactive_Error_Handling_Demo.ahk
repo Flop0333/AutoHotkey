@@ -2,7 +2,8 @@
 #SingleInstance Force
 #Warn All
 
-#Include ..\..\Lib\Core\CallbackAdapters.ahk
+#Include ..\..\Lib\Core\SafeCall.ahk
+#Include ..\..\Lib\Core\Notifier.ahk
 
 /** Interactive, isolated demonstration of the error-resilience components. */
 class InteractiveErrorHandlingDemo {
@@ -45,7 +46,7 @@ class InteractiveErrorHandlingDemo {
                 "Failed: " this.failed "`n`n"
                 "Important current limitation:`n"
                 "There is no suite-wide OnError handler yet. An error outside SafeCall or a "
-                "CallbackAdapters wrapper can still show AutoHotkey's normal error dialog and stop that thread.`n`n"
+                "SafeCallback wrapper can still show AutoHotkey's normal error dialog and stop that thread.`n`n"
                 "Demo logs:`n" logDir "`n`n"
                 "Open the demo log folder now?"
             )
@@ -70,14 +71,10 @@ class InteractiveErrorHandlingDemo {
     static TestErrorRecord() {
         this.Before("1. ErrorRecord", "Create structured diagnostic data from a normal Error object.")
         sourceError := Error("Intentional ErrorRecord demonstration")
-        record := ErrorRecord.FromThrown(sourceError, {
-            serviceId: "demo",
-            operationId: "record.normal-error",
-            category: "test"
-        })
+        record := ErrorRecord.FromThrown(sourceError, "ErrorRecord demonstration failed")
         ok := record.errorType = "Error"
             && record.errorMessage = sourceError.Message
-            && record.operationId = "record.normal-error"
+            && record.message = "ErrorRecord demonstration failed"
             && StrLen(record.fingerprint) = 8
         this.Check(ok, "ErrorRecord captured the Error", "Fingerprint: " record.fingerprint "`n`nJSON:`n" record.ToJson())
     }
@@ -90,24 +87,16 @@ class InteractiveErrorHandlingDemo {
         catch Any as thrownValue
             caughtValue := thrownValue
 
-        record := ErrorRecord.FromThrown(caughtValue, {
-            serviceId: "demo",
-            operationId: "record.string-value"
-        })
+        record := ErrorRecord.FromThrown(caughtValue, "Plain-string demonstration failed")
         ok := record.errorType = "String" && record.errorMessage = caughtValue
         this.Check(ok, "Plain thrown values are supported", "Captured type: " record.errorType "`nMessage: " record.errorMessage)
     }
 
     static TestDirectReporting() {
         this.Before("3. Direct reporting", "Write one structured JSON line through ErrorReporter.Report().")
-        record := ErrorRecord.FromThrown(Error("Intentional direct report"), {
-            serviceId: "demo",
-            operationId: "report.direct",
-            category: "test"
-        })
-        result := ErrorReporter.Report(record)
+        result := ErrorReporter.Report(Error("Intentional direct report"), "Direct reporting demonstration failed")
         line := result.ok ? this.ReadLastLine(result.path) : "No primary log line was written."
-        ok := result.ok && FileExist(result.path) && InStr(line, '"operationId":"report.direct"')
+        ok := result.ok && FileExist(result.path) && InStr(line, '"message":"Direct reporting demonstration failed"')
         this.Check(ok, "A JSONL record was written", this.ResultDetail(result) "`n`nLast log line:`n" line)
     }
 
@@ -121,11 +110,10 @@ class InteractiveErrorHandlingDemo {
         clipboardMarker := "ERROR_DEMO_CLIPBOARD_VALUE_9F31"
         try {
             A_Clipboard := clipboardMarker
-            record := ErrorRecord.FromThrown(
+            result := ErrorReporter.Report(
                 "Visit https://example.test/private and use Secrets.ApiToken with " clipboardMarker,
-                {serviceId: "demo", operationId: "report.redaction", category: "test"}
+                "Redaction demonstration failed"
             )
-            result := ErrorReporter.Report(record)
             line := result.ok ? this.ReadLastLine(result.path) : ""
         } finally {
             A_Clipboard := savedClipboard
@@ -141,11 +129,7 @@ class InteractiveErrorHandlingDemo {
 
     static TestSafeCallSuccess() {
         this.Before("5. SafeCall success", "Run a successful callable and preserve its return value.")
-        result := SafeCall(
-            (values*) => values[1] + values[2],
-            {serviceId: "demo", operationId: "safe.success"},
-            [20, 22]
-        )
+        result := SafeCall((*) => 20 + 22, "Addition failed")
         ok := result.status = "success" && result.value = 42 && HasProp(result, "durationMs")
         this.Check(ok, "SafeCall returned a successful result", "Status: " result.status "`nValue: " result.value "`nDuration: " result.durationMs " ms")
     }
@@ -157,11 +141,11 @@ class InteractiveErrorHandlingDemo {
         )
         result := SafeCall(
             (*) => this.ThrowPlainValue("Intentional plain-string SafeCall failure"),
-            {serviceId: "demo", operationId: "safe.intentional-failure"}
+            "The SafeCall demonstration failed"
         )
         ok := result.status = "execution-failed"
             && HasProp(result, "errorRecord")
-            && result.errorRecord.operationId = "safe.intentional-failure"
+            && result.errorRecord.message = "The SafeCall demonstration failed"
         details := "Status: " result.status
         if HasProp(result, "errorRecord")
             details .= "`nCaptured message: " result.errorRecord.errorMessage
@@ -170,30 +154,28 @@ class InteractiveErrorHandlingDemo {
 
     static TestCallbackArgumentForwarding() {
         this.Before(
-            "7. Callback adapter argument forwarding",
-            "Call a wrapped GUI-style handler with two arguments and verify that both reach the original callable."
+            "7. SafeCallback argument forwarding",
+            "Call a protected callback with two arguments and verify that both reach the original callable."
         )
-        handler := CallbackAdapters.MakeGuiEventHandler(
-            "callback.forward-arguments",
+        handler := SafeCallback(
             (values*) => values[1] ":" values[2],
-            {serviceId: "demo"}
+            "Argument forwarding failed"
         )
         result := handler.Call("left", "right")
         ok := result.status = "success" && result.value = "left:right"
-        this.Check(ok, "The callback adapter preserved its arguments", "Returned value: " result.value)
+        this.Check(ok, "SafeCallback preserved its arguments", "Returned value: " result.value)
     }
 
     static TestTimerFailure() {
         this.Before(
             "8. Real timer callback failure",
-            "A one-shot SetTimer callback will throw after this MsgBox closes. The adapter should catch it, log it, "
+            "A one-shot SetTimer callback will throw after this MsgBox closes. SafeCallback should catch it, log it, "
             "show a TrayTip, and allow the demo to continue."
         )
         holder := {result: "pending"}
-        handler := CallbackAdapters.MakeTimerHandler(
-            "timer.intentional-failure",
+        handler := SafeCallback(
             (*) => this.ThrowIntentional("Intentional timer failure"),
-            {serviceId: "demo-timer"}
+            "The timer demonstration failed"
         )
         RunTimer(*) {
             holder.result := handler.Call()
@@ -212,15 +194,14 @@ class InteractiveErrorHandlingDemo {
             "the same window remains usable; click 'Continue demo' to proceed."
         )
         holder := {result: "not triggered"}
-        testGui := Gui("+AlwaysOnTop", "Error adapter GUI test")
+        testGui := Gui("+AlwaysOnTop", "SafeCallback GUI test")
         testGui.SetFont("s10", "Segoe UI")
         statusText := testGui.AddText("w390", "No error triggered yet.")
         failButton := testGui.AddButton("xm y+14 w390 h36", "Trigger failing GUI callback")
         continueButton := testGui.AddButton("xm y+10 w390 h32", "Continue demo")
-        handler := CallbackAdapters.MakeGuiEventHandler(
-            "gui.intentional-failure",
+        handler := SafeCallback(
             (*) => this.ThrowIntentional("Intentional GUI event failure"),
-            {serviceId: "demo-gui"}
+            "The GUI demonstration failed"
         )
         HandleFailureClick(args*) {
             holder.result := handler.Call(args*)
@@ -265,11 +246,7 @@ class InteractiveErrorHandlingDemo {
         originalMaximum := ErrorReporter.MAX_LOG_BYTES
         try {
             ErrorReporter.MAX_LOG_BYTES := 1
-            result := ErrorReporter.Report(ErrorRecord.FromThrown("rotation trigger", {
-                serviceId: "demo",
-                operationId: "report.rotation",
-                category: "test"
-            }))
+            result := ErrorReporter.Report("rotation trigger", "Rotation demonstration failed")
         } finally {
             ErrorReporter.MAX_LOG_BYTES := originalMaximum
         }
@@ -287,11 +264,7 @@ class InteractiveErrorHandlingDemo {
         activeTestRoot := EnvGet("LOCALAPPDATA")
         try {
             EnvSet("LOCALAPPDATA", "?:\invalid-error-demo-path")
-            result := ErrorReporter.Report(ErrorRecord.FromThrown("fallback trigger", {
-                serviceId: "demo",
-                operationId: "report.fallback",
-                category: "test"
-            }))
+            result := ErrorReporter.Report("fallback trigger", "Fallback demonstration failed")
         } finally {
             EnvSet("LOCALAPPDATA", activeTestRoot)
         }

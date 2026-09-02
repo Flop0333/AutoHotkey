@@ -25,7 +25,7 @@
 #Include ..\..\Lib\Core\Notifier.ahk
 #Include ..\..\Startup\Startup.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
-#Include ..\..\Lib\Core\CallbackAdapters.ahk
+#Include ..\..\Lib\Core\SafeCall.ahk
 
 ; ===========================================================================
 ; === ACTIONS REGISTRATION ==================================================
@@ -67,4 +67,4 @@ profileButtons := Map(
 buttons.Push(profileButtons.Get(ProfileManager.Current, [])*)
 myMacroBoard := MacroBoard(buttons)
 DesktopsDDL.PinApp(myMacroBoard.Hwnd)
-CapsLock.Hotkey("Space", CallbackAdapters.MakeHotkeyHandler("macro_board.show", (*) => myMacroBoard.Show(), { serviceId: "macro_board" }))
+CapsLock.Hotkey("Space", (*) => myMacroBoard.Show())

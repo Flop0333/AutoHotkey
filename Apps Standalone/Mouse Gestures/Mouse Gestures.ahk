@@ -21,7 +21,7 @@
 ; ============================================================================
 
 #Include ..\..\Lib\Core.ahk
-#Include ..\..\Lib\Core\CallbackAdapters.ahk
+#Include ..\..\Lib\Core\SafeCall.ahk
 #Include Gesture Detector.ahk
 CoordMode "Mouse", "Screen"
 
@@ -37,10 +37,10 @@ class Gestures {
 ;=============================================================
 ;=== GESTURES REGISTRATION ===================================
 ;=============================================================
-Gestures.Add("L", CallbackAdapters.MakeHotkeyHandler("gesture.L", (*) => MoveWindowToMonitor("Left"), { serviceId: "mouse_gestures" }))
-Gestures.Add("R", CallbackAdapters.MakeHotkeyHandler("gesture.R", (*) => MoveWindowToMonitor("Right"), { serviceId: "mouse_gestures" }))
-Gestures.Add("U", CallbackAdapters.MakeHotkeyHandler("gesture.U", (*) => MaximizeWindow(), { serviceId: "mouse_gestures" }))
-Gestures.Add("D", CallbackAdapters.MakeHotkeyHandler("gesture.D", (*) => MinimizeWindow(), { serviceId: "mouse_gestures" }))
+Gestures.Add("L", SafeCallback((*) => MoveWindowToMonitor("Left"), "Could not move the window left"))
+Gestures.Add("R", SafeCallback((*) => MoveWindowToMonitor("Right"), "Could not move the window right"))
+Gestures.Add("U", SafeCallback((*) => MaximizeWindow(), "Could not maximize the window"))
+Gestures.Add("D", SafeCallback((*) => MinimizeWindow(), "Could not minimize the window"))
 
 
 ;=============================================================

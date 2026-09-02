@@ -3,7 +3,7 @@
 #Include ..\Lib\Helpers\ClipSend.ahk
 #Include ..\Lib\Extensions\Dark Gui.ahk
 #Include ..\Lib\Core\Paths.ahk
-#Include ..\Lib\Core\CallbackAdapters.ahk
+#Include ..\Lib\Core\SafeCall.ahk
 
 class Timer extends DarkGui {
 
@@ -36,7 +36,7 @@ class Timer extends DarkGui {
 		myText.SetFont("s18")
 		timerGui.OnEvent("Size", Gui_Move)
 		timerGui.OnEvent("Close", Gui_Close)
-		SetTimer(CallbackAdapters.MakeTimerHandler("timer.update", update, { serviceId: "timer" }), 1000)
+		SetTimer(SafeCallback(update, "Timer update failed"), 1000)
 		
 		update() {
 			currentTime--
@@ -78,7 +78,7 @@ class Timer extends DarkGui {
 		finishedGui.Show("w340 h215")
 		finishedGui.OnEvent("Close", (*) => ExitApp)
 
-		SetTimer(CallbackAdapters.MakeTimerHandler("timer.finished.update", update, { serviceId: "timer" }), 1000)
+		SetTimer(SafeCallback(update, "Finished timer update failed"), 1000)
 		
 		counter := 1
 		update() {
@@ -108,7 +108,7 @@ class Timer extends DarkGui {
 			timeChoiceGui.AddButton("x150 y130", "40m").OnEvent("Click", start40m)
 			timeChoiceGui.AddButton("x270 y130", "50m").OnEvent("Click", start50m)
 			timeChoiceGui.AddButton("x390 y130", "60m").OnEvent("Click", start60m)
-			timeChoiceGui.OnEvent("Close", CallbackAdapters.MakeHotkeyHandler("timer.timechoice.close", (*) => ExitApp, { serviceId: "timer" }))
+			timeChoiceGui.OnEvent("Close", (*) => ExitApp())
 			timeChoiceGui.Show()
 		}
 	}

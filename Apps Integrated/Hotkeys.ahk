@@ -21,7 +21,6 @@
 ; ============================================================================
 
 #Include ..\Lib\Core.ahk
-#Include ..\Lib\Core\CallbackAdapters.ahk
 #Include ..\Lib\Apps\Notion.ahk
 #Include ..\Lib\Apps\Spotify.ahk
 #Include ..\Lib\Apps\KeePass.ahk
@@ -44,5 +43,5 @@
 ; Profile-specific Hotkeys
 ; ================================
 #HotIf ProfileManager.Is(Profiles.work)
-CapsLock.Hotkey("D", CallbackAdapters.MakeHotkeyHandler("hotkeys.insert_main_password", (*) => KeePass.InsertMainPassword(), { serviceId: "hotkeys" }))
-CapsLock.Hotkey("!D", CallbackAdapters.MakeHotkeyHandler("hotkeys.insert_secondary_password", (*) => KeePass.InsertSecondaryPassword(), { serviceId: "hotkeys" }))
+CapsLock.Hotkey("D", SafeCallback((*) => KeePass.InsertMainPassword(), "Could not insert the main password"))
+CapsLock.Hotkey("!D", SafeCallback((*) => KeePass.InsertSecondaryPassword(), "Could not insert the secondary password"))

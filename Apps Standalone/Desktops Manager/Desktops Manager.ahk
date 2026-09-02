@@ -24,7 +24,7 @@
 ; ============================================================================
 
 #Include ..\..\Lib\Core.ahk
-#Include ..\..\Lib\Core\CallbackAdapters.ahk
+#Include ..\..\Lib\Core\SafeCall.ahk
 #Include Desktop.ahk
 #Include ..\..\Lib\Apps\VsCode.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
@@ -80,14 +80,13 @@ GetDesktopsForProfile() {
 desktops := GetDesktopsForProfile()
 
 for key, desktopObj in desktops {
-    operationId := "desktops.switch." key
-    handler := CallbackAdapters.MakeHotkeyHandler(operationId, ((d) => (*) => HandleSwitch(d))(desktopObj), { serviceId: "desktops_manager" })
+    handler := SafeCallback(((d) => (*) => HandleSwitch(d))(desktopObj), "Could not switch desktop " key)
     Capslock.Hotkey(key, handler)
 }
 
 ; Foreward & Backward
-Capslock.Hotkey("Tab", CallbackAdapters.MakeHotkeyHandler("desktops.previous", (*) => DesktopsDDL.GoToPrevious(), { serviceId: "desktops_manager" }))
-Capslock.Hotkey("P", CallbackAdapters.MakeHotkeyHandler("desktops.toggle_pin", (*) => DesktopsDDL.TogglePin(), { serviceId: "desktops_manager" }))
+Capslock.Hotkey("Tab", SafeCallback((*) => DesktopsDDL.GoToPrevious(), "Could not open the previous desktop"))
+Capslock.Hotkey("P", SafeCallback((*) => DesktopsDDL.TogglePin(), "Could not toggle window pinning"))
 
 ; ===== HELPER FUNCTIONS =====
 global onLeaveAction := ""

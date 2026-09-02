@@ -4,24 +4,19 @@
 class ErrorRecord {
     __New() {
         this.time := A_Now
-        this.severity := "error"
-        this.category := "unknown"
-        this.serviceId := ""
-        this.operationId := ""
-        this.safeMessage := ""
+        this.message := ""
         this.errorType := ""
         this.errorMessage := ""
         this.what := ""
         this.file := ""
         this.line := 0
         this.stack := ""
-        this.mode := ""
-        this.durationMs := 0
         this.fingerprint := ""
     }
 
-    static FromThrown(thrown, params := unset) {
+    static FromThrown(thrown, message := "") {
         record := ErrorRecord()
+        record.message := message
         record.errorType := Type(thrown)
 
         if IsObject(thrown) {
@@ -36,16 +31,13 @@ class ErrorRecord {
                 record.errorMessage := "<unserializable thrown value>"
         }
 
-        if IsSet(params)
-            this._ApplyParams(record, params)
-
         record.fingerprint := record._Fingerprint()
         return record
     }
 
     _Fingerprint() {
         ; 32-bit FNV-1a over stable fields.
-        source := this.errorMessage "|" this.errorType "|" this.serviceId "|" this.operationId
+        source := this.errorMessage "|" this.errorType
         hash := 2166136261
         Loop Parse source
             hash := ((hash ^ Ord(A_LoopField)) * 16777619) & 0xFFFFFFFF
@@ -57,18 +49,6 @@ class ErrorRecord {
         for name, value in this.OwnProps()
             properties.Push(ErrorRecord._JsonString(name) ":" ErrorRecord._JsonValue(value))
         return "{" ErrorRecord._Join(properties, ",") "}"
-    }
-
-    static _ApplyParams(record, params) {
-        if params is Map {
-            for name, value in params
-                record.%name% := value
-            return
-        }
-
-        if IsObject(params)
-            for name, value in params.OwnProps()
-                record.%name% := value
     }
 
     static _ReadProperty(value, name, fallback := "") {

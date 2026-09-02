@@ -3,7 +3,7 @@
 ; ================================================================================
 
 #Include ..\Lib\Core.ahk
-#Include ..\Lib\Core\CallbackAdapters.ahk
+#Include ..\Lib\Core\SafeCall.ahk
 
 ; Set default state for profile
 if ProfileManager.Is(Profiles.devbox)
@@ -22,7 +22,7 @@ Class FakeWorkMode {
     
     static Start() {
         this.Enabled := true
-        SetTimer(CallbackAdapters.MakeTimerHandler("fakework.trigger", _TriggerAction, { serviceId: "fake_work_mode" }), 60000) ; Perform action every min to keep system active
+        SetTimer(SafeCallback(_TriggerAction, "Fake working mode action failed"), 60000) ; Perform action every min to keep system active
 
         _TriggerAction() {
             Send("{ScrollLock}")

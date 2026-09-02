@@ -1,36 +1,26 @@
 #Requires AutoHotkey v2
-#Include ErrorRecord.ahk
 #Include ErrorReporter.ahk
+#Include Notifier.ahk
 
 /** Runs a failure-prone callable inside an error boundary. */
-SafeCall(callable, context := unset, args := unset) {
+SafeCall(callable, message := "Something went wrong") {
     startedAt := A_TickCount
-    if !IsSet(context)
-        context := {}
-    if !IsSet(args)
-        args := []
 
     try {
         if !HasMethod(callable, "Call")
             throw TypeError("SafeCall expects a callable", -1)
-        if !(args is Array)
-            throw TypeError("SafeCall args must be an Array", -1)
 
-        value := callable.Call(args*)
+        value := callable.Call()
         return {status: "success", value: value, durationMs: A_TickCount - startedAt}
     } catch Any as executionError {
         duration := A_TickCount - startedAt
-        serviceId := HasProp(context, "serviceId") ? context.serviceId : ""
-        operationId := HasProp(context, "operationId") ? context.operationId : ""
-        record := ErrorRecord.FromThrown(executionError, {
-            serviceId: serviceId,
-            operationId: operationId,
-            category: "invocation",
-            severity: "error",
-            durationMs: duration,
-            safeMessage: "Unexpected error in operation"
-        })
-        ErrorReporter.Report(record)
+        record := ErrorReporter.Report(executionError, message).record
+        Notifier.Error(message)
         return {status: "execution-failed", errorRecord: record, durationMs: duration}
     }
+}
+
+/** Returns a callback which applies SafeCall when AutoHotkey invokes it later. */
+SafeCallback(callable, message := "Something went wrong") {
+    return (callbackArgs*) => SafeCall((*) => callable.Call(callbackArgs*), message)
 }

@@ -2,7 +2,7 @@
 #SingleInstance Force
 #Include ..\..\Lib\Core.ahk
 #Include ..\..\Lib\Core\WebView.ahk
-#Include ..\..\Lib\Core\CallbackAdapters.ahk
+#Include ..\..\Lib\Core\SafeCall.ahk
 #Include Settings\Settings Service.ahk
 #Include Settings\Window State Tracker.ahk
 
@@ -37,7 +37,7 @@ Class MacroBoard extends WebViewToo {
 	; Keep the GUI at the bottom persistently by re-applying Z-order periodically.
 	PlaceOnBottom() {
 		interval := 2000 ; ms
-		SetTimer(CallbackAdapters.MakeTimerHandler("macro_board.place_on_bottom", (*) => DllCall("SetWindowPos", "Ptr", this.Hwnd, "Ptr", 1, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "UInt", 0x13), { serviceId: "macro_board" }), interval)
+		SetTimer(SafeCallback((*) => DllCall("SetWindowPos", "Ptr", this.Hwnd, "Ptr", 1, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "UInt", 0x13), "Could not position the Macro Board"), interval)
 		return this
 	}
 

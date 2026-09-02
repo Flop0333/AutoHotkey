@@ -13,10 +13,11 @@ class ErrorReporter {
         return RTrim(localAppData, "\/") "\AutoHotkey Workflow\Logs"
     }
 
-    static Report(record) {
+    static Report(thrown, message := "") {
         try {
-            if !(record is ErrorRecord)
-                record := ErrorRecord.FromThrown(record)
+            record := thrown is ErrorRecord ? thrown : ErrorRecord.FromThrown(thrown, message)
+            if message != "" && record.message = ""
+                record.message := message
 
             logDir := this.GetLogDir()
             DirCreate(logDir)
@@ -31,9 +32,11 @@ class ErrorReporter {
 
             json := this._Redact(record).ToJson()
             FileAppend(json "`n", logFile, "UTF-8")
-            return {ok: true, path: logFile}
+            return {ok: true, path: logFile, record: record}
         } catch as reportError {
-            return this._WriteFallback(reportError)
+            result := this._WriteFallback(reportError)
+            result.record := thrown is ErrorRecord ? thrown : ErrorRecord.FromThrown(thrown, message)
+            return result
         }
     }
 
@@ -62,10 +65,7 @@ class ErrorReporter {
     static _WriteFallback(reportError) {
         try {
             fallbackPath := A_Temp "\error-reporter-fallback.jsonl"
-            fallbackRecord := ErrorRecord.FromThrown(reportError, {
-                category: "reporter",
-                safeMessage: "Primary error reporting failed"
-            })
+            fallbackRecord := ErrorRecord.FromThrown(reportError, "Primary error reporting failed")
             FileAppend(fallbackRecord.ToJson() "`n", fallbackPath, "UTF-8")
             return {ok: false, fallback: fallbackPath, error: reportError.Message}
         } catch as fallbackError {

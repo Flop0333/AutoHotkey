@@ -12,7 +12,7 @@
 #Include ..\Lib\Core.ahk
 #Include ..\Lib\Core\ErrorReporter.ahk
 #Include ..\Lib\Core\Notifier.ahk
-#Include ..\Lib\Core\CallbackAdapters.ahk
+#Include ..\Lib\Core\SafeCall.ahk
 
 ^Space::TextSpeaker.TogglePlay()
 
@@ -39,7 +39,7 @@ class TextSpeaker {
             voice := this.voices.david
             if voice = "" {
                 Notifier.Error("No voice found", "Text Speaker")
-                ErrorReporter.Report(ErrorRecord.FromThrown("No voice found", { serviceId: "text_speaker", category: "validation", severity: "error", safeMessage: "No voice available" }))
+                ErrorReporter.Report("No voice found", "No voice available")
                 return
             }
         }
@@ -100,10 +100,10 @@ class TextSpeaker {
         Sleep(700) ; Wait until speaking starts
         if onOff = ""
             onOff := this._IsSpeaking() ? "On" : "Off"
-        Hotkey("Up", CallbackAdapters.MakeHotkeyHandler("text_speaker.volume_up", (*) => this._VolumeUp(), { serviceId: "text_speaker" }), onOff)
-        Hotkey("Down", CallbackAdapters.MakeHotkeyHandler("text_speaker.volume_down", (*) => this._VolumeDown(), { serviceId: "text_speaker" }), onOff)
-        Hotkey("Left", CallbackAdapters.MakeHotkeyHandler("text_speaker.speed_down", (*) => this._SpeedDown(), { serviceId: "text_speaker" }), onOff)
-        Hotkey("Right", CallbackAdapters.MakeHotkeyHandler("text_speaker.speed_up", (*) => this._SpeedUp(), { serviceId: "text_speaker" }), onOff)
+        Hotkey("Up", SafeCallback((*) => this._VolumeUp(), "Could not increase speech volume"), onOff)
+        Hotkey("Down", SafeCallback((*) => this._VolumeDown(), "Could not decrease speech volume"), onOff)
+        Hotkey("Left", SafeCallback((*) => this._SpeedDown(), "Could not decrease speech speed"), onOff)
+        Hotkey("Right", SafeCallback((*) => this._SpeedUp(), "Could not increase speech speed"), onOff)
     }
 
     static _DisplayVoiceOptions() {

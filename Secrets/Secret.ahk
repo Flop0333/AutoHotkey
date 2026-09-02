@@ -32,8 +32,6 @@ class Secret {
     }
 
     ; Protect secret retrieval and transmission once, close to the risky operation.
-    Send() => SafeCall(
-        (*) => ClipSend(this.GetOrSet()),
-        {serviceId: "secrets", operationId: "secrets.send"}
+    Send() => SafeCall((*) => ClipSend(this.GetOrSet()), "Could not send the secret"
     )
 }

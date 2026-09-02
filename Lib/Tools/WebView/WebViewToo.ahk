@@ -300,7 +300,7 @@ class WebViewToo {
 			pWebviewWindow := simpleWebviewWindow
 			if (!Success) {
 				Notifier.Error("An error occurred while attempting to save the file: " OutFileName, "Simple Print To Pdf")
-				ErrorReporter.Report(ErrorRecord.FromThrown("PrintToPdf failed: " OutFileName, { serviceId: "webview", category: "print", safeMessage: "Failed to save PDF" }))
+				ErrorReporter.Report("PrintToPdf failed: " OutFileName, "Failed to save PDF")
 			} else {
 				Notifier.Info("Saved PDF: " FileName, "Print to PDF")
 			}

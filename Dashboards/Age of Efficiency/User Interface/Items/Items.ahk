@@ -3,7 +3,7 @@
 #Include ../../Database/Apps/AppsState.ahk
 #Include ../../Input Handler/Command Executor.ahk
 #Include ..\..\..\..\Secrets\Secrets Service.ahk
-#Include ..\..\..\..\Lib\Core\CallbackAdapters.ahk
+#Include ..\..\..\..\Lib\Core\SafeCall.ahk
 
 Global TAB_OPTIONS := {Bookmarks: "Bookmarks", Apps: "Apps", Search: "Search"}
 
@@ -65,7 +65,7 @@ GetUrlFromClipboard(WebView) {
 }
  
 
-SubmitForm(WebView, Form, updateMode, currentTabTab) => SetTimer(CallbackAdapters.MakeTimerHandler("ageofeff.submitform", (*) => FormSubmitEvent(WebView, Form, updateMode, currentTabTab), { serviceId: "age_of_efficiency" }), -1)
+SubmitForm(WebView, Form, updateMode, currentTabTab) => SetTimer(SafeCallback((*) => FormSubmitEvent(WebView, Form, updateMode, currentTabTab), "Could not submit the form"), -1)
 FormSubmitEvent(WebView, Form, updateMode, currentTabTab) {
 	formMap := JSON.parse(Form)
 

@@ -19,14 +19,14 @@
 ; ============================================================================
 
 #Include ..\Lib\Core.ahk
-#Include ..\Lib\Core\CallbackAdapters.ahk
+#Include ..\Lib\Core\SafeCall.ahk
 SetWinDelay(0)
 CoordMode("Mouse")
 
-CapsLock.Hotkey("LButton",  CallbackAdapters.MakeHotkeyHandler("winmgr.drag", (*) => DragWindow(), { serviceId: "window_manager" }))
-CapsLock.Hotkey("RButton",  CallbackAdapters.MakeHotkeyHandler("winmgr.resize", (*) => ResizeWindow(), { serviceId: "window_manager" }))
-CapsLock.Hotkey("MButton",  CallbackAdapters.MakeHotkeyHandler("winmgr.close", (*) => WinClose(Win.WinUnderMouse()), { serviceId: "window_manager" }))
-CapsLock.Hotkey("Up",       CallbackAdapters.MakeHotkeyHandler("winmgr.toggle_always_on_top", (*) => Win.ToggleAlwaysOnTop(), { serviceId: "window_manager" }))
+CapsLock.Hotkey("LButton", SafeCallback((*) => DragWindow(), "Could not drag the window"))
+CapsLock.Hotkey("RButton", SafeCallback((*) => ResizeWindow(), "Could not resize the window"))
+CapsLock.Hotkey("MButton", SafeCallback((*) => WinClose(Win.WinUnderMouse()), "Could not close the window"))
+CapsLock.Hotkey("Up", SafeCallback((*) => Win.ToggleAlwaysOnTop(), "Could not change always-on-top"))
 
 DragWindow() {
     MouseGetPos(&origionalMouseX, &origionalMouseY, &winId)

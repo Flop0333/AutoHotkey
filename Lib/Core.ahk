@@ -8,6 +8,7 @@
 #Include Core\Paths.ahk
 #Include Core\Links.ahk
 #Include Core\Notifier.ahk
+#Include Core\SafeCall.ahk
 
 ; Extensions
 #Include Extensions\Array.ahk
