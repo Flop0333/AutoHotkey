@@ -11,6 +11,7 @@
 
 #Include ..\Lib\Core.ahk
 #Include ..\Lib\Core\ErrorReporter.ahk
+#Include ..\Lib\Core\Notifier.ahk
 #Include ..\Lib\Core\CallbackAdapters.ahk
 
 ^Space::TextSpeaker.TogglePlay()
@@ -37,7 +38,7 @@ class TextSpeaker {
         if voice = "" {
             voice := this.voices.david
             if voice = "" {
-                ErrorReporter.Notify("No voice found", "Text Speaker", "error")
+                Notifier.Error("No voice found", "Text Speaker")
                 ErrorReporter.Report(ErrorRecord.FromThrown("No voice found", { serviceId: "text_speaker", category: "validation", severity: "error", safeMessage: "No voice available" }))
                 return
             }
@@ -108,7 +109,7 @@ class TextSpeaker {
     static _DisplayVoiceOptions() {
         allVoices := this._spVoice.GetVoices()
         for voice in allVoices {
-            ErrorReporter.Notify(voice.GetDescription(), "Text Speaker", "info", 3)
+            Notifier.Info(voice.GetDescription(), "Text Speaker", 3)
         }
     }
 }

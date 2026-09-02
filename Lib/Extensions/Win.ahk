@@ -1,6 +1,6 @@
 #Include ..\Tools\Desktops DLL Library\Desktops DLL Library.ahk
 #Include Dark ToolTip.ahk
-#Include ..\Core\ErrorReporter.ahk
+#Include ..\Core\Notifier.ahk
 
 class Win {
 
@@ -40,7 +40,7 @@ class Win {
 	    static DWMWA_TEXT_COLOR    := 36
 	    
 		if (VerCompare(A_OSVersion, "10.0.22200") < 0) {
-			ErrorReporter.Notify("This is supported starting with Windows 11 Build 22000.", "OS Version Not Supported.", "warning")
+			Notifier.Warning("This is supported starting with Windows 11 Build 22000.", "OS Version Not Supported.")
 			return
 		}
 	

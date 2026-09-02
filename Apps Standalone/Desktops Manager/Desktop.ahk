@@ -27,7 +27,7 @@ Class Desktop {
   SwitchTo(onLeaveAction) {
     ; Run on-leave action safely so it doesn't block the switch
     if HasMethod(onLeaveAction, "Call")
-        SafeCall("desktops.onleave." this._number, onLeaveAction, { serviceId: "desktops_manager" })
+        SafeCall(onLeaveAction, {serviceId: "desktops_manager", operationId: "desktops.onleave." this._number})
     DesktopsDDL.desktopsHistory.Push(this._number)
     DesktopsDDL.GotoDesktop(this._number)
     if this._number = DesktopsDDL.GetCurrentDesktopNumber()
@@ -41,7 +41,7 @@ Class Desktop {
 
       if !WinExist(window.title) {
         if HasMethod(window.launchMethod, "Call")
-            SafeCall("desktops.launch." this._number, window.launchMethod, { serviceId: "desktops_manager", meta: { title: window.title } })
+            SafeCall(window.launchMethod, {serviceId: "desktops_manager", operationId: "desktops.launch." this._number})
         ; NOTE: if launchMethod is not callable we skip silently
       } 
       else if window.activate = true {

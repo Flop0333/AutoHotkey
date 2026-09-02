@@ -7,6 +7,7 @@
 #Include ..\Profiles\Profile Manager.ahk
 #Include Core\Paths.ahk
 #Include Core\Links.ahk
+#Include Core\Notifier.ahk
 
 ; Extensions
 #Include Extensions\Array.ahk

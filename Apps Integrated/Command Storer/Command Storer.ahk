@@ -20,7 +20,7 @@
 #Include ..\..\Lib\Tools\User Input.ahk
 #Include ..\..\Lib\Extensions\Dark Gui.ahk
 #Include Storage\FileService.ahk
-#Include ..\..\Lib\Core\ErrorReporter.ahk
+#Include ..\..\Lib\Core\Notifier.ahk
 
 scriptName := StrSplit(A_ScriptName, '.ahk')[1]
 
@@ -57,7 +57,7 @@ CreateSet(*) {
 DeleteSet(*) {
     fileName := StrReplace(selectedSet, ".txt", "")
         if (!IsSet(selectedSet)) {
-            ErrorReporter.Notify("Select a set", "Command Storer", "error")
+            Notifier.Error("Select a set", "Command Storer")
             return
         }
   
@@ -116,12 +116,12 @@ AddItem(*) {
 
 ShowMessageOnInvalidNewItemInput() {
     if (newDescription.Text = "description" || newCommand.Text = "command") {
-        ErrorReporter.Notify("Insert a description and command", "Command Storer", "error")
+        Notifier.Error("Insert a description and command", "Command Storer")
         return
     }
     
     if (!IsSet(selectedSet)) {
-        ErrorReporter.Notify("Select a set", "Command Storer", "error")
+        Notifier.Error("Select a set", "Command Storer")
         return
     }
 }

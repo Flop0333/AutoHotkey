@@ -1,4 +1,4 @@
-#Include ..\..\..\Lib\Core\ErrorReporter.ahk
+#Include ..\..\..\Lib\Core\Notifier.ahk
 
 GetScript() {
   return FileOpen(Paths.appsStandalone "\Command Storer\Storage\Command Sets\" selectedSet, "rw")
@@ -7,7 +7,7 @@ GetScript() {
 WriteItemToFile() {
   script := GetScript()
   script.Seek(0, 2)
-  ErrorReporter.Notify("Added to set: " selectedSet, "Command Storer", "info")
+  Notifier.Info("Added to set: " selectedSet, "Command Storer")
   script.WriteLine(newKeybinding.Text "|" newCommand.Text "|" newDescription.Text)
 }
 

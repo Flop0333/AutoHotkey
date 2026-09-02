@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2
 #Include ErrorRecord.ahk
 
-/** Writes sanitized diagnostics and shows non-modal notifications. */
+/** Writes sanitized error diagnostics. User notifications belong to Notifier. */
 class ErrorReporter {
     static MAX_LOG_BYTES := 2 * 1024 * 1024
     static LOG_KEEP_FILES := 5
@@ -34,28 +34,6 @@ class ErrorReporter {
             return {ok: true, path: logFile}
         } catch as reportError {
             return this._WriteFallback(reportError)
-        }
-    }
-
-    static Notify(message, title := "AutoHotkey", severity := "info", seconds := 5) {
-        try {
-            TrayTip(message, title)
-            if seconds > 0
-                SetTimer((*) => TrayTip(), -seconds * 1000)
-
-            record := ErrorRecord.FromThrown(message, {
-                severity: severity,
-                category: "notification",
-                safeMessage: message
-            })
-            this.Report(record)
-            return {ok: true}
-        } catch as notifyError {
-            result := this.Report(ErrorRecord.FromThrown(notifyError, {
-                category: "notification",
-                safeMessage: "Unable to show notification"
-            }))
-            return {ok: false, error: notifyError.Message, report: result}
         }
     }
 

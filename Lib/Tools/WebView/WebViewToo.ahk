@@ -30,6 +30,7 @@
 #Requires AutoHotkey v2
 #Include WebView2.ahk
 #Include ..\..\Core\ErrorReporter.ahk
+#Include ..\..\Core\Notifier.ahk
 #Include ..\..\Core\ErrorRecord.ahk
 
 class WebViewToo {
@@ -271,7 +272,7 @@ class WebViewToo {
 		Loop {
 			FileName := FileSelect("S", tFileName := IsSet(FileName) ? FileName : "",, "*.pdf")
 			if (FileName = "") {
-				ErrorReporter.Notify("Print Canceled", "Print to PDF", "info")
+				Notifier.Info("Print Canceled", "Print to PDF")
 				return
 			}
 
@@ -298,10 +299,10 @@ class WebViewToo {
 		SimplePrintToPdfHandler(HandlerPtr, pWebviewWindow, Success) {
 			pWebviewWindow := simpleWebviewWindow
 			if (!Success) {
-				ErrorReporter.Notify("An error occurred while attempting to save the file: " OutFileName, "Simple Print To Pdf", "error")
+				Notifier.Error("An error occurred while attempting to save the file: " OutFileName, "Simple Print To Pdf")
 				ErrorReporter.Report(ErrorRecord.FromThrown("PrintToPdf failed: " OutFileName, { serviceId: "webview", category: "print", safeMessage: "Failed to save PDF" }))
 			} else {
-				ErrorReporter.Notify("Saved PDF: " FileName, "Print to PDF", "info")
+				Notifier.Info("Saved PDF: " FileName, "Print to PDF")
 			}
 		}
 	}

@@ -1,3 +1,5 @@
+#Include ..\Lib\Core\SafeCall.ahk
+
 class Secret {
     __New(name, description, value := "", key := "") {
         this.name := name
@@ -29,6 +31,9 @@ class Secret {
         return this._value
     }
 
-    ; Send() => ClipSend(this.GetOrSet()) sleep(100) Send("{BackSpace}") ; Remove space added by ClipSend
-    Send() => ClipSend(this.GetOrSet())
+    ; Protect secret retrieval and transmission once, close to the risky operation.
+    Send() => SafeCall(
+        (*) => ClipSend(this.GetOrSet()),
+        {serviceId: "secrets", operationId: "secrets.send"}
+    )
 }

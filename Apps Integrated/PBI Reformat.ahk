@@ -3,7 +3,7 @@
 ; ============================================================================
 
 #Include ..\Lib\Core.ahk
-#Include ..\Lib\Core\ErrorReporter.ahk
+#Include ..\Lib\Core\Notifier.ahk
 
 Class PBIReformat {
 
@@ -40,7 +40,7 @@ Class PBIReformat {
             } 
         } 
         if !IsSet(newPrefix) {
-            ErrorReporter.Notify("The copied text does not start with a recognized PBI prefix.", "PBI Reformat", "error")
+            Notifier.Error("The copied text does not start with a recognized PBI prefix.", "PBI Reformat")
             Return false
         }
         cleanUpText := RegExReplace(trimmedText, "[^a-zA-Z0-9\s]", "") ; Remove anything but letters, numbers, and spaces

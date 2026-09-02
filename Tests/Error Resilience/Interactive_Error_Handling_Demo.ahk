@@ -141,7 +141,11 @@ class InteractiveErrorHandlingDemo {
 
     static TestSafeCallSuccess() {
         this.Before("5. SafeCall success", "Run a successful callable and preserve its return value.")
-        result := SafeCall("safe.success", (values*) => values[1] + values[2], {serviceId: "demo"}, [20, 22])
+        result := SafeCall(
+            (values*) => values[1] + values[2],
+            {serviceId: "demo", operationId: "safe.success"},
+            [20, 22]
+        )
         ok := result.status = "success" && result.value = 42 && HasProp(result, "durationMs")
         this.Check(ok, "SafeCall returned a successful result", "Status: " result.status "`nValue: " result.value "`nDuration: " result.durationMs " ms")
     }
@@ -152,9 +156,8 @@ class InteractiveErrorHandlingDemo {
             "The callable will throw now. SafeCall should return execution-failed and this demo should continue."
         )
         result := SafeCall(
-            "safe.intentional-failure",
             (*) => this.ThrowPlainValue("Intentional plain-string SafeCall failure"),
-            {serviceId: "demo"}
+            {serviceId: "demo", operationId: "safe.intentional-failure"}
         )
         ok := result.status = "execution-failed"
             && HasProp(result, "errorRecord")
@@ -241,16 +244,15 @@ class InteractiveErrorHandlingDemo {
     static TestNotification() {
         this.Before(
             "10. Non-modal notification",
-            "After this MsgBox closes, ErrorReporter.Notify() will show a TrayTip and also log a notification record."
+            "After this MsgBox closes, Notifier.Info() will show a TrayTip without creating an error record."
         )
-        result := ErrorReporter.Notify(
+        result := Notifier.Info(
             "This is an intentional error-handling demo notification.",
             "AutoHotkey demo",
-            "info",
             4
         )
         Sleep(750)
-        this.Check(result.ok, "The notification call succeeded", "A non-modal TrayTip was requested and a notification record was logged.")
+        this.Check(result.ok, "The notification call succeeded", "A non-modal TrayTip was requested without misclassifying it as an error.")
     }
 
     static TestRotation() {

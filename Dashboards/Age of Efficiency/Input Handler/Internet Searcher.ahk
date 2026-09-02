@@ -13,7 +13,7 @@
 #Include ..\..\..\Lib\Extensions\String.ahk
 #Include ../Database/Internet Search/SearchEngine.ahk
 #Include ../Database/Internet Search/SearchEnginesState.ahk
-#Include ..\..\..\Lib\Core\ErrorReporter.ahk
+#Include ..\..\..\Lib\Core\Notifier.ahk
 
 Class InternetSearcher {
 
@@ -40,7 +40,7 @@ Class InternetSearcher {
             this._selectedSearchEngine.url := newEngine.url
 		
 		else
-			ErrorReporter.Notify("Accepted parameters: `n-Search engine `n-Search engines name `n-Search engines command `n-Searchable url", "Internet Searcher", "info")
+			Notifier.Info("Accepted parameters: `n-Search engine `n-Search engines name `n-Search engines command `n-Searchable url", "Internet Searcher")
 	}
 
 	_ConvertQuery(query) {

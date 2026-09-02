@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2
 #Include SafeCall.ahk
+#Include Notifier.ahk
 
 /** Produces callbacks which preserve the arguments supplied by AutoHotkey. */
 class CallbackAdapters {
@@ -20,10 +21,21 @@ class CallbackAdapters {
     }
 
     static _Invoke(kind, operationId, callable, context := unset, args := unset) {
-        result := SafeCall(operationId, callable, context?, args?)
+        safeContext := {}
+        if IsSet(context) {
+            if context is Map {
+                for name, value in context
+                    safeContext.%name% := value
+            } else if IsObject(context) {
+                for name, value in context.OwnProps()
+                    safeContext.%name% := value
+            }
+        }
+        safeContext.operationId := operationId
+        result := SafeCall(callable, safeContext, args?)
         if result.status != "success" {
             serviceId := IsSet(context) && HasProp(context, "serviceId") ? context.serviceId : operationId
-            ErrorReporter.Notify(kind " '" operationId "' failed", serviceId, "error")
+            Notifier.Error(kind " '" operationId "' failed", serviceId)
         }
         return result
     }

@@ -22,7 +22,7 @@
 #Include ..\..\Apps Integrated\Fake Working Mode.ahk
 #Include ..\..\Lib\Apps\Spotify.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
-#Include ..\..\Lib\Core\ErrorReporter.ahk
+#Include ..\..\Lib\Core\Notifier.ahk
 #Include ..\..\Startup\Startup.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
 #Include ..\..\Lib\Core\CallbackAdapters.ahk
@@ -60,7 +60,7 @@ profileButtons := Map(
         Button(CloseAllBrowsers, "Kill Browsers", "game over.gif"),
     ],
     Profiles.default, [
-        Button((*) => ErrorReporter.Notify("Pizza Default", "Macro Board", "info"), "Pizza Default")
+        Button((*) => Notifier.Info("Pizza Default", "Macro Board"), "Pizza Default")
     ]
 )
 

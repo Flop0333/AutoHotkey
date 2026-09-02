@@ -46,7 +46,7 @@
 #SingleInstance force
 #Include Screen Snipper OCR.ahk
 #Include ..\..\Lib\Tools\Info.ahk
-#Include ..\..\Lib\Core\ErrorReporter.ahk
+#Include ..\..\Lib\Core\Notifier.ahk
 #Include ..\..\Lib\Core\SafeCall.ahk
 DetectHiddenWindows true
 SetWinDelay(0)
@@ -55,15 +55,15 @@ SetWinDelay(0)
 _SetupTrayMenu()
 _SetupTrayMenu() {   
 	A_TrayMenu.Delete()       
-	A_TrayMenu.Add("Close All Snips", (*) => ErrorReporter.Notify("Closing all snips", "Screen Snipper", "info") Reload())
+	A_TrayMenu.Add("Close All Snips", (*) => Notifier.Info("Closing all snips", "Screen Snipper") Reload())
     A_TrayMenu.Add()
-	A_TrayMenu.Add("Snip && Copy:    Win + LButton",   (*) => ErrorReporter.Notify("Snip and copy is not available in this context", "Screen Snipper", "info"))
+	A_TrayMenu.Add("Snip && Copy:    Win + LButton",   (*) => Notifier.Info("Snip and copy is not available in this context", "Screen Snipper"))
     A_TrayMenu.Add()
-	A_TrayMenu.Add("Copy Only:       Ctrl + Win + LButton",   (*) => ErrorReporter.Notify("Copy only is not available in this context", "Screen Snipper", "info"))
+	A_TrayMenu.Add("Copy Only:       Ctrl + Win + LButton",   (*) => Notifier.Info("Copy only is not available in this context", "Screen Snipper"))
     A_TrayMenu.Add()
-	A_TrayMenu.Add("Save  Only:        Alt  + Win + LButton",   (*) => ErrorReporter.Notify("Save only is not available in this context", "Screen Snipper", "info"))
+	A_TrayMenu.Add("Save  Only:        Alt  + Win + LButton",   (*) => Notifier.Info("Save only is not available in this context", "Screen Snipper"))
     A_TrayMenu.Add()
-	A_TrayMenu.Add("OCR Only:         Shift + Win + LButton",   (*) => ErrorReporter.Notify("OCR only is not available in this context", "Screen Snipper", "info"))
+	A_TrayMenu.Add("OCR Only:         Shift + Win + LButton",   (*) => Notifier.Info("OCR only is not available in this context", "Screen Snipper"))
     A_TrayMenu.Disable("Snip && Copy:    Win + LButton")
     A_TrayMenu.Disable("Copy Only:       Ctrl + Win + LButton")
     A_TrayMenu.Disable("Save  Only:        Alt  + Win + LButton")

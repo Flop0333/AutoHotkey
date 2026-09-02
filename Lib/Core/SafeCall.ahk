@@ -2,8 +2,8 @@
 #Include ErrorRecord.ahk
 #Include ErrorReporter.ahk
 
-/** Runs one callable inside an error boundary. */
-SafeCall(operationId, callable, context := unset, args := unset) {
+/** Runs a failure-prone callable inside an error boundary. */
+SafeCall(callable, context := unset, args := unset) {
     startedAt := A_TickCount
     if !IsSet(context)
         context := {}
@@ -21,6 +21,7 @@ SafeCall(operationId, callable, context := unset, args := unset) {
     } catch Any as executionError {
         duration := A_TickCount - startedAt
         serviceId := HasProp(context, "serviceId") ? context.serviceId : ""
+        operationId := HasProp(context, "operationId") ? context.operationId : ""
         record := ErrorRecord.FromThrown(executionError, {
             serviceId: serviceId,
             operationId: operationId,
