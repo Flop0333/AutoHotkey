@@ -41,8 +41,10 @@ Class Desktop {
 
       if !WinExist(window.title) {
         if HasMethod(window.launchMethod, "Call")
+        ; TODO: this does open a browser tab in a brower that is allready open (on another desktop) instead of opening it one the desktops switched too
             SafeCall(window.launchMethod, "Could not launch " window.title)
-        ; NOTE: if launchMethod is not callable we skip silently
+        else
+            Info("No launch method defined for " window.title, 3000)
       } 
       else if window.activate = true {
           try WinMaximize(window.title)
