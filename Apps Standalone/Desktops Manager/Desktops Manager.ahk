@@ -45,14 +45,14 @@ GetDesktopsForProfile() {
         config["2"] := Desktop(desktopCounter++)
         config["3"] := Desktop(desktopCounter++)
         
-        config["R"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser,      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get())))
+        config["R"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser.winTitle,      () => Run(Browser.defaultBrowser.winTitle.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get())))
         config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",   () => Run(Brave.ahk_exe " --new-window " Links.youtube))) 
         
         config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",      () => Run("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk C:\Users\BremerF\Documents\AutoHotkey",,"Max")))
-        config["G"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser,      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Links.chatGpt)))
+        config["G"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser.winTitle,      () => Run(Browser.defaultBrowser.winTitle.ahk_exe " --new-window " Links.chatGpt)))
         
         config["C"] := Desktop(desktopCounter++) ; for code
-        config["B"] := Desktop(desktopCounter++,  RequiredWindow(Browser.defaultBrowser,      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.WorkBoard.Get())))
+        config["B"] := Desktop(desktopCounter++,  RequiredWindow(Browser.defaultBrowser.winTitle,      () => Run(Browser.defaultBrowser.winTitle.ahk_exe " --new-window " Secrets.WorkBoard.Get())))
         config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",    () => WinMaximize("ahk_exe Notion.exe")))
                                         .OnLeave(() => WinMinimize("ahk_exe Notion.exe"))
     }
@@ -63,13 +63,13 @@ GetDesktopsForProfile() {
         config["3"] := Desktop(desktopCounter++)
 
         config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",    () => WhatsApp.Launch()))
-        config["R"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser,    () => Browser.OpenInNewBrowser(Links.githubRepos)))
+        config["R"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser.winTitle,    () => Browser.OpenInNewBrowser(Links.githubRepos)))
         config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",    () => Browser.OpenInNewBrowser(Links.youtube))) 
         
         config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.openAutoHotkey()))
         config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    () => Spotify.Launch()))
         config["G"] := Desktop(desktopCounter++,   RequiredWindow("ChatGPT",    () => Run("ahk_exe ChatGPT.exe"),false),
-                                                    RequiredWindow(Browser.defaultBrowser,    () => Browser.OpenInNewBrowser(Links.chatGpt),false))
+                                                    RequiredWindow(Browser.defaultBrowser.winTitle,    () => Browser.OpenInNewBrowser(Links.chatGpt),false))
         
         config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.Launch()))
         config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      () => Notion.Launch()))
