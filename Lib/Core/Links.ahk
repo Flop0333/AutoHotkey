@@ -6,4 +6,6 @@
 	static notionCalendar 	:= "https://calendar.notion.so/"
 	static googleMaps 		:= "https://www.google.com/maps/dir/home"
 	static chatGpt 			:= "https://chatgpt.com/"
+	static github 			:= "https://github.com/"
+	static githubRepos 		:= "https://github.com/Flop0333?tab=repositories"
 }

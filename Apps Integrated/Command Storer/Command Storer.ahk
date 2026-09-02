@@ -27,22 +27,6 @@ global DEFAULT_SET := "Powershell"
 
 #C:: WinExist(scriptName) ? WinActivate() : CommandStorer_ShowMainGui()
 
-Class CommandStorer {
-
-    static __New() {
-        this._SetupTrayMenu_()
-    }
-    
-    static _SetupTrayMenu_() {
-        A_TrayMenu.Delete()
-        A_TrayMenu.Add("Open Editor",   (*) => WinExist(scriptName) ? WinActivate() : CommandStorer_ShowMainGui())
-        A_TrayMenu.Add()
-        A_TrayMenu.Add("Exit",   (*) => ExitApp())
-        A_TrayMenu.Add()
-        A_TrayMenu.Add("Win + C",  (*) => WinExist(scriptName) ? WinActivate() : CommandStorer_ShowMainGui())
-        A_TrayMenu.Disable("Win + C")
-    }
-}
 
 CreateSet(*) {
     newSet := UserInput().WaitForInput()

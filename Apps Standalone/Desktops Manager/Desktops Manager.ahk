@@ -23,18 +23,19 @@
 ;   - Multiple RequiredWindow() per desktop supported
 ; ============================================================================
 
-#Include <Core>
+#Include ..\..\Lib\Core.ahk
 #Include Desktop.ahk
-#Include <Apps\VsCode>
-#Include <Apps\Notion>
-#Include <Apps\Spotify>
-#Include <Apps\WhatsApp>
+#Include ..\..\Lib\Apps\VsCode.ahk
+#Include ..\..\Lib\Apps\Notion.ahk
+#Include ..\..\Lib\Apps\Spotify.ahk
+#Include ..\..\Lib\Apps\WhatsApp.ahk
+#Include ..\..\Lib\Apps\Browser.ahk
 
 
 GetDesktopsForProfile() {
     desktopCounter := 0 ; Start at 0, increment for each desktop added
     config := Map()
-    
+
     if (ProfileManager.Is(Profiles.devbox)) {
         devBoxDesktopsAmount := 10
         desktopCounter := DesktopsDDL.GetDesktopCount() = devBoxDesktopsAmount ? 0 : 1 ; Devbox has 'Local desktops' which takes the first slot, so we need to shift all desktops by 1
@@ -42,15 +43,15 @@ GetDesktopsForProfile() {
         config["1"] := Desktop(desktopCounter++) ; Because of 'Local desktops' in devbox, we start at 1 instead of 0
         config["2"] := Desktop(desktopCounter++)
         config["3"] := Desktop(desktopCounter++)
-        
-        config["R"] := Desktop(desktopCounter++,   RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get())))
+
+        config["R"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser.winTitle,      () => Run(Browser.defaultBrowser.winTitle.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get())))
         config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",   () => Run(Brave.ahk_exe " --new-window " Links.youtube))) 
-        
+
         config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",      () => Run("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk C:\Users\BremerF\Documents\AutoHotkey",,"Max")))
-        config["G"] := Desktop(desktopCounter++,   RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Links.chatGpt)))
-        
+        config["G"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser.winTitle,      () => Run(Browser.defaultBrowser.winTitle.ahk_exe " --new-window " Links.chatGpt)))
+
         config["C"] := Desktop(desktopCounter++) ; for code
-        config["B"] := Desktop(desktopCounter++,  RequiredWindow("Edge",      () => Run(Browser.defaultBrowser.ahk_exe " --new-window " Secrets.WorkBoard.Get())))
+        config["B"] := Desktop(desktopCounter++,  RequiredWindow(Browser.defaultBrowser.winTitle,      () => Run(Browser.defaultBrowser.winTitle.ahk_exe " --new-window " Secrets.WorkBoard.Get())))
         config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",    () => WinMaximize("ahk_exe Notion.exe")))
                                         .OnLeave(() => WinMinimize("ahk_exe Notion.exe"))
     }
@@ -61,29 +62,32 @@ GetDesktopsForProfile() {
         config["3"] := Desktop(desktopCounter++)
 
         config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",    () => WhatsApp.Launch()))
+        config["R"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser.winTitle,    () => Browser.OpenInNewBrowser(Links.githubRepos)))
         config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",    () => Browser.OpenInNewBrowser(Links.youtube))) 
-        
+
         config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.openAutoHotkey()))
         config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    () => Spotify.Launch()))
         config["G"] := Desktop(desktopCounter++,   RequiredWindow("ChatGPT",    () => Run("ahk_exe ChatGPT.exe"),false),
-                                                    RequiredWindow("Brave",    () => Browser.OpenInNewBrowser(Links.chatGpt),false))
-        
+                                                    RequiredWindow(Browser.defaultBrowser.winTitle,    () => Browser.OpenInNewBrowser(Links.chatGpt),false))
+
         config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.Launch()))
         config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      () => Notion.Launch()))
     }
-    
+
     return config
 }
 
 ; ===== HOTKEY CONFIGURATION =====
 desktops := GetDesktopsForProfile()
 
-for key, desktopObj in desktops
-    Capslock.Hotkey(key, ((d) => (*) => HandleSwitch(d))(desktopObj))
+for key, desktopObj in desktops {
+    handler := ((d) => (*) => HandleSwitch(d))(desktopObj)
+    Capslock.Hotkey(key, handler)
+}
 
 ; Foreward & Backward
-Capslock.Hotkey("Tab", (*) => DesktopsDDL.GoToPrevious())
-Capslock.Hotkey("P", (*) => DesktopsDDL.TogglePin())
+Capslock.Hotkey("Tab", DesktopsDDL.GoToPrevious())
+Capslock.Hotkey("P", DesktopsDDL.TogglePin())
 
 ; ===== HELPER FUNCTIONS =====
 global onLeaveAction := ""

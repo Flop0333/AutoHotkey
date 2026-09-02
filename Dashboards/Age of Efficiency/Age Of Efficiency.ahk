@@ -32,12 +32,3 @@ Insert::	CommandInput().WaitForInputAndExecute() ; Desktop
 NumpadIns::	CommandInput().WaitForInputAndExecute() ; Laptop
 
 aoeWindow := UserInterface()
-
-A_TrayMenu.Delete()
-A_TrayMenu.Add("Reload", (*) => Reload())
-A_TrayMenu.Add()
-A_TrayMenu.Add("Open Terminal: Insert", (*) => CommandInput().WaitForInputAndExecute())
-A_TrayMenu.Disable("Open Terminal: Insert")
-A_TrayMenu.Add()
-A_TrayMenu.Add("Open Age of Efficiency: 'AoE'", (*) => aoeWindow.Show())
-A_TrayMenu.Disable("Open Age of Efficiency: 'AoE'")
