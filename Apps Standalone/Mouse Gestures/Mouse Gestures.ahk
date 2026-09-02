@@ -20,7 +20,7 @@
 ; - Configure hotkey and sensitivity in Gesture Detector.ahk
 ; ============================================================================
 
-#Include <Core>
+#Include ..\..\Lib\Core.ahk
 #Include Gesture Detector.ahk
 CoordMode "Mouse", "Screen"
 

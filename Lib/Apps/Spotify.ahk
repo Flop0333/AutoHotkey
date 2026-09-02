@@ -1,6 +1,6 @@
-#Include <Apps\App>
-#Include <Tools\UIA-v2\Lib\UIA>
-#Include <Tools\Info>
+#Include App.ahk
+#Include ..\Tools\UIA-v2\Lib\UIA.ahk
+#Include ..\Tools\Info.ahk
 
 StartSpotifyGoodMorningJazz() => Spotify.StartPlaylist(Playlist.goodMorningJazz)
 

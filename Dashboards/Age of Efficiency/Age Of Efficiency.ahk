@@ -20,7 +20,7 @@
 ;   - Configure items through the user interface
 ; ============================================================================
 
-#Include <Core>
+#Include ..\..\Lib\Core.ahk
 #Include User Interface\Controller.ahk
 #Include Input Handler\Command Input.ahk
 

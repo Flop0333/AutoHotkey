@@ -17,7 +17,7 @@
 ;   - All profile changes are persisted to current_profile.ini
 ; ============================================================================
 
-#Include <Helpers\System>
+#Include ..\Lib\Helpers\System.ahk
 
 class StartupMenuTray {
     __New() {

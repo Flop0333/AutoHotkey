@@ -1,8 +1,8 @@
 #Requires AutoHotkey v2
 #SingleInstance Force
-#Include <Core>
-#Include <Tools\Info>
-#Include <Tools\WebView\Webview Setup Template\My Model>
+#Include ..\..\..\Core.ahk
+#Include ..\..\Info.ahk
+#Include My Model.ahk
 
 USER_INTERFACE_PATH := Paths.autohotkey "\Webview Template\User Interface"
 TraySetIcon(USER_INTERFACE_PATH "\assets\tray icon.png")

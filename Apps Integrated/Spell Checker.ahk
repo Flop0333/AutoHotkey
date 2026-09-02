@@ -2,7 +2,7 @@
 ; === Spell Checker - Auto-corrects common spelling mistakes =================
 ; ============================================================================
 
-#Include <Core>
+#Include ..\Lib\Core.ahk
 
 class SpellChecker {
     static Enabled := true

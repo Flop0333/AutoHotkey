@@ -86,8 +86,8 @@ for key, desktopObj in desktops {
 }
 
 ; Foreward & Backward
-Capslock.Hotkey("Tab", DesktopsDDL.GoToPrevious())
-Capslock.Hotkey("P", DesktopsDDL.TogglePin())
+Capslock.Hotkey("Tab", (*) => DesktopsDDL.GoToPrevious())
+Capslock.Hotkey("P", (*) => DesktopsDDL.TogglePin())
 
 ; ===== HELPER FUNCTIONS =====
 global onLeaveAction := ""

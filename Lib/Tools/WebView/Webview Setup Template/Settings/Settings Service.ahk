@@ -1,4 +1,4 @@
-#Include <Tools\IniService>
+#Include ..\..\..\IniService.ahk
 
 class SettingsService extends IniService {
 

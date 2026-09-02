@@ -2,7 +2,7 @@
 ; === Fake Working Mode - Simulates activity to prevent system from going idle ===
 ; ================================================================================
 
-#Include <Core>
+#Include ..\Lib\Core.ahk
 
 ; Set default state for profile
 if ProfileManager.Is(Profiles.devbox)

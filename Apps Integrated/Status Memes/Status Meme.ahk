@@ -24,9 +24,9 @@
 
 #SingleInstance Force
 #NoTrayIcon
-#Include <Extensions\Dark Gui>
-#Include <Core\Paths>
-#Include <Tools\User Input>
+#Include ..\..\Lib\Extensions\Dark Gui.ahk
+#Include ..\..\Lib\Core\Paths.ahk
+#Include ..\..\Lib\Tools\User Input.ahk
 
 Class StatusMeme extends DarkGui {
 

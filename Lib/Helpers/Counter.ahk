@@ -1,4 +1,4 @@
-#Include <Tools\Info>
+#Include ..\Tools\Info.ahk
 
 class Counter {
 	static num := 0

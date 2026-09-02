@@ -1,5 +1,5 @@
-#Include <Apps\App>
-#Include <Tools\UIA-v2\Lib\UIA>
+#Include App.ahk
+#Include ..\Tools\UIA-v2\Lib\UIA.ahk
 
 class KeePass extends App {
 	static __New() => this.Init(

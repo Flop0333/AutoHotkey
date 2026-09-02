@@ -19,8 +19,9 @@
 
 #SingleInstance Force
 #NoTrayIcon
-#Include <Extensions\Dark Gui>
-#Include <Core\Paths>
+#Include ..\..\Lib\Core\OnError.ahk
+#Include ..\..\Lib\Extensions\Dark Gui.ahk
+#Include ..\..\Lib\Core\Paths.ahk
 SetTitleMatchMode 3 ; Match the title exactly (for editing this script)
 CoordMode "Mouse", "Screen"
 

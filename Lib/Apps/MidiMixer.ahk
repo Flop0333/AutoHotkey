@@ -1,5 +1,5 @@
-#Include <Apps\App>
-#Include <Core\Paths>
+#Include App.ahk
+#Include ..\Core\Paths.ahk
 
 class MidiMixer extends App {
 	static __New() => this.Init(

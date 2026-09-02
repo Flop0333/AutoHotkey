@@ -16,9 +16,10 @@
 ; ============================================================================
 
 #SingleInstance Force
-#Include <Core\Paths>
-#Include <Tools\User Input>
-#Include <Extensions\Dark Gui>
+#Include ..\..\Lib\Core\OnError.ahk
+#Include ..\..\Lib\Core\Paths.ahk
+#Include ..\..\Lib\Tools\User Input.ahk
+#Include ..\..\Lib\Extensions\Dark Gui.ahk
 #Include Storage\FileService.ahk
 
 scriptName := StrSplit(A_ScriptName, '.ahk')[1]

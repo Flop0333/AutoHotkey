@@ -1,1 +1,1 @@
-#Include <Tools\OCR\lib\OCR>
+#Include ..\Tools\OCR\lib\OCR.ahk

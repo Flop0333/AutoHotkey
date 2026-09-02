@@ -18,9 +18,10 @@
 ; - Integration with Desktops Manager for seamless VM workflows
 ; ============================================================================
 
-#Include <Tools\Info>
+#Include ..\Lib\Core\OnError.ahk
+#Include ..\Lib\Tools\Info.ahk
 #SingleInstance Force
-#NoTrayIcon
+   #NoTrayIcon
 
 CapsLock:: {
    EnsureHostFocus()                              ; Always return focus to host if in VM

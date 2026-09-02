@@ -1,4 +1,4 @@
-﻿#Include <Core>
+#Include ..\Lib\Core.ahk
 
 ; Base
 :X:\fl::Secrets.PersonalMail.Send()

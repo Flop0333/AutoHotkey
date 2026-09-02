@@ -13,7 +13,7 @@
 #Include ../Database/Bookmarks/BookmarksState.ahk
 #Include ../Database/Internet Search/SearchEnginesState.ahk
 #Include Command Executor.ahk
-#Include <Core\Paths>
+#Include ..\..\..\Lib\Core\Paths.ahk
 
 Class CommandInput extends DarkGui {
 
