@@ -75,17 +75,17 @@ GetDesktopsForProfile() {
 }
 
 class RequiredWindows {
-    static YouTube := RequiredWindow("YouTube", () => Browser.OpenInNewBrowser(Links.youtube))
+    static YouTube := RequiredWindow("YouTube", () => Brave.OpenURL(Links.youtube))
     static ChatGPTApp := RequiredWindow("ChatGPT", () => Run("ahk_exe ChatGPT.exe"),false)
-    static ChatGPTWeb := RequiredWindow(Browser.defaultBrowser.winTitle, () => Browser.OpenInNewBrowser(Links.chatGpt),false)
+    static ChatGPTWeb := RequiredWindow(Browser.defaultBrowser.winTitle, () => Browser.OpenURL(Links.chatGpt),false)
     static Notion := RequiredWindow("Notion", () => Notion.Launch())
     static Spotify := RequiredWindow("Spotify", () => Spotify.Launch())
     static WhatsApp := RequiredWindow("WhatsApp", () => WhatsApp.Launch())
     static Code := RequiredWindow("Code", () => VsCode.Launch())
-    static GitHub := RequiredWindow(Browser.defaultBrowser.winTitle, () => Browser.OpenInNewBrowser(Links.githubRepos))
+    static GitHub := RequiredWindow(Browser.defaultBrowser.winTitle, () => Browser.OpenURL(Links.githubRepos))
     static AutoHotkey := RequiredWindow("Code", () => VsCode.openAutoHotkey())
     static WorkRepo := RequiredWindow(Browser.defaultBrowser.winTitle, () => Run(Browser.defaultBrowser.winTitle.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get()))
-    static WorkBoard := RequiredWindow(Browser.defaultBrowser.winTitle, () => Browser.OpenInNewBrowser(Secrets.WorkBoard.Get()))
+    static WorkBoard := RequiredWindow(Browser.defaultBrowser.winTitle, () => Browser.OpenURL(Secrets.WorkBoard.Get()))
 }
 
 ; ===== HOTKEY CONFIGURATION =====

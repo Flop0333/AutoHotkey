@@ -65,7 +65,7 @@ Class Brave extends Browser {
 }
 
 Class Edge extends Browser {
-    static __New() => this.Init("Microsoft Edge", "msedge.exe")
+    static __New() => this.Init("Edge", "msedge.exe")
 }
 
 Class Chrome extends Browser {
