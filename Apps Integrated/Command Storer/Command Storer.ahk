@@ -16,6 +16,7 @@
 ; ============================================================================
 
 #SingleInstance Force
+#NoTrayIcon
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Paths.ahk
 #Include ..\..\Lib\Tools\User Input.ahk

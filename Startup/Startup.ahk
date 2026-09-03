@@ -45,5 +45,7 @@ RunStartup(profile?) {
 }
 
 ; Auto-run only when in Startup folder or run as standalone (not when #Include'd)
-if (StrSplit(A_ScriptDir, "\").Pop() = StrSplit(A_Startup, "\").Pop())
+if (StrSplit(A_ScriptDir, "\").Pop() = StrSplit(A_Startup, "\").Pop()) {
+    TraySetIcon "tray icon.png"
     RunStartup()
+}
