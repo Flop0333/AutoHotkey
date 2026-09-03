@@ -66,7 +66,44 @@ static DESKTOP_ACCESSOR_PATH   := Paths.lib "\Tools\Desktops DLL Library\Virtual
         return result
     }
 
+    static CloseOnAllDesktops() {
+        result := MsgBox("Close all windows on all desktops?", "Close All Windows", "YesNo")
+        if (result = "No")
+            return
+
+        desktopCount := this.GetDesktopCount()
+        result := {closed: 0, failed: 0, skipped: 0}
+        previousDetectHiddenWindows := A_DetectHiddenWindows
+
+        DetectHiddenWindows(true)
+        try {
+            for hwnd in WinGetList() {
+                if !this._ShouldManageWindow(hwnd, desktopCount) {
+                    result.skipped += 1
+                    continue
+                }
+
+                try {
+                    WinClose(hwnd)
+                    result.closed += 1
+                } catch {
+                    result.failed += 1
+                }
+            }
+        } finally {
+            DetectHiddenWindows(previousDetectHiddenWindows)
+        }
+
+        return result
+    }
+
     static _ShouldMoveWindow(hwnd, currentDesktop, desktopCount) {
+        if !this._ShouldManageWindow(hwnd, desktopCount)
+            return false
+        return !this.IsWindowOnDesktop(currentDesktop, hwnd)
+    }
+
+    static _ShouldManageWindow(hwnd, desktopCount) {
         static WS_VISIBLE := 0x10000000
         static WS_EX_TOOLWINDOW := 0x00000080
         static excludedClasses := Map(
@@ -89,13 +126,11 @@ static DESKTOP_ACCESSOR_PATH   := Paths.lib "\Tools\Desktops DLL Library\Virtual
                 return false
             if this.IsWindowPinned(hwnd) || this.IsAppPinned(hwnd)
                 return false
-            if this.IsWindowOnDesktop(currentDesktop, hwnd)
-                return false
 
-            ; Avoid moving system windows which are not assigned to any desktop.
+            ; Ignore system windows which are not assigned to any desktop.
             Loop desktopCount {
                 desktopNumber := A_Index - 1
-                if desktopNumber != currentDesktop && this.IsWindowOnDesktop(desktopNumber, hwnd)
+                if this.IsWindowOnDesktop(desktopNumber, hwnd)
                     return true
             }
         }

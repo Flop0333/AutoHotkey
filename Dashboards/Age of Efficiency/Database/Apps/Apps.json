@@ -98,5 +98,15 @@
 		"icon": "AutoHotkey",
 		"id": 16,
 		"title": "Kill AutoHotkey"
+	},
+	{
+		"action": "CloseOnAllDesktops",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "PC Management",
+		"command": "CleanDesktops",
+		"icon": "default",
+		"id": 17,
+		"title": "Close windows on all desktops"
 	}
 ]

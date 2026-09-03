@@ -15,6 +15,7 @@
 #Include ..\..\..\Apps Integrated\Picture In Picture.ahk
 #Include ..\..\..\Startup\Startup.ahk
 #Include ..\..\..\Lib\Apps\Notion.ahk
+#Include ..\..\..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
 
 StartPBIReformat() => PBIReformat.Start()
 
@@ -35,3 +36,5 @@ CapsOff() => SetCapsLockState('OFF')
 StartTimer(time) => Timer.Start(time)
 
 StartPictureInPicture() => PictureInPicture()
+
+CloseOnAllDesktops() => DesktopsDDL.CloseOnAllDesktops()
