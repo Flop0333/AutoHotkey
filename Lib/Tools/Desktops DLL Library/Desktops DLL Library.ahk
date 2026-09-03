@@ -31,6 +31,10 @@ static DESKTOP_ACCESSOR_PATH   := Paths.lib "\Tools\Desktops DLL Library\Virtual
      * belong to a virtual desktop are deliberately left untouched.
      */
     static PullAllWindowsToCurrentDesktop() {
+        result := MsgBox("Move all windows to this desktop?", "Single Desktop Mode", "YesNo")
+		if (result = "No")
+			return
+
         currentDesktop := this.GetCurrentDesktopNumber()
         desktopCount := this.GetDesktopCount()
         result := {moved: 0, failed: 0, skipped: 0, targetDesktop: currentDesktop}
