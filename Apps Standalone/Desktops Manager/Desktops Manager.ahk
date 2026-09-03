@@ -31,7 +31,6 @@
 #Include ..\..\Lib\Apps\WhatsApp.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
 
-
 GetDesktopsForProfile() {
     desktopCounter := 0 ; Start at 0, increment for each desktop added
     config := Map()
@@ -44,16 +43,15 @@ GetDesktopsForProfile() {
         config["2"] := Desktop(desktopCounter++)
         config["3"] := Desktop(desktopCounter++)
 
-        config["R"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser.winTitle,      () => Run(Browser.defaultBrowser.winTitle.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get())))
-        config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",   () => Run(Brave.ahk_exe " --new-window " Links.youtube))) 
+        config["R"] := Desktop(desktopCounter++,   RequiredWindows.WorkRepo)
+        config["Y"] := Desktop(desktopCounter++,   RequiredWindows.YouTube)
 
-        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",      () => Run("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk C:\Users\BremerF\Documents\AutoHotkey",,"Max")))
-        config["G"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser.winTitle,      () => Run(Browser.defaultBrowser.winTitle.ahk_exe " --new-window " Links.chatGpt)))
+        config["A"] := Desktop(desktopCounter++,   RequiredWindows.AutoHotkey)
+        config["G"] := Desktop(desktopCounter++,   RequiredWindows.ChatGPTWeb)
 
         config["C"] := Desktop(desktopCounter++) ; for code
-        config["B"] := Desktop(desktopCounter++,  RequiredWindow(Browser.defaultBrowser.winTitle,      () => Run(Browser.defaultBrowser.winTitle.ahk_exe " --new-window " Secrets.WorkBoard.Get())))
-        config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",    () => WinMaximize("ahk_exe Notion.exe")))
-                                        .OnLeave(() => WinMinimize("ahk_exe Notion.exe"))
+        config["B"] := Desktop(desktopCounter++,  RequiredWindows.WorkBoard)
+        config["N"] := Desktop(desktopCounter++,  RequiredWindows.Notion)
     }
 
     if (ProfileManager.Is(Profiles.woonkamerLaptops)) {
@@ -61,20 +59,33 @@ GetDesktopsForProfile() {
         config["2"] := Desktop(desktopCounter++)
         config["3"] := Desktop(desktopCounter++)
 
-        config["W"] := Desktop(desktopCounter++,   RequiredWindow("WhatsApp",    () => WhatsApp.Launch()))
-        config["R"] := Desktop(desktopCounter++,   RequiredWindow(Browser.defaultBrowser.winTitle,    () => Browser.OpenInNewBrowser(Links.githubRepos)))
-        config["Y"] := Desktop(desktopCounter++,   RequiredWindow("YouTube",    () => Browser.OpenInNewBrowser(Links.youtube))) 
+        config["W"] := Desktop(desktopCounter++,   RequiredWindows.WhatsApp)
+        config["R"] := Desktop(desktopCounter++,   RequiredWindows.GitHub)
+        config["Y"] := Desktop(desktopCounter++,   RequiredWindows.YouTube)
 
-        config["A"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.openAutoHotkey()))
-        config["S"] := Desktop(desktopCounter++,   RequiredWindow("Spotify",    () => Spotify.Launch()))
-        config["G"] := Desktop(desktopCounter++,   RequiredWindow("ChatGPT",    () => Run("ahk_exe ChatGPT.exe"),false),
-                                                    RequiredWindow(Browser.defaultBrowser.winTitle,    () => Browser.OpenInNewBrowser(Links.chatGpt),false))
+        config["A"] := Desktop(desktopCounter++,   RequiredWindows.AutoHotkey)
+        config["S"] := Desktop(desktopCounter++,   RequiredWindows.Spotify)
+        config["G"] := Desktop(desktopCounter++,   RequiredWindows.ChatGPTWeb, RequiredWindows.ChatGPTApp)
 
-        config["C"] := Desktop(desktopCounter++,   RequiredWindow("Code",       () => VsCode.Launch()))
-        config["N"] := Desktop(desktopCounter++,  RequiredWindow("Notion",      () => Notion.Launch()))
+        config["C"] := Desktop(desktopCounter++,   RequiredWindows.Code)
+        config["N"] := Desktop(desktopCounter++,  RequiredWindows.Notion)
     }
 
     return config
+}
+
+class RequiredWindows {
+    static YouTube := RequiredWindow("YouTube", () => Browser.OpenInNewBrowser(Links.youtube))
+    static ChatGPTApp := RequiredWindow("ChatGPT", () => Run("ahk_exe ChatGPT.exe"),false)
+    static ChatGPTWeb := RequiredWindow(Browser.defaultBrowser.winTitle, () => Browser.OpenInNewBrowser(Links.chatGpt),false)
+    static Notion := RequiredWindow("Notion", () => Notion.Launch())
+    static Spotify := RequiredWindow("Spotify", () => Spotify.Launch())
+    static WhatsApp := RequiredWindow("WhatsApp", () => WhatsApp.Launch())
+    static Code := RequiredWindow("Code", () => VsCode.Launch())
+    static GitHub := RequiredWindow(Browser.defaultBrowser.winTitle, () => Browser.OpenInNewBrowser(Links.githubRepos))
+    static AutoHotkey := RequiredWindow("Code", () => VsCode.openAutoHotkey())
+    static WorkRepo := RequiredWindow(Browser.defaultBrowser.winTitle, () => Run(Browser.defaultBrowser.winTitle.ahk_exe " --new-window " Secrets.ApolloPullRequest.Get() " " Secrets.AthenaPullRequest.Get()))
+    static WorkBoard := RequiredWindow(Browser.defaultBrowser.winTitle, () => Browser.OpenInNewBrowser(Secrets.WorkBoard.Get()))
 }
 
 ; ===== HOTKEY CONFIGURATION =====
