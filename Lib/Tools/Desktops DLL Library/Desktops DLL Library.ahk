@@ -20,8 +20,84 @@ static DESKTOP_ACCESSOR_PATH   := Paths.lib "\Tools\Desktops DLL Library\Virtual
     static PinApp(hwnd) => DllCall(DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "PinApp", "Ptr"), "UInt", hwnd)
     static UnpinApp(hwnd) => DllCall(DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "UnPinApp", "Ptr"), "UInt", hwnd)
     static IsAppPinned(hwnd) => DllCall(DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "IsPinnedApp", "Ptr"), "UInt", hwnd)
-    static _isWindowOnDesktopProc := DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "IsWindowOnDesktopNumber", "Ptr")
     static _IsWindowOnDesktopNumberProc := DllCall("GetProcAddress", "Ptr", this.DESKTOP_ACCESSOR, "AStr", "IsWindowOnDesktopNumber", "Ptr")
+    static IsWindowOnDesktop(number, hwnd) => DllCall(this._IsWindowOnDesktopNumberProc, "Ptr", hwnd, "Int", number, "Int")
+
+    /**
+     * Moves normal application windows from every other virtual desktop to the
+     * desktop which is active when this method starts.
+     *
+     * Pinned windows/apps, shell windows, tool windows and windows which do not
+     * belong to a virtual desktop are deliberately left untouched.
+     */
+    static PullAllWindowsToCurrentDesktop() {
+        currentDesktop := this.GetCurrentDesktopNumber()
+        desktopCount := this.GetDesktopCount()
+        result := {moved: 0, failed: 0, skipped: 0, targetDesktop: currentDesktop}
+        previousDetectHiddenWindows := A_DetectHiddenWindows
+
+        DetectHiddenWindows(true)
+        try {
+            for hwnd in WinGetList() {
+                if !this._ShouldMoveWindow(hwnd, currentDesktop, desktopCount) {
+                    result.skipped += 1
+                    continue
+                }
+
+                try {
+                    this.SendWindowToDesktop(currentDesktop, hwnd)
+                    if this.IsWindowOnDesktop(currentDesktop, hwnd)
+                        result.moved += 1
+                    else
+                        result.failed += 1
+                } catch {
+                    ; Elevated or protected windows can reject desktop moves.
+                    result.failed += 1
+                }
+            }
+        } finally {
+            DetectHiddenWindows(previousDetectHiddenWindows)
+        }
+
+        return result
+    }
+
+    static _ShouldMoveWindow(hwnd, currentDesktop, desktopCount) {
+        static WS_VISIBLE := 0x10000000
+        static WS_EX_TOOLWINDOW := 0x00000080
+        static excludedClasses := Map(
+            "Progman", true,
+            "WorkerW", true,
+            "Shell_TrayWnd", true,
+            "Shell_SecondaryTrayWnd", true
+        )
+
+        try {
+            if hwnd = A_ScriptHwnd
+                return false
+            if !(WinGetStyle(hwnd) & WS_VISIBLE)
+                return false
+            if WinGetExStyle(hwnd) & WS_EX_TOOLWINDOW
+                return false
+            if WinGetTitle(hwnd) = ""
+                return false
+            if excludedClasses.Has(WinGetClass(hwnd))
+                return false
+            if this.IsWindowPinned(hwnd) || this.IsAppPinned(hwnd)
+                return false
+            if this.IsWindowOnDesktop(currentDesktop, hwnd)
+                return false
+
+            ; Avoid moving system windows which are not assigned to any desktop.
+            Loop desktopCount {
+                desktopNumber := A_Index - 1
+                if desktopNumber != currentDesktop && this.IsWindowOnDesktop(desktopNumber, hwnd)
+                    return true
+            }
+        }
+
+        return false
+    }
 
     static GotoDesktop(number) {
         this._SetTeamsCallOnTop()

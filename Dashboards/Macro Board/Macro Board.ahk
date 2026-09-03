@@ -32,7 +32,7 @@ GetSpellCheckerState() => SpellChecker.Enabled
 KillAllAHkProcesses() => System.KillAllAHkProcesses()
 ToggleFakeWorkMode() => FakeWorkMode.Toggle()
 GetFakeWorkModeState() => FakeWorkMode.Enabled
-
+PullAllWindowsToCurrentDesktop() => DesktopsDDL.PullAllWindowsToCurrentDesktop()
 OpenNotionShitFixen() => Notion.OpenPage(NotionPages.shitFixen)
 CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 
@@ -43,9 +43,9 @@ CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 buttons := [
     ToggleButton(ToggleSpellChecker, GetSpellCheckerState, "Spell Checker", "spell checker.gif"),
     Button(KillAllAHkProcesses, "Kill All AHK Processes", "game over.gif"),
-    Button(CommandStorer_ShowMainGui, "Command Storer", "tetris.gif"),
+    Button(RunStartup, "Reload Startup"),
+    Button(PullAllWindowsToCurrentDesktop, "Pull All Windows to Current Desktop", "Maps.gif"),
     ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),
-    Button(RunStartup, "Reload Startup")
 ] 
 
 profileButtons := Map(
@@ -55,6 +55,7 @@ profileButtons := Map(
     ],
     Profiles.work, [
         Button(CloseAllBrowsers, "Kill Browsers", "game over.gif"),
+        Button(CommandStorer_ShowMainGui, "Command Storer", "tetris.gif"),
     ],
     Profiles.default, [
         Button(MsgBox, "Pizza Default")
