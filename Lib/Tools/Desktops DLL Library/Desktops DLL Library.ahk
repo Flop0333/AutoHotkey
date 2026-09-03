@@ -103,7 +103,6 @@ static DESKTOP_ACCESSOR_PATH   := Paths.lib "\Tools\Desktops DLL Library\Virtual
         this._SetTeamsCallOnTop()
         GetKeyState("LButton") ? this._MoveCurrentWindowToDesktop(number) : this.GoToDesktopNumber(number)
         if !GetKeyState("LButton") {
-            CaptureCapslockReleaseOnHost()
             try WinActivate(Win.WinUnderMouse())
         }
     }
@@ -144,15 +143,4 @@ static DESKTOP_ACCESSOR_PATH   := Paths.lib "\Tools\Desktops DLL Library\Virtual
                 WinSetAlwaysOnTop(, winId)
         }
     }
-}
-
-CaptureCapslockReleaseOnHost() {
-    ; Check if VM is under mouse
-    if WinGetClass(Win.WinUnderMouse()) != "TscShellContainerClass" 
-        return
-
-    ; Make sure that the release of the capslock does get captured by the host, not by the VM. 
-    ; If this is not done, the host is stuck with the capslock down state
-    WinActivate("ahk_class Shell_TrayWnd") ; Activate the taskbar of the host
-    KeyWait('CapsLock') ; wait for Capslock to be released, to capture it in the host
 }
