@@ -9,14 +9,16 @@ Class Browser extends App {
     
     ; This needs to take into account if the window is on another desktop
     static OpenURL(url, newTab := true) {
-        if !this.IsRunning() {
-            this.Launch()
-            WinWaitActive("ahk_exe " this.ahk_exe, "", 5)
-        } else {
+        try { ; try opening on the existing window on the current desktop
             this.Activate()
             WinWaitActive("ahk_exe " this.ahk_exe, "", 5)
+            Run(this.ahk_exe " " url)
+        } catch {
+            ; continue to run the URL in a new window
+            this.OpenInNewBrowser(url)
+            WinWaitActive("ahk_exe " this.ahk_exe, "", 5)
+            this.Activate()
         }
-        Run(this.ahk_exe " " url)
     }
 
     static OpenInNewBrowser(url) => Run(Browser.defaultBrowser.ahk_exe " --new-window " url,,"Max")
@@ -33,7 +35,6 @@ Class Browser extends App {
                 return
             }
         }
-        
         this.defaultBrowser.OpenURL(url) ; Use default if no browser found
     }
 
