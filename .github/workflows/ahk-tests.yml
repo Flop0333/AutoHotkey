@@ -1,4 +1,4 @@
-name: AHK Syntax Check
+name: AHK Tests
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  syntax-check:
+  tests:
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -25,3 +25,7 @@ jobs:
       - name: Run syntax check
         shell: pwsh
         run: .\Tests\Invoke-SyntaxCheck.ps1
+
+      - name: Run unit tests
+        shell: pwsh
+        run: .\Tests\Invoke-UnitTests.ps1

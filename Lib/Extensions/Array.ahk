@@ -1,6 +1,7 @@
 ; Extend Array with additional methods
 
 _ArrayToString(this, char := ", ") {
+	str := ""
 	for index, value in this {
 		if index = this.Length {
 			str .= value
