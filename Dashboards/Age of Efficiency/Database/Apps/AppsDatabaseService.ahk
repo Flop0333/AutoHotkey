@@ -9,15 +9,8 @@ Class AppsDatabaseService extends BaseDatabaseService {
   GetApps() {
     result := this.GetItems(CustomApp)
     AppsState.SetUniqueId(result.highestId)
-    _apps := {apps: [], argumentApps: [], allApps: result.items}
-    for app in result.items {
-      if app.argumentRequired
-        _apps.argumentApps.Push(app)
-      else
-        _apps.apps.Push(app)
-    }
-    return _apps
+    return result.items
   }
 
-  StoreApps() => this.StoreItems(AppsState.state.allApps)
+  StoreApps() => this.StoreItems(AppsState.state)
 }

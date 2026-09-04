@@ -25,7 +25,7 @@ class InternetSearch extends UserInput {
 
 	FeedQuery(input) {
 		restOfLink := this._SanitizeQuery(input)
-		Run(this.SelectedSearchEngine restOfLink)
+		Run('"' this.SelectedSearchEngine restOfLink '"')
 	}
 
 	FeedQueryInSameTab(input) {
