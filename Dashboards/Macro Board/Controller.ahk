@@ -65,15 +65,6 @@ Class MacroBoard extends WebViewToo {
 	}
 }
 
-ConvertToObject(jsonString, objectType := {}) {
-	objectMap := Json.parse(jsonString)
-	returnObject := Button
-	for key, value in objectMap 
-		returnObject.%key% := value
-
-	return returnObject
-}
-
 TriggerButtonFunction(jsonButton) {
 	button := JSON.ToObject(jsonButton)
 

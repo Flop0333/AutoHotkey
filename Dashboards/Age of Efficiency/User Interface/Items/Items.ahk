@@ -7,6 +7,7 @@
 Global TAB_OPTIONS := {Bookmarks: "Bookmarks", Apps: "Apps", Search: "Search"}
 
 ClickItem(WebView, item, currentTabTab) {
+	global aoeWindow
 	aoeWindow.Minimize() ; Hide first so a bookmark does not try to run in Neutron Gui
 	item := JSON.ToObject(item)
 

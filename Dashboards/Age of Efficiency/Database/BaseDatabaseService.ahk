@@ -27,7 +27,12 @@ Class BaseDatabaseService {
   }
 
   StoreItems(stateArray) {
-    FileDelete this.STORAGE_FILE_PATH
-    FileAppend JSON.stringify(JSON.ToPlainObjectArray(stateArray)), this.STORAGE_FILE_PATH
+    ; Write to a temp file first and rename over the destination, so a crash mid-write
+    ; can never leave the storage file deleted or half-written.
+    content := JSON.stringify(JSON.ToPlainObjectArray(stateArray))
+    tempPath := this.STORAGE_FILE_PATH . "." . A_TickCount . ".tmp"
+    try FileDelete(tempPath)
+    FileAppend(content, tempPath)
+    FileMove(tempPath, this.STORAGE_FILE_PATH, true)
   }
 }

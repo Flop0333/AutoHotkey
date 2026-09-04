@@ -78,11 +78,15 @@ class IniService {
             fileContent .= "`n" ; Linebreak between sections
         }
 
-        try FileDelete this.filePath
+        ; Write to a temp file first and rename over the destination, so a crash mid-write
+        ; can never leave the ini file deleted or half-written.
+        tempPath := this.filePath . "." . A_TickCount . ".tmp"
         try {
-            FileAppend fileContent, this.filePath
+            try FileDelete(tempPath)
+            FileAppend(fileContent, tempPath)
+            FileMove(tempPath, this.filePath, true)
         } catch {
-            MsgBox("could not append " this.filePath)
+            MsgBox("could not save " this.filePath)
         }
     }
 
