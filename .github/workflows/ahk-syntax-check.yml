@@ -1,0 +1,27 @@
+name: AHK Syntax Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  syntax-check:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install AutoHotkey v2
+        shell: pwsh
+        run: |
+          $zipPath = Join-Path $env:RUNNER_TEMP "ahk-v2.zip"
+          Invoke-WebRequest -Uri "https://www.autohotkey.com/download/ahk-v2.zip" -OutFile $zipPath
+          $installDir = Join-Path $env:RUNNER_TEMP "ahk-v2"
+          Expand-Archive -Path $zipPath -DestinationPath $installDir
+          Add-Content -Path $env:GITHUB_PATH -Value $installDir
+
+      - name: Run syntax check
+        shell: pwsh
+        run: .\Tests\Invoke-SyntaxCheck.ps1
