@@ -3,7 +3,7 @@
 
 Class LogDashboard extends WebViewToo {
 	static WIN_TITLE := "Log Dashboard"
-	static SHOW_OPTIONS := Format("w{} h{}", 900, Round(A_ScreenHeight * 0.75))
+	static SHOW_OPTIONS := Format("w{} h{}", Round(A_ScreenWidth * 0.85), Round(A_ScreenHeight * 0.75))
 
 	__New() {
 		super.__New()

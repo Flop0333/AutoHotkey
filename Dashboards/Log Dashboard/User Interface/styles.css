@@ -117,10 +117,10 @@ body {
 	top: 0;
 }
 
-#log-table th:nth-child(1), #log-table td:nth-child(1) { width: 22%; } /* Time */
+#log-table th:nth-child(1), #log-table td:nth-child(1) { width: 35%; } /* Time */
 #log-table th:nth-child(2), #log-table td:nth-child(2) { width: 12%; } /* Severity */
-#log-table th:nth-child(3), #log-table td:nth-child(3) { width: 20%; } /* Script */
-#log-table th:nth-child(4), #log-table td:nth-child(4) { width: 46%; } /* Message */
+#log-table th:nth-child(3), #log-table td:nth-child(3) { width: 40%; } /* Script */
+#log-table th:nth-child(4), #log-table td:nth-child(4) { width: 100%; } /* Message */
 
 #log-table tbody tr:hover {
 	background: #2a2d2e;
