@@ -14,13 +14,36 @@ class LogDashboardView {
 		this.scriptFilter = document.querySelector('#script-filter');
 		this.sortButton = document.querySelector('#sort-time');
 		this.refreshButton = document.querySelector('#refresh-btn');
+		this.refreshIcon = document.querySelector('#refresh-icon');
 		this.entryCount = document.querySelector('#entry-count');
+		this.toast = document.querySelector('#toast');
+		this.gitStatus = document.querySelector('#git-status');
+		this.testButtons = document.querySelectorAll('.test-btn');
 	}
 
 	render() {
 		this._populateFilters();
 		this._attachEvents();
 		this._renderRows();
+		this._loadGitStatus();
+	}
+
+	async _loadGitStatus() {
+		try {
+			const status = await AhkDataService.GetGitStatus();
+			if (!status.branch) {
+				this.gitStatus.textContent = '';
+				return;
+			}
+			const ahead = Number(status.ahead) || 0;
+			const behind = Number(status.behind) || 0;
+			let text = status.branch;
+			if (ahead) text += ` ↑${ahead}`;
+			if (behind) text += ` ↓${behind}`;
+			this.gitStatus.textContent = text;
+		} catch (e) {
+			this.gitStatus.textContent = 'git-status error: ' + e.message;
+		}
 	}
 
 	_populateFilters() {
@@ -38,7 +61,30 @@ class LogDashboardView {
 			this.sortButton.textContent = `Time ${this.sortDescending ? '↓' : '↑'}`;
 			this._renderRows();
 		});
-		this.refreshButton.addEventListener('click', () => this._refresh());
+		this.refreshButton.addEventListener('click', () => {
+			this.refreshIcon.classList.remove('spinning');
+			void this.refreshIcon.offsetWidth; // restart the animation even if it's still running
+			this.refreshIcon.classList.add('spinning');
+			this._refresh();
+		});
+		this.testButtons.forEach(button => {
+			button.addEventListener('click', () => {
+				AhkDataService.LogTestMessage(button.dataset.severity);
+				this._refresh();
+			});
+		});
+	}
+
+	_copyToClipboard(text, toastMessage) {
+		AhkDataService.SetClipboard(text);
+		this._showToast(toastMessage);
+	}
+
+	_showToast(message) {
+		this.toast.textContent = message;
+		this.toast.classList.remove('show');
+		void this.toast.offsetWidth; // restart the animation even if a toast is already showing
+		this.toast.classList.add('show');
 	}
 
 	_refresh() {
@@ -84,6 +130,11 @@ class LogDashboardView {
 				<td class="message-cell">${this._escape(entry.message)}</td>
 			`;
 			row.addEventListener('click', () => this._showDetail(entry, row));
+			row.querySelector('.message-cell').addEventListener('click', (e) => {
+				e.stopPropagation();
+				this._showDetail(entry, row);
+				this._copyToClipboard(entry.message, 'Message copied to clipboard');
+			});
 			this.tableBody.appendChild(row);
 		});
 	}
@@ -92,11 +143,18 @@ class LogDashboardView {
 		this.tableBody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
 		row.classList.add('selected');
 		this.detailPanel.innerHTML = `
-			<h2>${this._escape(entry.severity.toUpperCase())}: ${this._escape(entry.message)}</h2>
+			<div class="detail-header">
+				<h2>${this._escape(entry.severity.toUpperCase())}: ${this._escape(entry.message)}</h2>
+				<button class="copy-btn" title="Copy details to clipboard">📋 Copy</button>
+			</div>
 			<p><strong>Script:</strong> ${this._escape(entry.script)}</p>
 			<p><strong>Time:</strong> ${this._escape(entry.timestamp)}</p>
 			<pre>${this._escape(entry.stack || '(no stack trace)')}</pre>
 		`;
+		this.detailPanel.querySelector('.copy-btn').addEventListener('click', () => {
+			const details = `${entry.severity.toUpperCase()}: ${entry.message}\nScript: ${entry.script}\nTime: ${entry.timestamp}\n\n${entry.stack || '(no stack trace)'}`;
+			this._copyToClipboard(details, 'Error details copied to clipboard');
+		});
 	}
 
 	_escape(text) {

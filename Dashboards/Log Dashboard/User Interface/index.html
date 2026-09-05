@@ -10,6 +10,7 @@
   <div class="title-bar">
     <div class="drag-region" onmousedown="ahk.DragWindow()">
       <span class="title-text">Log Dashboard</span>
+      <span id="git-status" class="git-status"></span>
     </div>
     <div class="title-btn-container">
       <span class="title-btn" onclick="ahk.Minimize()">0</span>
@@ -21,7 +22,12 @@
     <select id="severity-filter"><option value="">All severities</option></select>
     <select id="script-filter"><option value="">All scripts</option></select>
     <button id="sort-time">Time ↓</button>
-    <button id="refresh-btn" title="Reload the log file">⟳ Refresh</button>
+    <button id="refresh-btn" title="Reload the log file"><span id="refresh-icon">⟳</span> Refresh</button>
+    <span class="test-buttons">
+      <button class="test-btn" data-severity="error" title="Log a test error entry">Test Error</button>
+      <button class="test-btn" data-severity="info" title="Log a test info entry">Test Info</button>
+      <button class="test-btn" data-severity="success" title="Log a test success entry">Test Success</button>
+    </span>
     <span id="entry-count"></span>
   </div>
   <div class="layout">
@@ -35,6 +41,7 @@
       <p class="empty-state">Select a log entry to see details.</p>
     </div>
   </div>
+  <div id="toast"></div>
   <script src="index.js"></script>
   <script src="AhkDataService.js"></script>
 </body>

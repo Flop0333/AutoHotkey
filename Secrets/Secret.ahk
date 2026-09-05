@@ -10,7 +10,7 @@ class Secret {
     Get() {
         SecretsFileManager.Initialize()
         if this._value = ""
-            Info("Empty secret value: " . this.name, 3000)
+            LogMessage("info", "Secret value not yet set: " . this.name)
 
         return this._value
     }
