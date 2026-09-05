@@ -1,0 +1,24 @@
+name: Idea / exploration
+description: A not-yet-scoped concept, e.g. from amazing-ideas.md, that needs thinking before it becomes a task.
+title: "[Idea]: "
+labels: ["idea", "needs-human-decision"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem or opportunity is this
+      description: The gap or itch that prompted the idea.
+    validations:
+      required: true
+
+  - type: textarea
+    id: approach
+    attributes:
+      label: Rough approach
+      description: Sketch, not a spec. Link prior art or discord/forum threads if relevant.
+
+  - type: textarea
+    id: related
+    attributes:
+      label: Related ideas or docs
+      description: Links to other issues, amazing-ideas.md sections, or ROAD MAP.md entries.

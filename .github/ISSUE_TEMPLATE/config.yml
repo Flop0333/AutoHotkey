@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Installation help
+    url: https://github.com/Flop0333/AutoHotkey/blob/main/INSTALLATION.md
+    about: Setup and installation questions belong in the guide, not an issue.

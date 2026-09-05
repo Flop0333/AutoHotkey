@@ -1,0 +1,61 @@
+name: Agent task
+description: A scoped, actionable task an AI agent (Claude Code, Copilot) can pick up.
+title: "[Task]: "
+labels: ["agent-ready"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: What needs to happen
+      description: One or two sentences. Be concrete about the end state, not the motivation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How to know it's done. Bullet list, testable where possible.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Files / areas touched
+      description: Known files, folders, or classes this task expects to touch.
+
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk level
+      description: Matches the AgentTool risk taxonomy in agent-plan.md.
+      options:
+        - read (no state change)
+        - reversible (easy-to-undo local change)
+        - sensitive (private context or meaningful external impact)
+        - destructive (requires human execution, not agent-eligible)
+      default: 1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size estimate
+      options:
+        - S (single file, under an hour)
+        - M (several files, a focused session)
+        - L (multi-session, needs a plan first)
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Links to related issues, docs (agent-plan.md, amazing-ideas.md), or prior discussion.
