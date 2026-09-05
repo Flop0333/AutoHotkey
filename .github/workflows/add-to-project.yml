@@ -1,0 +1,22 @@
+name: Add issues to project
+
+# Requires two one-time setup steps (see README section below), otherwise this
+# workflow will fail loudly rather than silently doing nothing:
+#   1. Create the Project (v2) board in the GitHub UI and set its URL as the
+#      repo variable PROJECT_URL (Settings > Secrets and variables > Actions > Variables).
+#   2. Create a fine-grained PAT with "Projects" read/write access (the default
+#      GITHUB_TOKEN cannot write to Projects v2) and store it as the repo
+#      secret ADD_TO_PROJECT_PAT.
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v2
+        with:
+          project-url: ${{ vars.PROJECT_URL }}
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
