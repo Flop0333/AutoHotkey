@@ -53,6 +53,10 @@ class TextSpeaker {
     static _spVoice := ComObject("SAPI.SpVoice")
     static voices := this._BuildVoiceList()
     static _settingsLoaded := this._LoadAndApplySettings()
+    ; Starts loading Piper's voice model in the background now, so it's
+    ; already warm by the time the user first presses Ctrl+Space - loading it
+    ; fresh per Speak() call was the main source of noticeable delay.
+    static _piperWarmedUp := PiperSynthesizer.WarmUp()
 
     ; ---- Playback -----------------------------------------------------------
 
