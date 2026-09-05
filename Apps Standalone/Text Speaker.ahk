@@ -5,15 +5,17 @@
 ; [FEATURES]
 ;   - Toggle play/pause with Ctrl + Space; reads selected text aloud
 ;   - Restart the current text from the beginning with Ctrl + Shift + Space
-;   - Prefers the best-sounding installed voice automatically (Windows'
-;     higher-quality "Mobile"/OneCore voices over legacy Desktop ones)
+;   - Speaks through the bundled Piper voice (Lib/Tools/Piper) - synthesizes
+;     to a WAV file, played back through Windows Media Player's ActiveX
+;     control so Play/Pause/Restart/Volume/Speed all stay live and instant
 ;   - Shows an always-on-top control panel while speaking: Play/Pause,
 ;     Restart, Volume, and Speed - draggable by its background
 ;   - Adjust volume with Up/Down and speed with Left/Right while active
-;   - Remembers the last-used voice, volume, and speed across sessions
+;   - Remembers the last-used volume and speed across sessions
 ; ============================================================================
 
 #Include ..\Lib\Core.ahk
+#Include ..\Lib\Tools\Piper\Piper Synthesizer.ahk
 
 ^Space::TextSpeaker.TogglePlay()
 ^+Space::TextSpeaker.Restart()
@@ -28,10 +30,11 @@ class TextSpeaker {
     static _SPEED_MAX := 10
 
     static _defaultVolume := 100
-    static _defaultSpeed := 3
+    static _defaultSpeed := 5 ; 5 = normal (1.0x) playback rate - see _SpeedToRate
     static _lastText := ""
-    static _isPaused := false
-    static _voice := ""
+
+    static _player := "" ; WMP ActiveX COM object, created on first use
+    static _currentWavPath := ""
 
     static _panel := ""
     static _playPauseBtn := ""
@@ -40,7 +43,9 @@ class TextSpeaker {
     static _watcherFn := ""
     static _dragHandlerRegistered := false
 
-    ; _spVoice must exist before voices/settings are resolved from it.
+    ; SAPI voice enumeration is currently unused by playback (Piper is the
+    ; active engine) but kept available for a future SAPI fallback path.
+    static _voice := ""
     static _spVoice := ComObject("SAPI.SpVoice")
     static voices := this._BuildVoiceList()
     static _settingsLoaded := this._LoadAndApplySettings()
@@ -48,7 +53,7 @@ class TextSpeaker {
     ; ---- Playback -----------------------------------------------------------
 
     static TogglePlay() {
-        if this._isPaused
+        if this._IsPaused()
             this.Resume()
         else if this._IsSpeaking()
             this.Pause()
@@ -56,66 +61,102 @@ class TextSpeaker {
             this.Speak()
     }
 
-    static Speak(text := this._GetSelectedText(), voice := this._voice) {
-        if voice = "" {
-            voice := this._PickBestVoice()
-            if voice = "" {
-                MsgBox("No voice found", "Error", "Iconi T1")
-                return
-            }
+    static Speak(text := this._GetSelectedText()) {
+        if !text
+            return
+
+        wavPath := PiperSynthesizer.Synthesize(text)
+        if !wavPath {
+            MsgBox("Voice synthesis failed", "Error", "Iconi T1")
+            return
         }
 
         this.Stop()
-        if !(text)
-            return
-
-        this._voice := voice
-        this._spVoice.Voice := voice
-        this._spVoice.Rate := this._defaultSpeed
-        this._isPaused := false
+        this._CleanupWav()
         this._lastText := text
-        this._spVoice.Speak(text, 1) ; Asynchronous speaking
+        this._currentWavPath := wavPath
+
+        player := this._GetPlayer()
+        player.URL := wavPath
+        this._WaitUntilPlaying(player)
+        try player.settings.volume := this._defaultVolume
+        try player.settings.rate := this._SpeedToRate(this._defaultSpeed)
 
         this._SetupHotkeys("On")
         this._ShowPanel()
     }
 
     static Restart() {
-        if this._lastText = ""
+        if this._player = "" || this._lastText = ""
             return
-        this.Speak(this._lastText, this._voice)
+        try {
+            this._player.controls.currentPosition := 0
+            this._player.controls.play()
+        }
+        this._UpdatePlayPauseLabel()
     }
 
     static Stop() {
-        this._spVoice.Speak("", 2) ; Purge: cancels the current utterance
-        this._isPaused := false
+        if this._player != ""
+            try this._player.controls.stop()
         this._SetupHotkeys("Off")
         this._HidePanel()
     }
 
     static Pause() {
-        this._spVoice.Pause()
-        this._isPaused := true
+        if this._player != ""
+            try this._player.controls.pause()
         this._SetupHotkeys("On")
         this._UpdatePlayPauseLabel()
     }
 
     static Resume() {
-        this._spVoice.Resume()
-        this._isPaused := false
+        if this._player != ""
+            try this._player.controls.play()
         this._SetupHotkeys("On")
         this._UpdatePlayPauseLabel()
     }
 
-    static _IsSpeaking() => (this._spVoice.Status.RunningState = 2)
+    static _IsSpeaking() => this._player != "" && this._PlayState() = 3   ; Playing
+    static _IsPaused() => this._player != "" && this._PlayState() = 2     ; Paused
+    static _PlayState() {
+        try return this._player.playState
+        return 0
+    }
+
+    static _GetPlayer() {
+        if this._player = "" {
+            this._player := ComObject("WMPlayer.OCX.7")
+            this._player.settings.autoStart := true
+            try this._player.uiMode := "none"
+        }
+        return this._player
+    }
+
+    static _WaitUntilPlaying(player, timeoutMs := 2000) {
+        elapsed := 0
+        while player.playState != 3 && elapsed < timeoutMs {
+            Sleep(20)
+            elapsed += 20
+        }
+    }
+
+    static _CleanupWav() {
+        if this._currentWavPath != "" {
+            try FileDelete(this._currentWavPath)
+            this._currentWavPath := ""
+        }
+    }
 
     ; ---- Volume / speed -------------------------------------------------
 
-    static _VolumeUp() => this._ApplyVolume(Min(this._VOLUME_MAX, this._spVoice.Volume + 10))
-    static _VolumeDown() => this._ApplyVolume(Max(this._VOLUME_MIN, this._spVoice.Volume - 10))
+    static _VolumeUp() => this._ApplyVolume(Min(this._VOLUME_MAX, this._defaultVolume + 10))
+    static _VolumeDown() => this._ApplyVolume(Max(this._VOLUME_MIN, this._defaultVolume - 10))
 
     static _ApplyVolume(value) {
-        try this._spVoice.Volume := value
+        this._defaultVolume := value
+        if this._player != ""
+            try this._player.settings.volume := value
         if this._volumeSlider != ""
             try this._volumeSlider.Value := value
         DarkToolTip("Volume: " value)
@@ -127,11 +168,21 @@ class TextSpeaker {
 
     static _ApplySpeed(value) {
         this._defaultSpeed := value
-        try this._spVoice.Rate := value
+        if this._player != ""
+            try this._player.settings.rate := this._SpeedToRate(value)
         if this._speedSlider != ""
             try this._speedSlider.Value := value
         DarkToolTip("Speed: " value)
         this._SaveSettings()
+    }
+
+    ; Maps the 0-10 Speed slider to WMP's playback-rate multiplier, centered
+    ; on 5 = 1.0x (normal) - the same "half speed to double speed" convention
+    ; video players commonly use, so 0 and 10 stay recognizable, not extreme.
+    static _SpeedToRate(sliderValue) {
+        if sliderValue <= 5
+            return 0.4 + (sliderValue / 5) * 0.6
+        return 1.0 + ((sliderValue - 5) / 5) * 1.0
     }
 
     static _SetupHotkeys(onOff) {
@@ -141,7 +192,8 @@ class TextSpeaker {
         Hotkey("Right", (*) => this._SpeedUp(), onOff)
     }
 
-    ; ---- Voice selection -------------------------------------------------
+    ; ---- SAPI voice selection (currently unused by playback; kept for a
+    ; future fallback path if the bundled Piper engine/model are missing) ---
 
     static _BuildVoiceList() {
         list := []
@@ -153,9 +205,6 @@ class TextSpeaker {
         return list
     }
 
-    ; SAPI has no explicit quality tier, but Windows registers its higher-quality
-    ; OneCore voices with "Mobile" in the description alongside the legacy Desktop
-    ; ones - preferring those gives a noticeably better default voice for free.
     static _PickBestVoice() {
         for voice in this.voices {
             try if InStr(voice.GetDescription(), "Mobile")
@@ -196,9 +245,10 @@ class TextSpeaker {
 
         if settings.Has("speed")
             this._defaultSpeed := settings["speed"]
+        if settings.Has("volume")
+            this._defaultVolume := settings["volume"]
 
-        volume := settings.Has("volume") ? settings["volume"] : this._defaultVolume
-        try this._spVoice.Volume := volume
+        try this._spVoice.Volume := this._defaultVolume
         try this._spVoice.Rate := this._defaultSpeed
 
         return true
@@ -218,7 +268,7 @@ class TextSpeaker {
     static _SaveSettings() {
         settings := Map(
             "voiceDescription", this._SafeVoiceDescription(this._voice),
-            "volume", this._spVoice.Volume,
+            "volume", this._defaultVolume,
             "speed", this._defaultSpeed
         )
 
@@ -253,7 +303,7 @@ class TextSpeaker {
 
         panel.SetFont("s10 cC5C5C5")
         panel.AddText("xm y+12", "Volume")
-        volumeSlider := panel.AddSlider("xm w232 Range" this._VOLUME_MIN "-" this._VOLUME_MAX " ToolTip", this._spVoice.Volume)
+        volumeSlider := panel.AddSlider("xm w232 Range" this._VOLUME_MIN "-" this._VOLUME_MAX " ToolTip", this._defaultVolume)
         volumeSlider.OnEvent("Change", (*) => this._ApplyVolume(volumeSlider.Value))
 
         panel.AddText("xm y+8", "Speed")
@@ -282,13 +332,13 @@ class TextSpeaker {
 
     static _UpdatePlayPauseLabel() {
         if this._playPauseBtn != ""
-            this._playPauseBtn.Text := this._isPaused ? "Play" : "Pause"
+            this._playPauseBtn.Text := this._IsPaused() ? "Play" : "Pause"
     }
 
     static _ShowPanel() {
         panel := this._EnsurePanel()
         this._UpdatePlayPauseLabel()
-        try this._volumeSlider.Value := this._spVoice.Volume
+        try this._volumeSlider.Value := this._defaultVolume
         try this._speedSlider.Value := this._defaultSpeed
         panel.Show("x" (A_ScreenWidth - 280) " y" (A_ScreenHeight - 190) " w260 h170 NoActivate")
         WinSetRegion("0-0 w260 h170 r14-14", panel)
@@ -316,7 +366,8 @@ class TextSpeaker {
     }
 
     static _CheckPanelState() {
-        if !this._IsSpeaking() && !this._isPaused
+        state := this._PlayState()
+        if state = 1 || state = 8 ; Stopped or MediaEnded
             this._HidePanel()
     }
 
