@@ -394,5 +394,77 @@
 		"isSecret": "0",
 		"title": "Weer",
 		"url": "https://www.weeronline.nl/Europa/Nederland/Blitterswijck/4058134/weersverwachting-48uur"
+	},
+	{
+		"category": "Github",
+		"command": "G",
+		"icon": "default",
+		"id": 51,
+		"isSecret": 0,
+		"title": "Github",
+		"url": "https://github.com/Flop0333?tab=repositories"
+	},
+	{
+		"category": "",
+		"command": "test",
+		"icon": "default",
+		"id": 52,
+		"isSecret": 0,
+		"title": "test",
+		"url": "test"
+	},
+	{
+		"category": "Github",
+		"command": "GAB",
+		"icon": "default",
+		"id": 53,
+		"isSecret": 0,
+		"title": "AutoHotkey Board",
+		"url": "https://github.com/users/Flop0333/projects/8"
+	},
+	{
+		"category": "Github",
+		"command": "GAP",
+		"icon": "default",
+		"id": 54,
+		"isSecret": 0,
+		"title": "AutoHotkey PR",
+		"url": "https://github.com/Flop0333/AutoHotkey/pulls"
+	},
+	{
+		"category": "Github",
+		"command": "GPP",
+		"icon": "default",
+		"id": 55,
+		"isSecret": 0,
+		"title": "Personal OS PR",
+		"url": "https://github.com/Flop0333/Personal-OS/pulls"
+	},
+	{
+		"category": "Github",
+		"command": "GPB",
+		"icon": "default",
+		"id": 56,
+		"isSecret": 0,
+		"title": "Personal OS Board",
+		"url": "https://github.com/users/Flop0333/projects/9"
+	},
+	{
+		"category": "Github",
+		"command": "GOP",
+		"icon": "default",
+		"id": 57,
+		"isSecret": 0,
+		"title": "OpenClaw PR",
+		"url": "https://github.com/Flop0333/openclaw-home/pulls"
+	},
+	{
+		"category": "Github",
+		"command": "GOB",
+		"icon": "default",
+		"id": 58,
+		"isSecret": 0,
+		"title": "OpenClaw Board",
+		"url": "https://github.com/users/Flop0333/projects/6"
 	}
 ]
