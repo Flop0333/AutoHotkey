@@ -23,14 +23,12 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 
-# AutoHotkey.exe (v2) must already be on PATH - see the setup step in
-# .github/workflows/ahk-syntax-check.yml for how CI installs it.
-$ahkExe = Get-Command "AutoHotkey.exe" -ErrorAction SilentlyContinue
-if (-not $ahkExe) {
-    $ahkExe = Get-Command "AutoHotkey64.exe" -ErrorAction SilentlyContinue
-}
-if (-not $ahkExe) {
-    Write-Error "Could not find AutoHotkey.exe or AutoHotkey64.exe on PATH."
+Import-Module (Join-Path $PSScriptRoot "Support\AhkRunner.psm1") -Force
+
+try {
+    $ahkExe = Get-AhkExecutable
+} catch {
+    Write-Error $_.Exception.Message
     exit 1
 }
 
@@ -85,29 +83,20 @@ ExitApp(0)
 "@ | Set-Content -Path $wrapperPath -Encoding UTF8
 
         $stderrPath = Join-Path $tempDir ((New-Guid).Guid + ".stderr.txt")
-        $proc = Start-Process -FilePath $ahkExe.Source -ArgumentList "/ErrorStdOut", "`"$wrapperPath`"" `
-            -PassThru -RedirectStandardError $stderrPath -WindowStyle Hidden
+        $run = Invoke-AhkScript -AhkExePath $ahkExe.Source -ScriptPath $wrapperPath -StdErrPath $stderrPath -TimeoutSeconds $TimeoutSeconds
 
-        # Touching .Handle forces PowerShell to open the process with the access
-        # rights needed to read .ExitCode later - without this, .ExitCode silently
-        # comes back empty even though the process exited normally.
-        $null = $proc.Handle
-
-        $exited = $proc.WaitForExit($TimeoutSeconds * 1000)
-
-        if (-not $exited) {
-            Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+        if (-not $run.Exited) {
             $results += [pscustomobject]@{ Script = $name; Status = "FAIL"; Detail = "Timed out after ${TimeoutSeconds}s - likely a blocked load-time error dialog" }
             continue
         }
 
-        if ($proc.ExitCode -ne 0) {
+        if ($run.ExitCode -ne 0) {
             $stderr = ""
             if (Test-Path $stderrPath) {
                 $rawContent = Get-Content -Raw $stderrPath
                 if ($null -ne $rawContent) { $stderr = $rawContent.Trim() }
             }
-            $results += [pscustomobject]@{ Script = $name; Status = "FAIL"; Detail = "Exit code $($proc.ExitCode). $stderr" }
+            $results += [pscustomobject]@{ Script = $name; Status = "FAIL"; Detail = "Exit code $($run.ExitCode). $stderr" }
             continue
         }
 

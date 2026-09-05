@@ -22,14 +22,12 @@ param(
 $ErrorActionPreference = "Stop"
 $unitTestDir = Join-Path $PSScriptRoot "Unit"
 
-# AutoHotkey.exe (v2) must already be on PATH - see the setup step in
-# .github/workflows/ahk-syntax-check.yml for how CI installs it.
-$ahkExe = Get-Command "AutoHotkey.exe" -ErrorAction SilentlyContinue
-if (-not $ahkExe) {
-    $ahkExe = Get-Command "AutoHotkey64.exe" -ErrorAction SilentlyContinue
-}
-if (-not $ahkExe) {
-    Write-Error "Could not find AutoHotkey.exe or AutoHotkey64.exe on PATH."
+Import-Module (Join-Path $PSScriptRoot "Support\AhkRunner.psm1") -Force
+
+try {
+    $ahkExe = Get-AhkExecutable
+} catch {
+    Write-Error $_.Exception.Message
     exit 1
 }
 
@@ -50,15 +48,9 @@ try {
         $stdoutPath = Join-Path $tempDir ((New-Guid).Guid + ".stdout.txt")
         $stderrPath = Join-Path $tempDir ((New-Guid).Guid + ".stderr.txt")
 
-        $proc = Start-Process -FilePath $ahkExe.Source -ArgumentList "/ErrorStdOut", "`"$($testFile.FullName)`"" `
-            -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -WindowStyle Hidden
+        $run = Invoke-AhkScript -AhkExePath $ahkExe.Source -ScriptPath $testFile.FullName `
+            -StdOutPath $stdoutPath -StdErrPath $stderrPath -TimeoutSeconds $TimeoutSeconds
 
-        # Touching .Handle forces PowerShell to open the process with the access
-        # rights needed to read .ExitCode later - without this, .ExitCode silently
-        # comes back empty even though the process exited normally.
-        $null = $proc.Handle
-
-        $exited = $proc.WaitForExit($TimeoutSeconds * 1000)
         $stdout = ""
         if (Test-Path $stdoutPath) {
             $rawStdout = Get-Content -Raw $stdoutPath
@@ -67,8 +59,7 @@ try {
 
         Write-Host "--- $($testFile.Name) ---"
 
-        if (-not $exited) {
-            Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+        if (-not $run.Exited) {
             Write-Host $stdout
             Write-Host "TIMEOUT after ${TimeoutSeconds}s - likely a blocked load-time error dialog somewhere in this file's #Include chain."
             $fileResults += [pscustomobject]@{ File = $testFile.Name; Status = "TIMEOUT" }
@@ -77,7 +68,7 @@ try {
 
         Write-Host $stdout
 
-        if ($proc.ExitCode -ne 0) {
+        if ($run.ExitCode -ne 0) {
             $stderr = ""
             if (Test-Path $stderrPath) {
                 $rawContent = Get-Content -Raw $stderrPath
