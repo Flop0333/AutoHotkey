@@ -13,3 +13,13 @@
 *.ico binary
 *.exe binary
 *.dll binary
+
+# Vendored Piper TTS engine + voice model: treat everything as binary so
+# core.autocrlf can't "helpfully" rewrite line endings inside espeak-ng's many
+# extensionless data files and corrupt them; the large ones also go to LFS.
+Lib/Tools/Piper/Engine/** binary
+Lib/Tools/Piper/Voices/** binary
+Lib/Tools/Piper/Engine/*.exe filter=lfs diff=lfs merge=lfs -text
+Lib/Tools/Piper/Engine/*.dll filter=lfs diff=lfs merge=lfs -text
+Lib/Tools/Piper/Engine/*.ort filter=lfs diff=lfs merge=lfs -text
+Lib/Tools/Piper/Voices/**/*.onnx filter=lfs diff=lfs merge=lfs -text
