@@ -62,8 +62,8 @@ class AddUpdateModal {
     formData.icon = document.getElementById('selected-icon-text').textContent;
 
     var isSecret = document.getElementById('isSecret') ? document.getElementById('isSecret').checked : false;
+    formData.isSecret = isSecret;
     if (isSecret) {
-      formData.isSecret = true;
       formData.secretPropertyName = document.getElementById('secretPropertyName').value;
       formData.secretName = document.getElementById('secretName').value;
       formData.secretDescription = document.getElementById('secretDescription').value;

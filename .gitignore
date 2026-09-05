@@ -7,3 +7,6 @@ Dashboards/Macro Board/Settings/Profile Settings/
 Lib/Test.ahk
 Secrets/My Secrets.json
 Secrets/Removed Secrets.json
+
+# Text Speaker - remembered voice/volume/speed, machine-specific
+Apps Standalone/Text Speaker.settings.json

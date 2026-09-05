@@ -12,12 +12,6 @@
 - Connect to devices by name
 - Integration with Macro Board and Age of Efficiency dashboards
 
-### Text Speaker Upgrades
-- Use better voice
-- Show GUI with voice controlls when text is speaking, always on top
-
-
-
 ## Libraries & Resources to Explore
 
 ### Performance & Optimization
