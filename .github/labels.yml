@@ -1,40 +1,40 @@
 # Synced to the repo by .github/workflows/sync-labels.yml on every push to main.
 - name: agent-ready
-  color: "0E8A16"
+  color: "#0E8A16"
   description: Scoped enough for an AI agent to start without further clarification.
 
 - name: needs-human-decision
-  color: "D93F0B"
+  color: "#D93F0B"
   description: Blocked on a judgment call only the maintainer can make.
 
 - name: idea
-  color: "C5DEF5"
+  color: "#C5DEF5"
   description: Not-yet-scoped concept from amazing-ideas.md or a new suggestion.
 
 - name: "size: S"
-  color: "BFD4F2"
+  color: "#BFD4F2"
   description: Single file, under an hour.
 
 - name: "size: M"
-  color: "5319E7"
+  color: "#5319E7"
   description: Several files, a focused session.
 
 - name: "size: L"
-  color: "0052CC"
+  color: "#0052CC"
   description: Multi-session, needs a plan first.
 
 - name: "risk: read"
-  color: "C2E0C6"
+  color: "#C2E0C6"
   description: No state change.
 
 - name: "risk: reversible"
-  color: "FBCA04"
+  color: "#FBCA04"
   description: Easy-to-undo local change.
 
 - name: "risk: sensitive"
-  color: "E99695"
+  color: "#E99695"
   description: Private context or meaningful external impact.
 
 - name: "risk: destructive"
-  color: "B60205"
+  color: "#B60205"
   description: Requires human execution, not agent-eligible.
