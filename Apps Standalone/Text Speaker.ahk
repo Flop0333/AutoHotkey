@@ -24,7 +24,7 @@ class TextSpeaker {
 
     static _VOLUME_MIN := 0
     static _VOLUME_MAX := 100
-    static _SPEED_MIN := -10
+    static _SPEED_MIN := 0
     static _SPEED_MAX := 10
 
     static _defaultVolume := 100
