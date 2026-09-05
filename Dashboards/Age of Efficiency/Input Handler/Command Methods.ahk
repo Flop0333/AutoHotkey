@@ -38,3 +38,5 @@ StartTimer(time) => Timer.Start(time)
 StartPictureInPicture() => PictureInPicture()
 
 CloseOnAllDesktops() => DesktopsDDL.CloseOnAllDesktops()
+
+OpenAutoHotkeyDashboard() => OpenLogDashboard()
