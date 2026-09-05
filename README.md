@@ -30,6 +30,7 @@ I'm excited to show my AutoHotkey v2 workflow system that I've been building! It
 - 🧑‍💻 **Command Storer** - Quick access to frequently used commands
 - 🤓 **Emoji Sender** - Quick emoji picker with keyboard shortcuts
 - ⌨️ **Capslock Modifier** - Capslock as powerful modifier key
+- 🔊 **Text Speaker** - Select text, hit Ctrl+Space, hear it read aloud with a real neural voice (bundled, works out of the box) - with a floating Play/Pause/Restart/Volume/Speed panel
 - ♾️ **And much more!**
 
 
@@ -44,6 +45,8 @@ I'm excited to show my AutoHotkey v2 workflow system that I've been building! It
 **Apps Integrated** - Background services that run continuously and integrate via hotkeys
 
 **Apps Standalone** - Independent utilities that can run separately (Window Manager, Command Storer, etc.) 
+
+**Bundled third-party software** - Text Speaker vendors the [Piper](https://github.com/rhasspy/piper) TTS engine (MIT) and a voice model (MIT) directly in the repo under `Lib/Tools/Piper/`, so it sounds good on a fresh clone with no setup. See [NOTICE.md](Lib/Tools/Piper/NOTICE.md) there for what's bundled, why an archived release was chosen deliberately over the actively maintained (but GPL + Python-dependent) successor, and full licensing details.
 
 
 ## 💭 Philosophy
