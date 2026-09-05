@@ -1,0 +1,15 @@
+# AutoHotkey and docs are edited on Windows; normalize to CRLF on checkout
+# so git stops warning about LF/CRLF conversion on every touch.
+*.ahk text eol=crlf
+*.md text eol=crlf
+*.ini text eol=crlf
+*.json text eol=crlf
+
+# Binary assets: never diff or convert line endings.
+*.png binary
+*.gif binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.exe binary
+*.dll binary

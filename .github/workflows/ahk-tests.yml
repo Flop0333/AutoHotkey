@@ -1,0 +1,48 @@
+name: AHK Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ahk-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install AutoHotkey v2
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # autohotkey.com puts its download links behind a Cloudflare bot
+          # challenge that GitHub-hosted runner IPs fail, so pull the same
+          # zip from the official GitHub release instead.
+          $headers = @{ Authorization = "Bearer $env:GH_TOKEN"; "User-Agent" = "ahk-tests-ci" }
+          $release = Invoke-RestMethod -Uri "https://api.github.com/repos/AutoHotkey/AutoHotkey/releases/latest" -Headers $headers
+          $asset = $release.assets | Where-Object { $_.name -like "AutoHotkey_*.zip" } | Select-Object -First 1
+          if (-not $asset) {
+              throw "Could not find an AutoHotkey_*.zip asset on the latest AutoHotkey/AutoHotkey release."
+          }
+
+          $zipPath = Join-Path $env:RUNNER_TEMP "ahk-v2.zip"
+          Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zipPath -Headers @{ "User-Agent" = "ahk-tests-ci" }
+          $installDir = Join-Path $env:RUNNER_TEMP "ahk-v2"
+          Expand-Archive -Path $zipPath -DestinationPath $installDir
+          Add-Content -Path $env:GITHUB_PATH -Value $installDir
+
+      - name: Run syntax check
+        shell: pwsh
+        run: .\Tests\Invoke-SyntaxCheck.ps1
+
+      - name: Run unit tests
+        shell: pwsh
+        run: .\Tests\Invoke-UnitTests.ps1
