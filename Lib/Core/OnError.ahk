@@ -1,13 +1,23 @@
-#Include ..\Tools\Info.ahk
 #Include ..\Extensions\Json.ahk
 #Include Paths.ahk
 
 OnError(HandleUnhandledError)
+OnMessage(0x404, HandleTrayIconMessage) ; AHK_NOTIFYICON: catches clicks on the error TrayTip
 
 HandleUnhandledError(error, mode) {
-    try Info("Unhandled error: " error.Message "`n" error.Stack, 4000)
+    try TrayTip("Unhandled error: " error.Message, "AutoHotkey Error", 0x3) ; 0x3 = error icon
     try LogError(error)
     return true ; Suppress the default modal error dialog; the failed thread ends.
+}
+
+; lParam 0x405 (NIN_BALLOONUSERCLICK) means the user clicked the TrayTip balloon.
+HandleTrayIconMessage(wParam, lParam, msg, hwnd) {
+    if (lParam = 0x405)
+        OpenLogDashboard()
+}
+
+OpenLogDashboard() {
+    Run(Paths.dashboards '\Log Dashboard\Log Dashboard.ahk')
 }
 
 ; Appends a structured entry (JSON lines format) to the shared error log,
