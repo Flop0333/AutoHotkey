@@ -13,6 +13,7 @@ class LogDashboardView {
 		this.severityFilter = document.querySelector('#severity-filter');
 		this.scriptFilter = document.querySelector('#script-filter');
 		this.sortButton = document.querySelector('#sort-time');
+		this.refreshButton = document.querySelector('#refresh-btn');
 		this.entryCount = document.querySelector('#entry-count');
 	}
 
@@ -37,6 +38,22 @@ class LogDashboardView {
 			this.sortButton.textContent = `Time ${this.sortDescending ? '↓' : '↑'}`;
 			this._renderRows();
 		});
+		this.refreshButton.addEventListener('click', () => this._refresh());
+	}
+
+	_refresh() {
+		const previousSeverity = this.severityFilter.value;
+		const previousScript = this.scriptFilter.value;
+
+		this.entries = AhkDataService.GetLogEntries();
+		this.severityFilter.innerHTML = '<option value="">All severities</option>';
+		this.scriptFilter.innerHTML = '<option value="">All scripts</option>';
+		this._populateFilters();
+		this.severityFilter.value = previousSeverity;
+		this.scriptFilter.value = previousScript;
+
+		this.detailPanel.innerHTML = '<p class="empty-state">Select a log entry to see details.</p>';
+		this._renderRows();
 	}
 
 	_filteredEntries() {

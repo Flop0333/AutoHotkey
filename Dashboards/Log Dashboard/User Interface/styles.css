@@ -12,6 +12,53 @@ body {
 	height: 100vh;
 }
 
+.title-bar {
+	display: flex;
+	align-items: stretch;
+	height: 32px;
+	background: #2d2d2d;
+	border-bottom: 1px solid #333;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.drag-region {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	padding-left: 12px;
+	cursor: default;
+}
+
+.title-text {
+	font-size: 12px;
+	color: #ccc;
+}
+
+.title-btn-container {
+	display: flex;
+}
+
+.title-btn {
+	font-family: Webdings;
+	font-size: 10pt;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	cursor: pointer;
+	color: #ccc;
+}
+
+.title-btn:hover {
+	background: #3d3d3d;
+}
+
+.title-btn-close:hover {
+	background: #e81123;
+	color: #fff;
+}
+
 .toolbar {
 	display: flex;
 	align-items: center;
@@ -69,6 +116,11 @@ body {
 	position: sticky;
 	top: 0;
 }
+
+#log-table th:nth-child(1), #log-table td:nth-child(1) { width: 22%; } /* Time */
+#log-table th:nth-child(2), #log-table td:nth-child(2) { width: 12%; } /* Severity */
+#log-table th:nth-child(3), #log-table td:nth-child(3) { width: 20%; } /* Script */
+#log-table th:nth-child(4), #log-table td:nth-child(4) { width: 46%; } /* Message */
 
 #log-table tbody tr:hover {
 	background: #2a2d2e;
