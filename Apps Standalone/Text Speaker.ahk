@@ -43,8 +43,12 @@ class TextSpeaker {
     static _watcherFn := ""
     static _dragHandlerRegistered := false
 
-    ; SAPI voice enumeration is currently unused by playback (Piper is the
-    ; active engine) but kept available for a future SAPI fallback path.
+    ; Which backend produced the currently-loaded audio: "piper" or "sapi".
+    ; Piper is preferred; SAPI is a fallback for when the bundled engine or
+    ; voice model is missing (see Speak()).
+    static _engine := ""
+    static _sapiPaused := false
+
     static _voice := ""
     static _spVoice := ComObject("SAPI.SpVoice")
     static voices := this._BuildVoiceList()
@@ -65,13 +69,22 @@ class TextSpeaker {
         if !text
             return
 
+        this.Stop()
+        if PiperSynthesizer.IsAvailable()
+            this._SpeakViaPiper(text)
+        else
+            this._SpeakViaSapi(text)
+    }
+
+    static _SpeakViaPiper(text) {
         wavPath := PiperSynthesizer.Synthesize(text)
         if !wavPath {
-            MsgBox("Voice synthesis failed", "Error", "Iconi T1")
+            ; Piper looked available but failed at runtime - fall back rather than silently do nothing.
+            this._SpeakViaSapi(text)
             return
         }
 
-        this.Stop()
+        this._engine := "piper"
         this._CleanupWav()
         this._lastText := text
         this._currentWavPath := wavPath
@@ -86,39 +99,97 @@ class TextSpeaker {
         this._ShowPanel()
     }
 
-    static Restart() {
-        if this._player = "" || this._lastText = ""
-            return
-        try {
-            this._player.controls.currentPosition := 0
-            this._player.controls.play()
+    static _SpeakViaSapi(text) {
+        voice := this._voice
+        if voice = "" {
+            voice := this._PickBestVoice()
+            if voice = "" {
+                MsgBox("No voice found", "Error", "Iconi T1")
+                return
+            }
         }
-        this._UpdatePlayPauseLabel()
+
+        this._engine := "sapi"
+        this._sapiPaused := false
+        this._voice := voice
+        this._lastText := text
+        this._spVoice.Voice := voice
+        this._spVoice.Volume := this._defaultVolume
+        this._spVoice.Rate := this._SapiRateFromSlider(this._defaultSpeed)
+        this._spVoice.Speak(text, 1) ; Asynchronous speaking
+
+        this._SetupHotkeys("On")
+        this._ShowPanel()
+    }
+
+    static Restart() {
+        if this._lastText = ""
+            return
+        if this._engine = "piper" {
+            if this._player = ""
+                return
+            try {
+                this._player.controls.currentPosition := 0
+                this._player.controls.play()
+            }
+            this._UpdatePlayPauseLabel()
+        } else if this._engine = "sapi" {
+            this._SpeakViaSapi(this._lastText)
+        }
     }
 
     static Stop() {
-        if this._player != ""
-            try this._player.controls.stop()
+        if this._engine = "piper" {
+            if this._player != ""
+                try this._player.controls.stop()
+        } else if this._engine = "sapi" {
+            try this._spVoice.Speak("", 2) ; Purge: cancels the current utterance
+            this._sapiPaused := false
+        }
         this._SetupHotkeys("Off")
         this._HidePanel()
     }
 
     static Pause() {
-        if this._player != ""
-            try this._player.controls.pause()
+        if this._engine = "piper" {
+            if this._player != ""
+                try this._player.controls.pause()
+        } else if this._engine = "sapi" {
+            try this._spVoice.Pause()
+            this._sapiPaused := true
+        }
         this._SetupHotkeys("On")
         this._UpdatePlayPauseLabel()
     }
 
     static Resume() {
-        if this._player != ""
-            try this._player.controls.play()
+        if this._engine = "piper" {
+            if this._player != ""
+                try this._player.controls.play()
+        } else if this._engine = "sapi" {
+            try this._spVoice.Resume()
+            this._sapiPaused := false
+        }
         this._SetupHotkeys("On")
         this._UpdatePlayPauseLabel()
     }
 
-    static _IsSpeaking() => this._player != "" && this._PlayState() = 3   ; Playing
-    static _IsPaused() => this._player != "" && this._PlayState() = 2     ; Paused
+    static _IsSpeaking() {
+        if this._engine = "piper"
+            return this._player != "" && this._PlayState() = 3 ; Playing
+        if this._engine = "sapi"
+            return !this._sapiPaused && this._spVoice.Status.RunningState = 2
+        return false
+    }
+
+    static _IsPaused() {
+        if this._engine = "piper"
+            return this._player != "" && this._PlayState() = 2 ; Paused
+        if this._engine = "sapi"
+            return this._sapiPaused
+        return false
+    }
+
     static _PlayState() {
         try return this._player.playState
         return 0
@@ -155,8 +226,11 @@ class TextSpeaker {
 
     static _ApplyVolume(value) {
         this._defaultVolume := value
-        if this._player != ""
+        if this._engine = "piper" && this._player != "" {
             try this._player.settings.volume := value
+        } else if this._engine = "sapi" {
+            try this._spVoice.Volume := value
+        }
         if this._volumeSlider != ""
             try this._volumeSlider.Value := value
         DarkToolTip("Volume: " value)
@@ -168,8 +242,11 @@ class TextSpeaker {
 
     static _ApplySpeed(value) {
         this._defaultSpeed := value
-        if this._player != ""
+        if this._engine = "piper" && this._player != "" {
             try this._player.settings.rate := this._SpeedToRate(value)
+        } else if this._engine = "sapi" {
+            try this._spVoice.Rate := this._SapiRateFromSlider(value)
+        }
         if this._speedSlider != ""
             try this._speedSlider.Value := value
         DarkToolTip("Speed: " value)
@@ -184,6 +261,10 @@ class TextSpeaker {
             return 0.4 + (sliderValue / 5) * 0.6
         return 1.0 + ((sliderValue - 5) / 5) * 1.0
     }
+
+    ; Maps the same 0-10 slider to SAPI's native -10..10 Rate range, centered
+    ; on 5 = 0 (normal), matching _SpeedToRate's "5 = normal" convention.
+    static _SapiRateFromSlider(sliderValue) => sliderValue - 5
 
     static _SetupHotkeys(onOff) {
         Hotkey("Up", (*) => this._VolumeUp(), onOff)
@@ -269,7 +350,8 @@ class TextSpeaker {
         settings := Map(
             "voiceDescription", this._SafeVoiceDescription(this._voice),
             "volume", this._defaultVolume,
-            "speed", this._defaultSpeed
+            "speed", this._defaultSpeed,
+            "engine", this._engine != "" ? this._engine : "piper" ; informational only - engine choice is always re-derived from PiperSynthesizer.IsAvailable()
         )
 
         tempPath := this.SETTINGS_FILE_PATH ".tmp"

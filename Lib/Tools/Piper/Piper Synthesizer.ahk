@@ -27,22 +27,25 @@ class PiperSynthesizer {
             return ""
 
         outputPath := A_Temp "\piper-tts-" A_TickCount "-" Random(1000, 9999) ".wav"
+        inputPath := A_Temp "\piper-input-" A_TickCount "-" Random(1000, 9999) ".txt"
         try FileDelete(outputPath)
 
         try {
-            shell := ComObject("WScript.Shell")
-            shell.CurrentDirectory := this.ENGINE_DIR
-            ; Invoked directly (no cmd.exe /C) - avoids cmd's well-known quoting
-            ; quirk where a quoted exe path followed by more quoted args gets
-            ; mis-parsed, and we don't need any shell features here anyway.
-            command := Format('"{1}" --model "{2}" --output_file "{3}"', this.ENGINE_PATH, modelPath, outputPath)
-            exec := shell.Exec(command)
-            exec.StdIn.Write(text)
-            exec.StdIn.Close()
-            while exec.Status = 0
-                Sleep(20)
+            FileAppend(text, inputPath, "UTF-8-RAW")
+            inner := Format('"{1}" --model "{2}" --output_file "{3}"', this.ENGINE_PATH, modelPath, outputPath)
+            ; piper.exe only takes text on stdin, which needs cmd.exe's "<" to
+            ; redirect from a file - but cmd mis-parses this command's several
+            ; quoted segments unless the whole thing is wrapped in one more
+            ; pair of quotes (the same quirk worked around in a different way
+            ; elsewhere; WScript.Shell.Exec avoided it before, but always
+            ; shows a visible console window, which cmd.exe run with AHK's
+            ; Run/RunWait "Hide" does not).
+            commandLine := A_ComSpec ' /C "' inner ' < "' inputPath '""'
+            RunWait(commandLine, this.ENGINE_DIR, "Hide")
         } catch {
             return ""
+        } finally {
+            try FileDelete(inputPath)
         }
 
         return FileExist(outputPath) ? outputPath : ""
