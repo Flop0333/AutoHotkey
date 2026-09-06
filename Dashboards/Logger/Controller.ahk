@@ -102,15 +102,7 @@ Class LoggerPopup extends WebViewToo {
 	}
 
 	_ReadAllEntries() {
-		entries := []
-		if !FileExist(ErrorLogFile())
-			return entries
-		for line in StrSplit(FileRead(ErrorLogFile(), "UTF-8"), "`n", "`r") {
-			if (Trim(line) = "")
-				continue
-			try entries.Push(JSON.parse(line))
-		}
-		return entries
+		return ReadLogEntries()
 	}
 
 	_Count(entry) {
@@ -121,10 +113,7 @@ Class LoggerPopup extends WebViewToo {
 	}
 
 	_RefreshUnreadCounts(entries) {
-		this.counts := Map("info", 0, "warning", 0, "error", 0)
-		readEntryCount := Min(GetReadLogEntryCount(), entries.Length)
-		loop entries.Length - readEntryCount
-			this._Count(entries[readEntryCount + A_Index])
+		this.counts := GetUnreadLogCounts()
 	}
 
 	_Poll() {

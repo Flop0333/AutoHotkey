@@ -8,22 +8,28 @@ HandleUnhandledError(error, mode) {
     return true ; Suppress the default modal error dialog; the failed thread ends.
 }
 
-ErrorLogFile() => Paths.autohotkey "\Logs\errors.log"
-ErrorLogReadStateFile() => Paths.autohotkey "\Logs\errors.read"
+ErrorLogDirectory() => EnvGet("AUTOHOTKEY_LOG_DIR") != "" ? EnvGet("AUTOHOTKEY_LOG_DIR") : Paths.autohotkey "\Logs"
+ErrorLogFile() => ErrorLogDirectory() "\errors.log"
+ErrorLogReadStateFile() => ErrorLogDirectory() "\errors.read"
 
 GetLogEntryCount() {
-    count := 0
-    if !FileExist(ErrorLogFile())
-        return count
-    for line in StrSplit(FileRead(ErrorLogFile(), "UTF-8"), "`n", "`r") {
-        if (Trim(line) = "")
-            continue
-        try {
-            JSON.parse(line)
-            count += 1
-        }
-    }
-    return count
+	return ReadLogEntries().Length
+}
+
+ReadLogEntries() {
+	entries := []
+	if !FileExist(ErrorLogFile())
+		return entries
+	for line in StrSplit(FileRead(ErrorLogFile(), "UTF-8"), "`n", "`r") {
+		if (Trim(line) = "")
+			continue
+		try {
+			entry := JSON.parse(line)
+			if (entry is Map && entry.Has("severity") && entry.Has("message"))
+				entries.Push(entry)
+		}
+	}
+	return entries
 }
 
 GetReadLogEntryCount() {
@@ -34,10 +40,29 @@ GetReadLogEntryCount() {
 }
 
 MarkAllLogsRead() {
-    DirCreate(Paths.autohotkey "\Logs")
+	DirCreate(ErrorLogDirectory())
     readState := FileOpen(ErrorLogReadStateFile(), "w", "UTF-8")
     readState.Write(GetLogEntryCount())
-    readState.Close()
+	readState.Close()
+}
+
+GetUnreadLogEntries() {
+	entries := ReadLogEntries()
+	readEntryCount := Min(GetReadLogEntryCount(), entries.Length)
+	unreadEntries := []
+	loop entries.Length - readEntryCount
+		unreadEntries.Push(entries[readEntryCount + A_Index])
+	return unreadEntries
+}
+
+GetUnreadLogCounts() {
+	counts := Map("info", 0, "warning", 0, "error", 0)
+	for entry in GetUnreadLogEntries() {
+		severity := entry.Has("severity") ? entry["severity"] : "info"
+		if counts.Has(severity)
+			counts[severity] += 1
+	}
+	return counts
 }
 
 ; --- Log only: append a structured entry. The Logger popup counts these ---
@@ -64,7 +89,7 @@ AppendLogEntry(severity, message, stack := "", notify := false) {
         "stack", stack,
         "notify", notify
     )
-    DirCreate(Paths.autohotkey "\Logs")
+	DirCreate(ErrorLogDirectory())
     FileAppend(JSON.Dump(entry) "`n", ErrorLogFile(), "UTF-8")
 }
 

@@ -19,12 +19,13 @@
 #Include Startup Menu Tray.ahk
 
 RunStartup(profile?) {
+    TraySetIcon(Paths.autoHotkeyIcon)
+    StartupMessage()
+    StartupMenuTray()
     InitializeLogging()
     SecretsFileManager.Initialize()
 
     IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetByComputerName()
-    StartupMessage()
-    StartupMenuTray()
 
     Run(Paths.appsStandalone "\Capslock Service.ahk") ; Run this before scripts that set a capslock hotkey
     Run(Paths.dashboards "\Age of Efficiency\Age of Efficiency.ahk")
@@ -45,6 +46,7 @@ RunStartup(profile?) {
 }
 
 ; Auto-run only when in Startup folder or run as standalone (not when #Include'd)
-if (StrSplit(A_ScriptDir, "\").Pop() = StrSplit(A_Startup, "\").Pop())
+if (StrSplit(A_ScriptDir, "\").Pop() = StrSplit(A_Startup, "\").Pop())     
     RunStartup()
+
 

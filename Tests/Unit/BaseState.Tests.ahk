@@ -1,6 +1,12 @@
 #Requires AutoHotkey v2
 #Include ..\Support\Assert.ahk
 #Include ..\..\Lib\Extensions\Array.ahk
+
+; BaseState emits user notifications after mutations. Unit tests exercise its
+; state behavior without starting the shared logger host.
+LogAndNotifyInfo(message) {
+}
+
 #Include ..\..\Dashboards\Age of Efficiency\Database\BaseState.ahk
 
 ; BaseState.state and BaseState._uniqueId are shared static fields, so every

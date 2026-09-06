@@ -21,7 +21,7 @@ InitializeLogging() {
 	dashboardWindow := WaitForLogDashboardWindow()
 
 	if !dashboardWindow || !loggerWindow
-		throw Error("Failed to initialize the logger UI hosts")
+		throw Error("Failed to initialize logger UI hosts (logger=" loggerWindow ", dashboard=" dashboardWindow ")")
 
 	return Map("dashboard", dashboardWindow, "logger", loggerWindow)
 }
