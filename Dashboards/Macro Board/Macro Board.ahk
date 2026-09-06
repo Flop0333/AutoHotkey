@@ -36,6 +36,7 @@ GetFakeWorkModeState() => FakeWorkMode.Enabled
 PullAllWindowsToCurrentDesktop() => DesktopsDDL.PullAllWindowsToCurrentDesktop()
 OpenNotionShitFixen() => Notion.OpenPage(NotionPages.shitFixen)
 CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
+KillAndReloadAllAHkProcesses() => System.KillAndReload()
 
 ; ============================================================================
 ; === BUTTONS REGISTRATION ======================---==========================
@@ -43,7 +44,7 @@ CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 
 buttons := [
     Button(ShowLogDashboard, "Log Dashboard", "log dashboard.gif"),
-    Button(RunStartup, "Reload AutoHotkey" , "Reload button.gif"),
+    Button(KillAndReloadAllAHkProcesses, "Reload AutoHotkey" , "Reload button.gif"),
     Button(KillAllAHkProcesses, "Kill All AHK Processes", "Kill all AHK processes.gif"),
     Button(PullAllWindowsToCurrentDesktop, "Pull All Windows to Current Desktop", "Pull all windows to current desktop.gif"),
     ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),

@@ -25,7 +25,7 @@ class StartupMenuTray {
         ; Explicitly publish the startup owner's tray icon before building it.
         A_IconHidden := false
         A_TrayMenu.Delete()
-        A_TrayMenu.Add("Reload", (*) => Reload())
+        A_TrayMenu.Add("Reload", (*) => System.KillAndReload())
         this._AddProfilesToTrayMenu()
         A_TrayMenu.Add("Log Dashboard", (*) => ShowLogDashboard())
         A_TrayMenu.Add("Exit", (*) => System.KillAllAHkProcesses())

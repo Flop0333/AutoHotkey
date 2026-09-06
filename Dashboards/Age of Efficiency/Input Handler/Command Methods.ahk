@@ -25,7 +25,7 @@ StartFakeWorkMode() => FakeWorkMode.Start()
 
 ShutPcDown() => System.PowerDown()
 
-RerunStartup() => RunStartup()
+RerunStartup() => System.KillAndReload(false)
 
 ShowStatusMeme(meme) => StatusMeme(meme)
 

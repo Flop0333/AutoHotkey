@@ -1,3 +1,5 @@
+#Include ..\Core\Paths.ahk
+
 class System {
 	static PowerDown() => Shutdown(1) ; Shutdown: ;0 = Logoff,  1 = Shutdown,  2 = Reboot,  4 = Force,  8 = Power down
 	
@@ -18,6 +20,24 @@ class System {
 		if (result = "No")
 			return
 
+		this._KillOtherAhkProcesses()
+		ExitApp
+	}
+
+	; Use instead of the built-in Reload() so other stray AHK processes get killed too.
+	static KillAndReload(promptUser := true) {
+		if (promptUser) {
+			result := MsgBox("Kill all AutoHotkey processes and reload?", "Kill and Reload", "YesNo")
+			if (result = "No")
+				return
+		}
+
+		this._KillOtherAhkProcesses()
+		Run(Paths.startup "\Startup.ahk")
+		ExitApp
+	}
+
+	static _KillOtherAhkProcesses() {
 		DetectHiddenWindows true
 		SetTitleMatchMode 'RegEx'
 		HWNDs := WinGetList('ahk_exe AutoHotkey')
@@ -27,6 +47,5 @@ class System {
 				try
 					WinKill(HWND)
 		}
-		ExitApp
 	}
 }
