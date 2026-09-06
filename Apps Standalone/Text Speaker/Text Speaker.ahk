@@ -139,7 +139,10 @@ class TextSpeaker {
         try {
             switch this._state {
                 case "speaking": this.Pause()
-                case "paused": this.Resume()
+                ; A paused screen-snip utterance isn't resumed in place: unlike selected
+                ; text, the user has likely moved on from the snipped screen area, so a
+                ; second Ctrl+Space re-reads whatever text is currently selected instead.
+                case "paused": this._highlightWords.Length ? this.Speak() : this.Resume()
                 default: this.Speak()
             }
         } catch as Error {
