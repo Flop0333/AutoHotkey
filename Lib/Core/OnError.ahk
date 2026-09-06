@@ -5,8 +5,7 @@ OnError(HandleUnhandledError)
 OnMessage(0x404, HandleTrayIconMessage) ; AHK_NOTIFYICON: catches clicks on the error TrayTip
 
 HandleUnhandledError(error, mode) {
-    try TrayTip("Unhandled error: " error.Message, "AutoHotkey Error", 0x3) ; 0x3 = error icon
-    try LogError(error)
+    try LogAndNotifyError(error.Message, error.HasProp("Stack") ? error.Stack : "")
     return true ; Suppress the default modal error dialog; the failed thread ends.
 }
 
@@ -22,18 +21,36 @@ OpenLogDashboard() {
 
 ErrorLogFile() => Paths.autohotkey "\Logs\errors.log"
 
+; --- Log only: append a structured entry, no notification. ---------------
+LogInfo(message) => AppendLogEntry("info", message)
+LogWarning(message) => AppendLogEntry("warning", message)
+LogError(message, stack := "") => AppendLogEntry("error", message, stack)
+
+; --- Log and notify: append the entry, then surface it immediately. ------
+LogAndNotifyInfo(message) {
+    LogInfo(message)
+    Notify("info", message)
+}
+
+LogAndNotifyWarning(message) {
+    LogWarning(message)
+    Notify("warning", message)
+}
+
+LogAndNotifyError(message, stack := "") {
+    LogError(message, stack)
+    Notify("error", message)
+}
+
+; Placeholder notification (native TrayTip) until the custom Logger popup replaces it.
+Notify(severity, message) {
+    icons := Map("info", 0x1, "warning", 0x2, "error", 0x3)
+    try TrayTip(message, "AutoHotkey " StrTitle(severity), icons.Get(severity, 0x1))
+}
+
 ; Appends a structured entry (JSON lines format) to the shared error log,
 ; so past errors stay reviewable instead of only flashing in a toast.
-LogError(error, severity := "error") {
-    AppendLogEntry(severity, error.Message, error.HasProp("Stack") ? error.Stack : "")
-}
-
-; Lets other code (e.g. the Log Dashboard's test buttons) log an entry without a real Error object.
-LogMessage(severity, message, stack := "") {
-    AppendLogEntry(severity, message, stack)
-}
-
-AppendLogEntry(severity, message, stack) {
+AppendLogEntry(severity, message, stack := "") {
     entry := Map(
         "timestamp", FormatTime(, "yyyy-MM-dd HH:mm:ss"),
         "script", A_ScriptName,

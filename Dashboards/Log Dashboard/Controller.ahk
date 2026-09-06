@@ -40,7 +40,13 @@ Class LogDashboard extends WebViewToo {
 	)
 
 	LogTestMessage(severity) {
-		LogMessage(severity, LogDashboard.TestMessages.Get(severity, "Test message"))
+		message := LogDashboard.TestMessages.Get(severity, "Test message")
+		switch severity {
+			case "info": LogInfo(message)
+			case "warning": LogWarning(message)
+			case "error": LogError(message)
+			default: AppendLogEntry(severity, message)
+		}
 	}
 
 	GetGitStatusForWeb() {
