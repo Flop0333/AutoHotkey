@@ -23,6 +23,7 @@
 #Include ..\..\Lib\Apps\Notion.ahk
 #Include ..\..\Startup\Startup.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
+#Include ..\Log Dashboard\Log Dashboard.ahk
 
 ; ===========================================================================
 ; === ACTIONS REGISTRATION ==================================================
@@ -46,7 +47,8 @@ buttons := [
     Button(RunStartup, "Reload Startup"),
     Button(PullAllWindowsToCurrentDesktop, "Pull All Windows to Current Desktop", "Maps.gif"),
     ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),
-] 
+    Button(ShowLogDashboard, "Log Dashboard", "log dashboard.png"),
+]
 
 profileButtons := Map(
     Profiles.woonkamerLaptops, [
