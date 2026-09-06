@@ -21,6 +21,10 @@ Test_RealHostsAndCrossProcessBehavior() {
 	try FileDelete(A_Temp "\ahk_logger_debug.log")
 	try {
 		hosts := InitializeLogging()
+		refindLogger := FindLoggerWindow()
+		refindDashboard := FindLogDashboardWindow()
+		FileAppend("DEBUG hosts.logger=" hosts["logger"] " refindLogger=" refindLogger " isWindowLogger=" (DllCall("IsWindow", "Ptr", hosts["logger"]) ? 1 : 0)
+			" hosts.dashboard=" hosts["dashboard"] " refindDashboard=" refindDashboard " isWindowDashboard=" (DllCall("IsWindow", "Ptr", hosts["dashboard"]) ? 1 : 0) "`n", "*")
 		loggerPid := WinGetPID("ahk_id " hosts["logger"])
 		dashboardPid := WinGetPID("ahk_id " hosts["dashboard"])
 		Assert.NotEqual(loggerPid, dashboardPid, "Logger and dashboard must have separate host processes")
