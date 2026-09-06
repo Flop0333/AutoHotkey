@@ -10,3 +10,6 @@ Secrets/Removed Secrets.json
 
 # Runtime error log store (see Lib/Core/OnError.ahk)
 Logs/
+
+# Text Speaker - persisted last-used voice/volume/speed
+Apps Standalone/Text Speaker.settings.json
