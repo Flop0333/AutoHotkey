@@ -2,9 +2,9 @@
 #Include ..\..\Lib\Core\WebView.ahk
 
 Class LoggerPopup extends WebViewToo {
-	static WIDTH := 300
-	static HEIGHT := 220
-	static VISIBLE_DURATION := 5000 ; ms a severity's detail stays expanded since its last log
+	static WIDTH := 150
+	static HEIGHT := 230
+	static VISIBLE_DURATION := 500000 ; ms a severity's detail stays expanded since its last log
 	static SEVERITIES := ["info", "warning", "error"]
 
 	counts := Map("info", 0, "warning", 0, "error", 0)
@@ -31,8 +31,8 @@ Class LoggerPopup extends WebViewToo {
 
 	; Positioned near the tray (bottom-right), shown without stealing focus.
 	Show() {
-		x := A_ScreenWidth - LoggerPopup.WIDTH - 20
-		y := A_ScreenHeight - LoggerPopup.HEIGHT - 60
+		x := A_ScreenWidth - LoggerPopup.WIDTH - 10
+		y := A_ScreenHeight - LoggerPopup.HEIGHT - 50
 		super.Show(Format("x{} y{} w{} h{} NoActivate", x, y, LoggerPopup.WIDTH, LoggerPopup.HEIGHT), "Logger")
 		this.isOpen := true
 	}
