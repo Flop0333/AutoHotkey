@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Speaker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="deck" id="deck">
+    <img class="cassette-gif" src="assets/cassette.gif" alt="Cassette tape" draggable="false">
+
+    <button class="close-btn no-drag" onclick="AhkDataService.StopSpeaking()" title="Close">&times;</button>
+
+    <div class="status-badge no-drag">
+      <span class="led" id="led"></span>
+      <span id="status-text">Idle</span>
+    </div>
+
+    <button class="reel-btn no-drag" id="restart-btn" title="Restart">⏮</button>
+    <button class="reel-btn reel-btn-primary no-drag" id="play-pause-btn" title="Play/Pause">▶</button>
+
+    <div class="vol-module no-drag">
+      <div class="vol-label">
+        <span>VOL</span>
+        <span id="volume-value">100</span>
+      </div>
+      <input type="range" id="volume-slider" class="slider" min="0" max="100" value="100">
+    </div>
+
+    <div class="speed-module no-drag">
+      <div class="speed-buttons" id="speed-buttons"></div>
+    </div>
+  </div>
+
+  <script src="AhkDataService.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>

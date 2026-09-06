@@ -37,7 +37,7 @@ RunStartup(profile?) {
     Run(Paths.appsStandalone "\Mouse Gestures\Mouse Gestures.ahk")
     Run(Paths.appsStandalone "\Screen Snipper\Screen Snipper.ahk")
     Run(Paths.appsStandalone "\Key Bindings.ahk")
-    Run(Paths.appsStandalone "\Text Speaker.ahk")
+    Run(Paths.appsStandalone "\Text Speaker\Text Speaker.ahk")
     Run(Paths.appsStandalone "\Window Manager.ahk")
 
     Run(Paths.appsIntegrated "\Command Storer\Command Storer.ahk")
