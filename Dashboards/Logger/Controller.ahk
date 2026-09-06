@@ -3,12 +3,15 @@
 
 Class LoggerPopup extends WebViewToo {
 	static WIDTH := 300
-	static HEIGHT := 140
-	static SHOW_DELAY := 5000 ; ms after the last log entry before the popup appears
+	static HEIGHT := 220
+	static VISIBLE_DURATION := 5000 ; ms a severity's detail stays expanded since its last log
+	static SEVERITIES := ["info", "warning", "error"]
 
 	counts := Map("info", 0, "warning", 0, "error", 0)
-	latestEntry := ""
 	lastEntryCount := 0
+	isOpen := false
+	activeSeverities := Map("info", false, "warning", false, "error", false)
+	hideTimerFns := Map()
 
 	__New() {
 		super.__New()
@@ -18,7 +21,9 @@ Class LoggerPopup extends WebViewToo {
 		this.AddCallbackToScript("Dismiss", (*) => this.Dismiss())
 		this.AddCallbackToScript("OpenDashboard", (*) => this.OpenDashboard())
 
-		this.showTimerFn := this._OnShowTimer.Bind(this)
+		for severity in LoggerPopup.SEVERITIES {
+			this.hideTimerFns[severity] := this._OnSeverityTimeout.Bind(this, severity)
+		}
 
 		this._Seed()
 		SetTimer(this._Poll.Bind(this), 1000)
@@ -29,9 +34,19 @@ Class LoggerPopup extends WebViewToo {
 		x := A_ScreenWidth - LoggerPopup.WIDTH - 20
 		y := A_ScreenHeight - LoggerPopup.HEIGHT - 60
 		super.Show(Format("x{} y{} w{} h{} NoActivate", x, y, LoggerPopup.WIDTH, LoggerPopup.HEIGHT), "Logger")
+		this.isOpen := true
 	}
 
-	Dismiss() => this.Hide()
+	; Dismiss cancels every severity's timer - a right-click closes it outright,
+	; rather than leaving a timer running that would silently reopen it.
+	Dismiss() {
+		for severity in LoggerPopup.SEVERITIES {
+			SetTimer(this.hideTimerFns[severity], 0)
+			this.activeSeverities[severity] := false
+		}
+		this.Hide()
+		this.isOpen := false
+	}
 
 	OpenDashboard() => Run(Paths.dashboards '\Log Dashboard\Log Dashboard.ahk')
 
@@ -76,41 +91,51 @@ Class LoggerPopup extends WebViewToo {
 			this.lastEntryCount := 0
 		}
 
-		sawNotifyEntry := false
 		loop entries.Length - this.lastEntryCount {
 			entry := entries[this.lastEntryCount + A_Index]
 			this._Count(entry)
 			; Plain Log* entries still count toward the totals, but only
-			; LogAndNotify* entries (notify=true) should pop up / expand.
+			; LogAndNotify* entries (notify=true) should show/expand a row.
 			if (entry.Has("notify") && entry["notify"]) {
-				this.latestEntry := entry
-				sawNotifyEntry := true
+				severity := entry.Has("severity") ? entry["severity"] : "info"
+				this._ShowSeverity(severity, entry)
 			}
 		}
 		this.lastEntryCount := entries.Length
 
 		this._PushCounts()
-		if sawNotifyEntry {
-			SetTimer(this.showTimerFn, 0) ; cancel any pending show
-			SetTimer(this.showTimerFn, -LoggerPopup.SHOW_DELAY) ; ...and restart the debounce
-		}
 	}
 
-	_OnShowTimer() {
-		this._PushLatest()
-		this.Show()
+	; Expands (or re-expands) one severity's row with its latest entry, opens
+	; the popup if it was closed, and (re)starts that severity's own 5s timer.
+	_ShowSeverity(severity, entry) {
+		this.activeSeverities[severity] := true
+		if !this.isOpen
+			this.Show()
+
+		payload := Map(
+			"script", entry.Has("script") ? entry["script"] : "",
+			"message", entry.Has("message") ? entry["message"] : ""
+		)
+		this.ExecuteScript("window.expandRow('" severity "', " JSON.Dump(payload) ")")
+
+		SetTimer(this.hideTimerFns[severity], 0) ; cancel any pending hide for this severity
+		SetTimer(this.hideTimerFns[severity], -LoggerPopup.VISIBLE_DURATION) ; ...and restart it
+	}
+
+	; Fires 5s after the last log for this severity: collapse just that row,
+	; then close the whole popup once no severity is showing anymore.
+	_OnSeverityTimeout(severity) {
+		this.activeSeverities[severity] := false
+		this.ExecuteScript("window.collapseRow('" severity "')")
+
+		for sev in LoggerPopup.SEVERITIES {
+			if this.activeSeverities[sev]
+				return ; something else is still showing - keep the popup open
+		}
+		this.Hide()
+		this.isOpen := false
 	}
 
 	_PushCounts() => this.ExecuteScript("window.updateCounts(" JSON.Dump(this.counts) ")")
-
-	_PushLatest() {
-		if !this.latestEntry
-			return
-		severity := this.latestEntry.Has("severity") ? this.latestEntry["severity"] : "info"
-		payload := Map(
-			"script", this.latestEntry.Has("script") ? this.latestEntry["script"] : "",
-			"message", this.latestEntry.Has("message") ? this.latestEntry["message"] : ""
-		)
-		this.ExecuteScript("window.expandRow('" severity "', " JSON.Dump(payload) ")")
-	}
 }
