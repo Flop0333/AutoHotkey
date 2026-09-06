@@ -15,13 +15,10 @@ Class LogDashboard extends WebViewToo {
 		this.AddCallbackToScript("SetClipboard", (webview, text) => A_Clipboard := text)
 		this.AddCallbackToScript("LogTestMessage", (webview, severity) => this.LogTestMessage(severity))
 		this.AddCallbackToScript("GetGitStatus", (*) => this.GetGitStatusForWeb())
-
-		this.Show()
-		; this.OpenDevToolsWindow()
 	}
 
 	Show() => super.Show(LogDashboard.SHOW_OPTIONS, LogDashboard.WIN_TITLE)
-	InitializeHidden() => super.Show(LogDashboard.SHOW_OPTIONS " Hide", LogDashboard.WIN_TITLE)
+	InitializeHidden() => super.Show("Hide " LogDashboard.SHOW_OPTIONS, LogDashboard.WIN_TITLE)
 
 	Close() => this.Hide()
 
