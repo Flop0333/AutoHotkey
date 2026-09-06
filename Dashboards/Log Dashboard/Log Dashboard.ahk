@@ -48,7 +48,9 @@ StartLogDashboard() {
 	Run('"' A_AhkPath '" "' dashboardScript '"')
 }
 
-WaitForLogDashboardWindow(timeoutMs := 5000) {
+; A generous timeout - WebView2 first-run init (extracting the loader, spinning
+; up its child process) can take several seconds on a cold/slow machine.
+WaitForLogDashboardWindow(timeoutMs := 20000) {
 	startedAt := A_TickCount
 	while (A_TickCount - startedAt < timeoutMs) {
 		if dashboardWindow := FindLogDashboardWindow()

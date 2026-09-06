@@ -1,4 +1,4 @@
-param([int]$TimeoutSeconds = 30)
+param([int]$TimeoutSeconds = 90)
 
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "Support\AhkRunner.psm1") -Force

@@ -42,7 +42,9 @@ FindLoggerWindow() {
 
 StartLogger() => Run('"' A_AhkPath '" "' Paths.dashboards '\Logger\Logger Host.ahk"')
 
-WaitForLoggerWindow(timeoutMs := 5000) {
+; A generous timeout - WebView2 first-run init (extracting the loader, spinning
+; up its child process) can take several seconds on a cold/slow machine.
+WaitForLoggerWindow(timeoutMs := 20000) {
 	startedAt := A_TickCount
 	while (A_TickCount - startedAt < timeoutMs) {
 		if loggerWindow := FindLoggerWindow()
