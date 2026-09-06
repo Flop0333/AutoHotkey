@@ -76,16 +76,24 @@ Class LoggerPopup extends WebViewToo {
 			this.lastEntryCount := 0
 		}
 
+		sawNotifyEntry := false
 		loop entries.Length - this.lastEntryCount {
 			entry := entries[this.lastEntryCount + A_Index]
 			this._Count(entry)
-			this.latestEntry := entry
+			; Plain Log* entries still count toward the totals, but only
+			; LogAndNotify* entries (notify=true) should pop up / expand.
+			if (entry.Has("notify") && entry["notify"]) {
+				this.latestEntry := entry
+				sawNotifyEntry := true
+			}
 		}
 		this.lastEntryCount := entries.Length
 
 		this._PushCounts()
-		SetTimer(this.showTimerFn, 0) ; cancel any pending show
-		SetTimer(this.showTimerFn, -LoggerPopup.SHOW_DELAY) ; ...and restart the debounce
+		if sawNotifyEntry {
+			SetTimer(this.showTimerFn, 0) ; cancel any pending show
+			SetTimer(this.showTimerFn, -LoggerPopup.SHOW_DELAY) ; ...and restart the debounce
+		}
 	}
 
 	_OnShowTimer() {
