@@ -28,6 +28,7 @@ class StartupMenuTray {
         A_TrayMenu.Add("Reload", (*) => System.KillAndReload())
         this._AddProfilesToTrayMenu()
         A_TrayMenu.Add("Log Dashboard", (*) => ShowLogDashboard())
+        A_TrayMenu.Add("Test Dashboard", (*) => RunTests())
         A_TrayMenu.Add("Exit", (*) => System.KillAllAHkProcesses())
     }
 
