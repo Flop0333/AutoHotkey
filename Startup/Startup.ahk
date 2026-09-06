@@ -17,8 +17,10 @@
 #Include ..\Secrets\Secrets File Manager.ahk
 #Include Startup Message.ahk
 #Include Startup Menu Tray.ahk
-
+^e::throw Error("Test error", -1, "Startup.ahk") ; Test error handling
+^r::LogInfo("Startup.ahk loaded")
 RunStartup(profile?) {
+    ClearErrorLog() ; Dashboard only shows errors from the current run, not past runs
     SecretsFileManager.Initialize()
 
     IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetByComputerName()
@@ -26,7 +28,8 @@ RunStartup(profile?) {
     StartupMenuTray()
     
     Run(Paths.appsStandalone "\Capslock Service.ahk") ; Run this before scripts that set a capslock hotkey
-    
+    Run(Paths.dashboards "\Logger\Logger.ahk") ; Notification popup for logged info/warning/error entries
+
     Run(Paths.dashboards "\Age of Efficiency\Age of Efficiency.ahk")
     Run(Paths.dashboards "\Macro Board\Macro Board.ahk")
 

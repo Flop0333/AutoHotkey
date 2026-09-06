@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logger</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body onclick="ahk.OpenDashboard()" oncontextmenu="event.preventDefault(); ahk.Dismiss();">
+  <div class="row" id="row-error" data-severity="error">
+    <div class="row-header">
+      <span class="dot"></span>
+      <span class="label">Error</span>
+      <span class="count" id="count-error">0</span>
+    </div>
+    <div class="detail" id="detail-error"></div>
+  </div>
+  <div class="row" id="row-warning" data-severity="warning">
+    <div class="row-header">
+      <span class="dot"></span>
+      <span class="label">Warning</span>
+      <span class="count" id="count-warning">0</span>
+    </div>
+    <div class="detail" id="detail-warning"></div>
+  </div>
+  <div class="row" id="row-info" data-severity="info">
+    <div class="row-header">
+      <span class="dot"></span>
+      <span class="label">Info</span>
+      <span class="count" id="count-info">0</span>
+    </div>
+    <div class="detail" id="detail-info"></div>
+  </div>
+  <script src="index.js"></script>
+</body>
+</html>
