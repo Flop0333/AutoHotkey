@@ -18,6 +18,7 @@ Test_RealHostsAndCrossProcessBehavior() {
 
 	loggerPid := 0
 	dashboardPid := 0
+	try FileDelete(A_Temp "\ahk_logger_debug.log")
 	try {
 		hosts := InitializeLogging()
 		loggerPid := WinGetPID("ahk_id " hosts["logger"])
@@ -27,6 +28,11 @@ Test_RealHostsAndCrossProcessBehavior() {
 		loggerMinMax := WinGetMinMax("ahk_id " hosts["logger"])
 		debugLine := "DEBUG screen=" A_ScreenWidth "x" A_ScreenHeight " style=" Format("0x{:X}", loggerStyle) " wsVisible=" (loggerStyle & 0x10000000 ? 1 : 0) " isWindowVisible=" (DllCall("IsWindowVisible", "Ptr", hosts["logger"]) ? 1 : 0) " minmax=" loggerMinMax
 		FileAppend(debugLine "`n", "*")
+		debugLogPath := A_Temp "\ahk_logger_debug.log"
+		if FileExist(debugLogPath)
+			FileAppend("----- ahk_logger_debug.log -----`n" FileRead(debugLogPath, "UTF-8") "----- end -----`n", "*")
+		else
+			FileAppend("----- ahk_logger_debug.log NOT FOUND at " debugLogPath " -----`n", "*")
 		Assert.False(IsVisible(hosts["logger"]), "Logger starts hidden")
 		Assert.False(IsVisible(hosts["dashboard"]), "Dashboard starts hidden")
 

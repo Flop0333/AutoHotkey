@@ -35,7 +35,9 @@ Class LoggerPopup extends WebViewToo {
 		}
 
 		this._Seed()
+		DebugLog("before InitializeHidden, style=" Format("0x{:X}", WinGetStyle(this.Gui)))
 		this.InitializeHidden()
+		DebugLog("after InitializeHidden, style=" Format("0x{:X}", WinGetStyle(this.Gui)))
 		; Don't start polling until the page has actually finished loading -
 		; window.updateCounts/expandRow don't exist before then, so an
 		; ExecuteScript() call that races the navigation fails silently and
@@ -66,7 +68,10 @@ Class LoggerPopup extends WebViewToo {
 	InitializeHidden() {
 		x := A_ScreenWidth - LoggerPopup.WIDTH - LoggerPopup.MARING
 		y := A_ScreenHeight - LoggerPopup.HEIGHT - LoggerPopup.Y_POS_MARGIN
-		super.Show(Format("Hide x{} y{} w{} h{} NoActivate", x, y, LoggerPopup.WIDTH, LoggerPopup.HEIGHT), LoggerPopup.WIN_TITLE)
+		options := Format("Hide x{} y{} w{} h{} NoActivate", x, y, LoggerPopup.WIDTH, LoggerPopup.HEIGHT)
+		DebugLog("InitializeHidden calling super.Show with options=[" options "]")
+		super.Show(options, LoggerPopup.WIN_TITLE)
+		DebugLog("InitializeHidden after super.Show, style=" Format("0x{:X}", WinGetStyle(this.Gui)))
 		this.isOpen := false
 	}
 

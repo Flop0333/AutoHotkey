@@ -30,6 +30,10 @@
 #Requires AutoHotkey v2
 #Include WebView2.ahk
 
+DebugLog(msg) {
+	try FileAppend(A_TickCount " " msg "`n", A_Temp "\ahk_logger_debug.log", "UTF-8")
+}
+
 class WebViewToo {
     static Template := {}
     static Template.Framework := "
@@ -72,8 +76,11 @@ class WebViewToo {
         this.Gui.BorderSize := 0, this.MaximizedBorderSize := 7
         this.Gui.Add("Button", "x0 y0 vNCLBUTTONDOWN_Sink Hidden", "John Cena")
         this.Gui.Add("Text", "x" this.BorderSize " y" this.BorderSize " vWebViewTooContainer BackgroundTrans", "If you can see this, something went wrong.")
+        DebugLog("before WebView2.create, style=" Format("0x{:X}", WinGetStyle(this.Gui)))
         this.wvc := !A_IsCompiled ? WebView2.create(this.Gui["WebViewTooContainer"].Hwnd) : WebView2.create(this.Gui["WebViewTooContainer"].Hwnd,,,,,, WebViewToo.DllPath)
+        DebugLog("after WebView2.create, style=" Format("0x{:X}", WinGetStyle(this.Gui)))
         this.IsVisible := 1, this.wv := this.wvc.CoreWebView2
+        DebugLog("after CoreWebView2 assign, style=" Format("0x{:X}", WinGetStyle(this.Gui)))
         this.Gui.OnEvent("Size", (*) => this.Fill())
         this.AddCallbackToScript("Close", this.Close)
         this.AddCallbackToScript("DragWindow", this.DragWindow)
@@ -81,9 +88,11 @@ class WebViewToo {
         this.AddCallbackToScript("Maximize", this.Maximize)
         this.AddScriptToExecuteOnDocumentCreated("const ahk = window.chrome.webview.hostObjects", 0)
         this.wv.NavigateToString(Format(WebViewToo.Template.Framework, Html, CSS, JS))
+        DebugLog("after NavigateToString, style=" Format("0x{:X}", WinGetStyle(this.Gui)))
         if (this.CustomCaption) {
             this.CustomCaptionBarInit()
         }
+        DebugLog("end of WebViewToo.__New, style=" Format("0x{:X}", WinGetStyle(this.Gui)))
     }
 
     __Delete() {
@@ -379,7 +388,10 @@ class WebViewToo {
 			Height += (NumGet(rect, 4, "Int") - NumGet(rect, 12, "Int")) ;+ (this.BorderSize * 2)
 		}
 		this.Gui.Title := Title
-		this.Gui.Show(Options " w" Width " h" Height)
+		finalOptions := Options " w" Width " h" Height
+		DebugLog("WebViewToo.Show finalOptions=[" finalOptions "] styleBefore=" Format("0x{:X}", WinGetStyle(this.Gui)))
+		this.Gui.Show(finalOptions)
+		DebugLog("WebViewToo.Show done styleAfter=" Format("0x{:X}", WinGetStyle(this.Gui)))
 	}
 
     ;-------------------------------------------------------------------------------------------
