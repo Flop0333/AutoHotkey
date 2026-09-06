@@ -122,20 +122,32 @@ class TextSpeaker {
     ; Playback state is tracked ourselves in `_state` rather than re-derived from
     ; SAPI's Status.RunningState on every keypress: RunningState transitions
     ; asynchronously (a few hundred ms of lag around Speak()/Stop()), so deciding
-    ; Play-vs-Pause-vs-Resume from it directly is a race - it can land on the wrong
-    ; branch and get stuck "paused" with nothing actually playing and no panel shown.
-    ; RunningState is still polled, but only to notice natural end-of-speech.
+    ; Play-vs-Pause-vs-Resume from it  .
 
     static TogglePlay() {
-        switch this._state {
-            case "speaking": this.Pause()
-            case "paused": this.Resume()
-            default: this.Speak()
+        try {
+            switch this._state {
+                case "speaking": this.Pause()
+                case "paused": this.Resume()
+                default: this.Speak()
+            }
+        } catch as Error {
+            MsgBox("Error in TogglePlay: " Error.Message " | " Error.What " at line " Error.Line, "Error")
         }
         this._SetupHotkeys()
     }
 
-    static Speak(text := this._GetSelectedText(), voice := this._currentVoice) {
+    static Speak(text := "", voice := "") {
+        if text = "" {
+            try {
+                text := this._GetSelectedText()
+            } catch as Error {
+                Info("Error getting selected text: " Error.Message)
+                return
+            }
+        }
+        if voice = ""
+            voice := this._currentVoice
         if voice = "" {
             voice := this.defaultVoice
             if voice = "" {
@@ -143,20 +155,26 @@ class TextSpeaker {
                 return
             }
         }
-        if !text
+        if !text {
+            Info("No text to speak")
             return
+        }
 
-        this._spVoice.Speak("", 2) ; cancel anything currently speaking
-        this._currentVoice := voice
-        this._spVoice.Voice := voice
-        this._spVoice.Volume := this._currentVolume
-        this._spVoice.Rate := this.speedOptions[this._speedIndex + 1].rate
-        this._lastText := text
-        this._state := "speaking"
-        this._speechStartTick := A_TickCount
-        this._spVoice.Speak(text, 1) ; asynchronous
-
-        this._ShowPanel()
+        try {
+            this._spVoice.Speak("", 2) ; cancel anything currently speaking
+            this._currentVoice := voice
+            this._spVoice.Voice := voice
+            this._spVoice.Volume := this._currentVolume
+            this._spVoice.Rate := this.speedOptions[this._speedIndex + 1].rate
+            this._lastText := text
+            this._state := "speaking"
+            this._speechStartTick := A_TickCount
+            this._spVoice.Speak(text, 1) ; asynchronous
+            this._ShowPanel()
+        } catch as Error {
+            Info("Error in Speak: " Error.Message " at line " Error.Line)
+            return
+        }
     }
 
     static Restart() {
@@ -216,10 +234,20 @@ class TextSpeaker {
         this._SetSpeedIndex(this._speedIndex - 1)
     }
 
+    static _MakeSpeedButtonHandler(buttonIndex) {
+        return (*) => this._SetSpeedIndex(buttonIndex)
+    }
+
     static _SetSpeedIndex(index) {
+        Info("_SetSpeedIndex called with: " index)
         index := Max(0, Min(this.speedOptions.Length - 1, index))
         this._speedIndex := index
-        try this._spVoice.Rate := this.speedOptions[index + 1].rate
+        try {
+            this._spVoice.Rate := this.speedOptions[index + 1].rate
+            Info("Speed set to: " this.speedOptions[index + 1].label)
+        } catch as Error {
+            Info("Error setting speed: " Error.Message)
+        }
         this._SaveSettings()
         this._UpdatePanel()
         DarkToolTip("Speed: " this.speedOptions[index + 1].label)
@@ -227,11 +255,14 @@ class TextSpeaker {
 
     static _GetSelectedText() {
         backupClipboard := A_Clipboard
+        backupWindow := WinExist("A")  ; Save current active window
         A_Clipboard := ""
-        Send("^c")
-        Sleep(50)
+        try Send("^c")
+        Sleep(100)  ; Wait for clipboard to fill
         highlightedText := A_Clipboard
         A_Clipboard := backupClipboard
+        if backupWindow
+            WinActivate(backupWindow)  ; Restore focus
         return highlightedText
     }
 
@@ -252,18 +283,29 @@ class TextSpeaker {
     ; ---- Control panel -----------------------------------------------------
 
     static _ShowPanel() {
-        if !this._panel {
-            this._BuildPanel()
+        try {
+            if !this._panel {
+                this._BuildPanel()
+            }
+            this._UpdatePanel()
+            this._panel.Show("w500 h200 y100 NoActivate")
+            SetTimer(this._pollCallback, 200)
+        } catch as Error {
+            Info("Error showing panel: " Error.Message " at line " Error.Line)
         }
-        this._UpdatePanel()
-        this._panel.Show("w500 h200 NoActivate")
-        SetTimer(this._pollCallback, 200)
     }
 
     static _HidePanel() {
-        if this._panel
-            this._panel.Hide()
-        SetTimer(this._pollCallback, 0)
+        try {
+            if this._panel {
+                this._panel.Destroy()
+                this._panel := ""
+                this._panelControls := {}
+            }
+            SetTimer(this._pollCallback, 0)
+        } catch as Error {
+            Info("Error hiding panel: " Error.Message)
+        }
     }
 
     static _PollPlaybackState() {
@@ -306,9 +348,15 @@ class TextSpeaker {
         speedButtons := []
         x := "y+2"
         for i, option in this.speedOptions {
-            btn := panel.AddButton((i = 1 ? x : "x+5") " w42", option.label)
-            btn.OnEvent("Click", ObjBindMethod(this, "_SetSpeedIndex", i - 1))
-            speedButtons.Push(btn)
+            try {
+                btn := panel.AddButton((i = 1 ? x : "x+5") " w42", option.label)
+                ; Use a factory function to properly capture the index
+                handler := this._MakeSpeedButtonHandler(i - 1)
+                btn.OnEvent("Click", handler)
+                speedButtons.Push(btn)
+            } catch as Error {
+                Info("Error creating speed button " i ": " Error.Message)
+            }
         }
         controls.speedButtons := speedButtons
 
