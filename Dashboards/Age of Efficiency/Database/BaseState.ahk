@@ -15,6 +15,7 @@ Class BaseState extends Singleton {
     item.id := this.GetUniqueId()
     this.state.Push(item)
     this.Store()
+    LogAndNotifyInfo("Saved " this._KindLabel() ": " item.title)
   }
 
   static GetById(id) {
@@ -60,6 +61,7 @@ Class BaseState extends Singleton {
     for key, value in updatedItem.OwnProps()
         item.%key% := value
     this.Store()
+    LogAndNotifyInfo("Updated " this._KindLabel() ": " item.title)
   }
 
   static Delete(deleteTitle) {
@@ -67,6 +69,7 @@ Class BaseState extends Singleton {
       if item.title = deleteTitle {
         this.state.RemoveAt(index)
         this.Store()
+        LogAndNotifyInfo("Deleted " this._KindLabel() ": " deleteTitle)
         return
       }
     Throw UnsetError("Item not found. title: " deleteTitle)
@@ -74,4 +77,12 @@ Class BaseState extends Singleton {
 
   ; Persists state to storage (override in subclasses)
   static Store() => {}
+
+  ; Friendly noun for log/notify messages, e.g. "BookmarksState" -> "bookmark".
+  ; (this.__Class inside a static method resolves to the meta-class "Class" -
+  ; this.Prototype.__Class is what actually holds the subclass's own name.)
+  static _KindLabel() {
+    static labels := Map("BookmarksState", "bookmark", "AppsState", "app", "SearchEnginesState", "search engine")
+    return labels.Get(this.Prototype.__Class, this.Prototype.__Class)
+  }
 }
