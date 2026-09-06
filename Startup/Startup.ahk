@@ -11,12 +11,18 @@
 ;   - Manually set profile on startup (or auto-detect based on computer name)
 ;   - Switch profiles using tray menu
 ; ============================================================================
+#Include ..\Dashboards\Logger\Logging.ahk
 #Include ..\Lib\Core\Paths.ahk
 #Include ..\Profiles\Profile Manager.ahk
 #Include ..\Secrets\Secrets File Manager.ahk
 #Include Startup Message.ahk
 #Include Startup Menu Tray.ahk
-#Include ..\Dashboards\Logger\Logging.ahk
+
+^1::ShowLogDashboard()
+^2::HideLogDashboard()
+^3::LogAndNotifyInfo("Startup.ahk INFO this is a multiline test of the logging system. It should be able to handle long messages and display them properly in the Logger dashboard. This message is intentionally verbose to test the limits of the logging functionality and ensure that all features are working as expected.")
+^4::LogAndNotifyWarning("Startup.ahk WARNING")
+^5::LogAndNotifyError("Startup.ahk ERROR")
 
 RunStartup(profile?) {
     InitializeLogging()

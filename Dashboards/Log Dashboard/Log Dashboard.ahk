@@ -23,12 +23,13 @@ ShowLogDashboard() {
 	if dashboardWindow {
 		WinShow("ahk_id " dashboardWindow)
 		WinActivate("ahk_id " dashboardWindow)
+		MarkAllLogsRead()
 	}
 }
 
 HideLogDashboard() {
 	if dashboardWindow := FindLogDashboardWindow()
-		WinHide("ahk_id " dashboardWindow)
+		try WinHide("ahk_id " dashboardWindow)
 }
 
 FindLogDashboardWindow() {

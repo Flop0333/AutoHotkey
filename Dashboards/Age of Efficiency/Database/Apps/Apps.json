@@ -114,9 +114,9 @@
 		"argument": "",
 		"argumentRequired": 0,
 		"category": "PC Management",
-		"command": "AD",
+		"command": "AL",
 		"icon": "AutoHotkey",
 		"id": 18,
-		"title": "AutoHotkey Dashboard"
+		"title": "AutoHotkey Log Dashboard"
 	}
 ]

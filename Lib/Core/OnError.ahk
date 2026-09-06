@@ -9,6 +9,36 @@ HandleUnhandledError(error, mode) {
 }
 
 ErrorLogFile() => Paths.autohotkey "\Logs\errors.log"
+ErrorLogReadStateFile() => Paths.autohotkey "\Logs\errors.read"
+
+GetLogEntryCount() {
+    count := 0
+    if !FileExist(ErrorLogFile())
+        return count
+    for line in StrSplit(FileRead(ErrorLogFile(), "UTF-8"), "`n", "`r") {
+        if (Trim(line) = "")
+            continue
+        try {
+            JSON.parse(line)
+            count += 1
+        }
+    }
+    return count
+}
+
+GetReadLogEntryCount() {
+    if !FileExist(ErrorLogReadStateFile())
+        return 0
+    try return Max(0, Integer(Trim(FileRead(ErrorLogReadStateFile(), "UTF-8"))))
+    return 0
+}
+
+MarkAllLogsRead() {
+    DirCreate(Paths.autohotkey "\Logs")
+    readState := FileOpen(ErrorLogReadStateFile(), "w", "UTF-8")
+    readState.Write(GetLogEntryCount())
+    readState.Close()
+}
 
 ; --- Log only: append a structured entry. The Logger popup counts these ---
 ; --- toward the session totals but never pops up or expands for them. ----
@@ -43,4 +73,6 @@ AppendLogEntry(severity, message, stack := "", notify := false) {
 ClearErrorLog() {
     if FileExist(ErrorLogFile())
         FileDelete(ErrorLogFile())
+    if FileExist(ErrorLogReadStateFile())
+        FileDelete(ErrorLogReadStateFile())
 }

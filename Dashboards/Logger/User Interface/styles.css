@@ -27,6 +27,10 @@ body {
 	padding: 6px 10px;
 }
 
+.row[hidden] {
+	display: none;
+}
+
 .row:last-child {
 	border-bottom: none;
 }

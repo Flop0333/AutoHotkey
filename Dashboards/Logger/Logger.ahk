@@ -26,7 +26,7 @@ ShowLogger() {
 
 HideLogger() {
 	if loggerWindow := FindLoggerWindow()
-		WinHide("ahk_id " loggerWindow)
+		Try WinHide("ahk_id " loggerWindow)
 }
 
 FindLoggerWindow() {

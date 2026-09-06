@@ -20,6 +20,10 @@
 #Include ..\Lib\Helpers\System.ahk
 class StartupMenuTray {
     __New() {
+        ; Logging.ahk includes Core.ahk, whose #NoTrayIcon directive is correct
+        ; for worker scripts but also applies to this combined startup script.
+        ; Explicitly publish the startup owner's tray icon before building it.
+        A_IconHidden := false
         A_TrayMenu.Delete()
         A_TrayMenu.Add("Reload", (*) => Reload())
         this._AddProfilesToTrayMenu()

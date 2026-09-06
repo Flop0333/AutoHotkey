@@ -11,9 +11,14 @@ function formatCount(severity, count) {
 }
 
 function updateCounts(counts) {
-	document.getElementById('label-info').textContent = formatCount('info', counts.info ?? 0);
-	document.getElementById('label-warning').textContent = formatCount('warning', counts.warning ?? 0);
-	document.getElementById('label-error').textContent = formatCount('error', counts.error ?? 0);
+	for (const severity of ['info', 'warning', 'error']) {
+		const count = counts[severity] ?? 0;
+		const row = document.getElementById('row-' + severity);
+		document.getElementById('label-' + severity).textContent = formatCount(severity, count);
+		row.hidden = count < 1;
+		if (row.hidden) row.classList.remove('expanded');
+	}
+	scheduleResize();
 }
 
 // Rows expand/collapse independently - info/warning/error can all be
@@ -28,12 +33,18 @@ function expandRow(severity, entry) {
 		<div class="detail-script">${escapeHtml(entry.script)}</div>
 		<div class="detail-message">${escapeHtml(entry.message)}</div>
 	`;
+	scheduleResize();
 }
 
 function collapseRow(severity) {
 	const row = document.getElementById('row-' + severity);
 	if (!row) return;
 	row.classList.remove('expanded');
+	scheduleResize();
+}
+
+function scheduleResize() {
+	requestAnimationFrame(() => ahk.Resize(Math.ceil(document.body.getBoundingClientRect().height)));
 }
 
 function escapeHtml(text) {
