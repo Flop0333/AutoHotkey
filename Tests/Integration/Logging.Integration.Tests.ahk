@@ -31,6 +31,14 @@ Test_RealHostsAndCrossProcessBehavior() {
 		Assert.False(IsVisible(hosts["logger"]), "Logger starts hidden")
 		Assert.False(IsVisible(hosts["dashboard"]), "Dashboard starts hidden")
 
+		; Both hosts may have already logged their own incidental startup
+		; warnings by now (e.g. missing-secret notices from unrelated modules
+		; pulled in via Core.ahk) - clear those out so only this test's own
+		; log calls are visible from here on. The Logger's _Poll() already
+		; handles the file shrinking out from under it (see the entries.Length
+		; < lastEntryCount branch), so this is safe post-construction.
+		ClearErrorLog()
+
 		LogInfo("silent unread info")
 		Sleep(1250)
 		Assert.False(IsVisible(FindLoggerWindow()), "LogInfo increments unread state without notifying")
