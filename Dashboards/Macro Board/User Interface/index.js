@@ -37,12 +37,12 @@ class Buttons {
 		const image = button.image;
 		const imagePath = 'assets/icons/' + image;
 		const defaultImagePath = 'assets/icons/pizza.gif';
-		
+
 		try {
 			await fetch(imagePath, { method: 'HEAD' });
 			element.style.backgroundImage = `url('${imagePath}')`;
 		} catch {
-			console.warn(`Button image ${image} not found for button "${button.tooltip}". using default image instead`);
+			AhkDataService.LogIconLoadError(image, button.tooltip);
 			element.style.backgroundImage = `url('${defaultImagePath}')`;
 		};
 	}

@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="title-bar">
+    <div class="drag-region" onmousedown="ahk.DragWindow()">
+      <span class="title-text">Log Dashboard</span>
+      <span id="git-status" class="git-status"></span>
+    </div>
+    <div class="title-btn-container">
+      <span class="title-btn" onclick="ahk.Minimize()">0</span>
+      <span class="title-btn title-btn-maximize" onclick="ahk.Maximize()">1</span>
+      <span class="title-btn title-btn-close" onclick="ahk.Close()">r</span>
+    </div>
+  </div>
+  <div class="toolbar">
+    <select id="severity-filter"><option value="">All severities</option></select>
+    <select id="script-filter"><option value="">All scripts</option></select>
+    <button id="sort-time">Time ↓</button>
+    <span id="entry-count"></span>
+    <span class="test-buttons">
+      <button class="test-btn" data-severity="info" title="Log and notify a test info entry">Test Info</button>
+      <button class="test-btn" data-severity="warning" title="Log and notify a test warning entry">Test Warning</button>
+      <button class="test-btn" data-severity="error" title="Log and notify a test error entry">Test Error</button>
+    </span>
+  </div>
+  <div class="layout">
+    <table id="log-table">
+      <thead>
+        <tr><th>Time</th><th>Severity</th><th>Script</th><th>Message</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="detail-panel">
+      <p class="empty-state">Select a log entry to see details.</p>
+    </div>
+  </div>
+  <div id="toast"></div>
+  <script src="index.js"></script>
+  <script src="AhkDataService.js"></script>
+</body>
+</html>

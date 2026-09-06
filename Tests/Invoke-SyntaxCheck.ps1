@@ -44,6 +44,9 @@ $startupContent = Get-Content -Raw $startupFile
 
 $targets = [System.Collections.Generic.List[string]]::new()
 $targets.Add($startupFile)
+$targets.Add((Join-Path $repoRoot "Dashboards\Logger\Logger Host.ahk"))
+$targets.Add((Join-Path $repoRoot "Dashboards\Log Dashboard\Dashboard.ahk"))
+$targets.Add((Join-Path $repoRoot "Dashboards\Logger\Logging.ahk"))
 
 $runCalls = [regex]::Matches($startupContent, 'Run\(Paths\.(\w+)\s*"([^"]+)"\)')
 foreach ($m in $runCalls) {

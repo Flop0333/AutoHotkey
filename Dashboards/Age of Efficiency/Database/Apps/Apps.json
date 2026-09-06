@@ -108,5 +108,15 @@
 		"icon": "default",
 		"id": 17,
 		"title": "Close windows on all desktops"
+	},
+	{
+		"action": "OpenAutoHotkeyDashboard",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "PC Management",
+		"command": "AL",
+		"icon": "AutoHotkey",
+		"id": 18,
+		"title": "AutoHotkey Log Dashboard"
 	}
 ]

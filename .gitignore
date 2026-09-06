@@ -7,3 +7,6 @@ Dashboards/Macro Board/Settings/Profile Settings/
 Lib/Test.ahk
 Secrets/My Secrets.json
 Secrets/Removed Secrets.json
+
+# Runtime error log store (see Lib/Core/OnError.ahk)
+Logs/

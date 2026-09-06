@@ -5,5 +5,7 @@ class AhkDataService {
   static TriggerButtonFunction = (button) => ahk.TriggerButtonFunction(JSON.stringify(button));
   
   static DragWindow = () => ahk.DragWindow();
+
+  static LogIconLoadError = (iconName, tooltip) => ahk.LogIconLoadError(iconName, tooltip);
 }
   

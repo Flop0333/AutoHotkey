@@ -23,6 +23,7 @@
 #Include ..\..\Lib\Apps\Notion.ahk
 #Include ..\..\Startup\Startup.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
+#Include ..\Log Dashboard\Log Dashboard.ahk
 
 ; ===========================================================================
 ; === ACTIONS REGISTRATION ==================================================
@@ -41,12 +42,13 @@ CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 ; ============================================================================
 
 buttons := [
-    ToggleButton(ToggleSpellChecker, GetSpellCheckerState, "Spell Checker", "spell checker.gif"),
-    Button(KillAllAHkProcesses, "Kill All AHK Processes", "game over.gif"),
-    Button(RunStartup, "Reload Startup"),
-    Button(PullAllWindowsToCurrentDesktop, "Pull All Windows to Current Desktop", "Maps.gif"),
+    Button(ShowLogDashboard, "Log Dashboard", "log dashboard.gif"),
+    Button(RunStartup, "Reload AutoHotkey" , "Reload button.gif"),
+    Button(KillAllAHkProcesses, "Kill All AHK Processes", "Kill all AHK processes.gif"),
+    Button(PullAllWindowsToCurrentDesktop, "Pull All Windows to Current Desktop", "Pull all windows to current desktop.gif"),
     ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),
-] 
+    ToggleButton(ToggleSpellChecker, GetSpellCheckerState, "Spell Checker", "spell checker.gif"),
+]
 
 profileButtons := Map(
     Profiles.woonkamerLaptops, [

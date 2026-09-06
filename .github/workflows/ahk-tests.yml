@@ -46,3 +46,7 @@ jobs:
       - name: Run unit tests
         shell: pwsh
         run: .\Tests\Invoke-UnitTests.ps1
+
+      - name: Run logging integration test
+        shell: pwsh
+        run: .\Tests\Invoke-IntegrationTests.ps1
