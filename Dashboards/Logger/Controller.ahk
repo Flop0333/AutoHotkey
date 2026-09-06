@@ -35,9 +35,7 @@ Class LoggerPopup extends WebViewToo {
 		}
 
 		this._Seed()
-		DebugLog("before InitializeHidden, style=" Format("0x{:X}", WinGetStyle(this.Gui)))
 		this.InitializeHidden()
-		DebugLog("after InitializeHidden, style=" Format("0x{:X}", WinGetStyle(this.Gui)))
 		; Don't start polling until the page has actually finished loading -
 		; window.updateCounts/expandRow don't exist before then, so an
 		; ExecuteScript() call that races the navigation fails silently and
@@ -65,13 +63,13 @@ Class LoggerPopup extends WebViewToo {
 		this.isOpen := true
 	}
 
+	; NoActivate must be omitted here - combined with Hide, AHK's Gui.Show()
+	; treats NoActivate as the show-state and ends up showing the window
+	; (just without activating it) instead of hiding it.
 	InitializeHidden() {
 		x := A_ScreenWidth - LoggerPopup.WIDTH - LoggerPopup.MARING
 		y := A_ScreenHeight - LoggerPopup.HEIGHT - LoggerPopup.Y_POS_MARGIN
-		options := Format("Hide x{} y{} w{} h{} NoActivate", x, y, LoggerPopup.WIDTH, LoggerPopup.HEIGHT)
-		DebugLog("InitializeHidden calling super.Show with options=[" options "]")
-		super.Show(options, LoggerPopup.WIN_TITLE)
-		DebugLog("InitializeHidden after super.Show, style=" Format("0x{:X}", WinGetStyle(this.Gui)))
+		super.Show(Format("Hide x{} y{} w{} h{}", x, y, LoggerPopup.WIDTH, LoggerPopup.HEIGHT), LoggerPopup.WIN_TITLE)
 		this.isOpen := false
 	}
 
