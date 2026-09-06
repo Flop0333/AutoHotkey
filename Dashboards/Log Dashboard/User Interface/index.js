@@ -5,9 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 class LogDashboardView {
 
+	static POLL_INTERVAL_MS = 1000; // matches Dashboards/Logger's own polling cadence
+
 	constructor() {
 		this.entries = AhkDataService.GetLogEntries();
 		this.sortDescending = true;
+		this.selectedKey = null;
 		this.tableBody = document.querySelector('#log-table tbody');
 		this.detailPanel = document.querySelector('#detail-panel');
 		this.severityFilter = document.querySelector('#severity-filter');
@@ -26,6 +29,48 @@ class LogDashboardView {
 		this._attachEvents();
 		this._renderRows();
 		this._loadGitStatus();
+		setInterval(() => this._checkForUpdates(), LogDashboardView.POLL_INTERVAL_MS);
+	}
+
+	// Entries are plain objects re-created on every fetch, so object identity
+	// can't survive a refresh - this key (good enough for a personal log, not
+	// a guaranteed-unique id) is what lets a live update find the previously
+	// selected row again without disturbing what the user is doing.
+	_entryKey(entry) {
+		return `${entry.timestamp}|${entry.script}|${entry.message}`;
+	}
+
+	// Polls for new entries (same cadence as Dashboards/Logger) and applies
+	// them without resetting the user's filters, sort, or open detail view -
+	// unlike a manual _refresh(), which is a deliberate full reset.
+	_checkForUpdates() {
+		const fresh = AhkDataService.GetLogEntries();
+		if (fresh.length === this.entries.length)
+			return;
+
+		const wasCleared = fresh.length < this.entries.length; // e.g. ClearErrorLog() at the next full-suite start
+		this.entries = fresh;
+
+		const previousSeverity = this.severityFilter.value;
+		const previousScript = this.scriptFilter.value;
+		this.severityFilter.innerHTML = '<option value="">All severities</option>';
+		this.scriptFilter.innerHTML = '<option value="">All scripts</option>';
+		this._populateFilters();
+		this.severityFilter.value = previousSeverity;
+		this.scriptFilter.value = previousScript;
+
+		if (wasCleared) {
+			this.selectedKey = null;
+			this.detailPanel.innerHTML = '<p class="empty-state">Select a log entry to see details.</p>';
+		}
+
+		this._renderRows();
+
+		if (this.selectedKey) {
+			const row = [...this.tableBody.querySelectorAll('tr')].find(r => r.dataset.key === this.selectedKey);
+			if (row)
+				row.classList.add('selected');
+		}
 	}
 
 	async _loadGitStatus() {
@@ -98,6 +143,7 @@ class LogDashboardView {
 		this.severityFilter.value = previousSeverity;
 		this.scriptFilter.value = previousScript;
 
+		this.selectedKey = null;
 		this.detailPanel.innerHTML = '<p class="empty-state">Select a log entry to see details.</p>';
 		this._renderRows();
 	}
@@ -123,6 +169,7 @@ class LogDashboardView {
 
 		rows.forEach(entry => {
 			const row = document.createElement('tr');
+			row.dataset.key = this._entryKey(entry);
 			row.innerHTML = `
 				<td>${this._escape(entry.timestamp)}</td>
 				<td class="severity severity-${this._escape(entry.severity)}">${this._escape(entry.severity)}</td>
@@ -142,6 +189,7 @@ class LogDashboardView {
 	_showDetail(entry, row) {
 		this.tableBody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
 		row.classList.add('selected');
+		this.selectedKey = this._entryKey(entry);
 		this.detailPanel.innerHTML = `
 			<div class="detail-header">
 				<h2>${this._escape(entry.severity.toUpperCase())}: ${this._escape(entry.message)}</h2>
