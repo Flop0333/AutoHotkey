@@ -19,9 +19,10 @@ Class MacroBoard extends WebViewToo {
 		this.BorderSize := 1  ; Increase border size for easier resizing
 		
 		this.SetVirtualHostNameToFolderMapping("app.local", USER_INTERFACE_PATH, 0) ; block cors error, allow loading local files
-		this.Load("http://app.local/index.html")
 		this.AddCallbackToScript("GetButtons", 				(*) => this.GetButtonsForWeb(buttons))
 		this.AddCallbackToScript("TriggerButtonFunction", 	(webView, button) => TriggerButtonFunction(button))
+		this.AddCallbackToScript("LogIconLoadError", 		(webView, iconName, tooltip) => LogAndNotifyError("Failed to load icon '" iconName "' for button '" tooltip "'"))
+		this.Load("http://app.local/index.html")
 		
 		this.showOptions := Format("x{} y{} w{} h{}", this.settingsService.Window.x, this.settingsService.Window.y, this.settingsService.Window.Width, this.settingsService.Window.Height)
 		this.Show()

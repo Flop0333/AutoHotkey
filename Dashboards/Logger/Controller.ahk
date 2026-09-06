@@ -4,9 +4,11 @@
 
 Class LoggerPopup extends WebViewToo {
 	static WIN_TITLE := "AutoHotkey Logger"
-	static WIDTH := 280
+	static WIDTH := 290
 	static HEIGHT := 230
 	static MIN_HEIGHT := 34
+	static MARING := 7
+	static Y_POS_MARGIN := 50 + LoggerPopup.MARING ; Taskbar height + margin
 	static VISIBLE_DURATION := 5000 ; ms a severity's detail stays expanded since its last log
 	static SEVERITIES := ["info", "warning", "error"]
 
@@ -55,23 +57,23 @@ Class LoggerPopup extends WebViewToo {
 
 	; Positioned near the tray (bottom-right), shown without stealing focus.
 	Show() {
-		x := A_ScreenWidth - LoggerPopup.WIDTH - 10
-		y := A_ScreenHeight - this.currentHeight - 50
+		x := A_ScreenWidth - LoggerPopup.WIDTH - LoggerPopup.MARING
+		y := A_ScreenHeight - this.currentHeight - LoggerPopup.Y_POS_MARGIN
 		super.Show(Format("x{} y{} w{} h{} NoActivate", x, y, LoggerPopup.WIDTH, this.currentHeight), LoggerPopup.WIN_TITLE)
 		this.isOpen := true
 	}
 
 	InitializeHidden() {
-		x := A_ScreenWidth - LoggerPopup.WIDTH - 10
-		y := A_ScreenHeight - LoggerPopup.HEIGHT - 50
+		x := A_ScreenWidth - LoggerPopup.WIDTH - LoggerPopup.MARING
+		y := A_ScreenHeight - LoggerPopup.HEIGHT - LoggerPopup.Y_POS_MARGIN
 		super.Show(Format("Hide x{} y{} w{} h{} NoActivate", x, y, LoggerPopup.WIDTH, LoggerPopup.HEIGHT), LoggerPopup.WIN_TITLE)
 		this.isOpen := false
 	}
 
 	ResizeToContent(height) {
 		this.currentHeight := Max(LoggerPopup.MIN_HEIGHT, Round(height))
-		x := A_ScreenWidth - LoggerPopup.WIDTH - 10
-		y := A_ScreenHeight - this.currentHeight - 50
+		x := A_ScreenWidth - LoggerPopup.WIDTH - LoggerPopup.MARING
+		y := A_ScreenHeight - this.currentHeight - LoggerPopup.Y_POS_MARGIN
 		this.Gui.Move(x, y, LoggerPopup.WIDTH, this.currentHeight)
 	}
 
