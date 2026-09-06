@@ -6,8 +6,6 @@
 ;   - Toggle text-to-speech playback with Ctrl + Space (pauses/resumes in place)
 ;   - Reads selected text aloud, preferring higher-quality installed voices
 ;   - Always-on-top cassette-player control panel: Play/Pause, Restart, Volume, Speed
-;   - Adjust volume with Up/Down arrow keys during playback
-;   - Adjust speech speed with Left/Right arrow keys during playback
 ;   - Last-used voice/volume/speed persist across restarts
 ; ============================================================================
 
@@ -136,7 +134,6 @@ class TextSpeaker {
         } catch as Error {
             Info("Error in TogglePlay: " Error.Message " at line " Error.Line)
         }
-        this._SetupHotkeys()
     }
 
     static Speak(text := "", voice := "") {
@@ -186,7 +183,6 @@ class TextSpeaker {
         this._spVoice.Speak("", 2)
         this._state := "idle"
         this._HidePanel()
-        this._SetupHotkeys()
     }
 
     static Pause() {
@@ -208,14 +204,6 @@ class TextSpeaker {
 
     static _IsSpeaking() => (this._spVoice.Status.RunningState = 2)
 
-    static _VolumeUp() {
-        this._SetVolume(this._currentVolume + 10)
-    }
-
-    static _VolumeDown() {
-        this._SetVolume(this._currentVolume - 10)
-    }
-
     static _SetVolume(volume) {
         volume := Max(0, Min(100, Round(volume)))
         this._currentVolume := volume
@@ -223,14 +211,6 @@ class TextSpeaker {
         this._SaveSettings()
         this._PushPanelState()
         DarkToolTip("Volume: " volume)
-    }
-
-    static _SpeedUp() {
-        this._SetSpeedIndex(this._speedIndex + 1)
-    }
-
-    static _SpeedDown() {
-        this._SetSpeedIndex(this._speedIndex - 1)
     }
 
     static _SetSpeedIndex(index) {
@@ -292,19 +272,9 @@ class TextSpeaker {
         if this._state = "speaking" && A_TickCount - this._speechStartTick > 300 && !this._IsSpeaking() {
             this._state := "idle"
             this._HidePanel()
-            this._SetupHotkeys()
             return
         }
         this._PushPanelState()
-    }
-
-    static _SetupHotkeys(onOff := "") {
-        if onOff = ""
-            onOff := (this._state != "idle") ? "On" : "Off"
-        Hotkey("Up", (*) => this._VolumeUp(), onOff)
-        Hotkey("Down", (*) => this._VolumeDown(), onOff)
-        Hotkey("Left", (*) => this._SpeedDown(), onOff)
-        Hotkey("Right", (*) => this._SpeedUp(), onOff)
     }
 
     static _PushPanelState() {
@@ -347,7 +317,7 @@ class TextSpeakerPanel extends WebViewToo {
     }
 
     ShowPanel() {
-     this.Show("w420 h520 y80", "Text Speaker")
+     this.Show("w628 h390 x10 y" (A_ScreenHeight - 410), "Text Speaker")
      this.Opt("+AlwaysOnTop")
     }
 

@@ -9,7 +9,6 @@ class TextSpeakerUI {
     this.restartBtn = document.getElementById('restart-btn');
     this.volumeSlider = document.getElementById('volume-slider');
     this.volumeValueEl = document.getElementById('volume-value');
-    this.speedValueEl = document.getElementById('speed-value');
     this.speedButtonsEl = document.getElementById('speed-buttons');
 
     this.speedButtons = [];
@@ -20,6 +19,10 @@ class TextSpeakerUI {
     const state = AhkDataService.GetState();
     this._buildSpeedButtons(state.speedOptions);
     this.render(state);
+
+    document.getElementById('deck').addEventListener('mousedown', (e) => {
+      if (!e.target.closest('.no-drag')) AhkDataService.DragWindow();
+    });
 
     this.playPauseBtn.addEventListener('click', () => AhkDataService.TogglePlay());
     this.restartBtn.addEventListener('click', () => AhkDataService.Restart());
@@ -58,7 +61,6 @@ class TextSpeakerUI {
       this.volumeValueEl.textContent = state.volume;
     }
 
-    this.speedValueEl.textContent = state.speedLabel;
     this.speedButtons.forEach((btn, index) => {
       btn.classList.toggle('active', index === state.speedIndex);
     });
