@@ -9,6 +9,7 @@ Class Paths {
 	static profiles			:= this.autohotkey "\Profiles"
 	static startup			:= this.autohotkey "\Startup"
 	static lib				:= this.autohotkey "\Lib"
+	static autoHotkeyIcon	:= this.lib "\icon.png"
 
 	static _username := "C:\Users\" A_UserName
 	static vsCode := A_AppData "\..\Local\Programs\Microsoft VS Code\Code.exe"

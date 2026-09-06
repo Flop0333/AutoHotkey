@@ -1,6 +1,8 @@
 #SingleInstance Force
 Persistent(true)
 
+TraySetIcon(Paths.autoHotkeyIcon)
+
 myLogDashboard := LogDashboard()
 myLogDashboard.InitializeHidden()
 
