@@ -66,7 +66,7 @@ class TestKit {
             testFunc.Call()
             this._results.Push({ name: name, passed: true, error: "" })
         } catch as err {
-            this._results.Push({ name: name, passed: false, error: err.Message })
+            this._results.Push({ name: name, passed: false, error: err.Message " [" (err.HasProp("File") ? err.File : "") ":" (err.HasProp("Line") ? err.Line : "") "]" })
         }
     }
 

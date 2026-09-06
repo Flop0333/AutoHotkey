@@ -18,8 +18,13 @@ Test_RealHostsAndCrossProcessBehavior() {
 
 	loggerPid := 0
 	dashboardPid := 0
+	try FileDelete(A_Temp "\ahk_logger_debug.log")
 	try {
 		hosts := InitializeLogging()
+		refindLogger := FindLoggerWindow()
+		refindDashboard := FindLogDashboardWindow()
+		FileAppend("DEBUG hosts.logger=" hosts["logger"] " refindLogger=" refindLogger " isWindowLogger=" (DllCall("IsWindow", "Ptr", hosts["logger"]) ? 1 : 0)
+			" hosts.dashboard=" hosts["dashboard"] " refindDashboard=" refindDashboard " isWindowDashboard=" (DllCall("IsWindow", "Ptr", hosts["dashboard"]) ? 1 : 0) "`n", "*")
 		loggerPid := WinGetPID("ahk_id " hosts["logger"])
 		dashboardPid := WinGetPID("ahk_id " hosts["dashboard"])
 		Assert.NotEqual(loggerPid, dashboardPid, "Logger and dashboard must have separate host processes")
@@ -50,6 +55,12 @@ Test_RealHostsAndCrossProcessBehavior() {
 		Assert.True(IsVisible(FindLoggerWindow()), "Logger stays open after first severity timer expires")
 		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow()), 4000), "Logger hides after final severity timer expires")
 	} finally {
+		debugLogPath := A_Temp "\ahk_logger_debug.log"
+		Sleep(200)
+		if FileExist(debugLogPath)
+			FileAppend("----- ahk_logger_debug.log -----`n" FileRead(debugLogPath, "UTF-8") "----- end -----`n", "*")
+		else
+			FileAppend("----- ahk_logger_debug.log NOT FOUND -----`n", "*")
 		if loggerPid && ProcessExist(loggerPid)
 			ProcessClose(loggerPid)
 		if dashboardPid && ProcessExist(dashboardPid)
