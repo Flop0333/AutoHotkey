@@ -4,7 +4,7 @@
 Class LoggerPopup extends WebViewToo {
 	static WIDTH := 150
 	static HEIGHT := 230
-	static VISIBLE_DURATION := 500000 ; ms a severity's detail stays expanded since its last log
+	static VISIBLE_DURATION := 5000 ; ms a severity's detail stays expanded since its last log
 	static SEVERITIES := ["info", "warning", "error"]
 
 	counts := Map("info", 0, "warning", 0, "error", 0)
@@ -17,6 +17,7 @@ Class LoggerPopup extends WebViewToo {
 		super.__New()
 		this.Gui.Opt("+AlwaysOnTop +ToolWindow -SysMenu")
 		this.SetVirtualHostNameToFolderMapping("app.local", USER_INTERFACE_PATH, 0) ; block cors error, allow loading local files
+		this.Load("http://app.local/index.html")
 		this.AddCallbackToScript("Dismiss", (*) => this.Dismiss())
 		this.AddCallbackToScript("OpenDashboard", (*) => this.OpenDashboard())
 
@@ -35,8 +36,8 @@ Class LoggerPopup extends WebViewToo {
 		; the page's default 0/0/0 until an unrelated later log event
 		; happened to succeed. Deferring the whole poll loop, not just the
 		; first push, closes the race for every ExecuteScript call, not just this one.
-		this.NavigationCompleted((*) => this._OnPageReady())
-		this.Load("http://app.local/index.html")
+		this._PushCounts() 
+		SetTimer(this._Poll.Bind(this), 1000)
 	}
 
 	_OnPageReady() {
@@ -95,8 +96,8 @@ Class LoggerPopup extends WebViewToo {
 	}
 
 	_Poll() {
+		this._PushCounts()
 		entries := this._ReadAllEntries()
-
 		if (entries.Length = this.lastEntryCount)
 			return
 
