@@ -23,6 +23,7 @@ Test_RealHostsAndCrossProcessBehavior() {
 
 	loggerPid := 0
 	dashboardPid := 0
+	try FileDelete(A_Temp "\ahk_logger_debug.log")
 	try {
 		hosts := InitializeLogging()
 		loggerPid := WinGetPID("ahk_id " hosts["logger"])
@@ -33,6 +34,9 @@ Test_RealHostsAndCrossProcessBehavior() {
 
 		LogInfo("silent unread info")
 		Sleep(1250)
+		debugLogPath := A_Temp "\ahk_logger_debug.log"
+		if FileExist(debugLogPath)
+			FileAppend("----- ahk_logger_debug.log (mid-test) -----`n" FileRead(debugLogPath, "UTF-8") "----- end -----`n", "*")
 		Assert.False(IsVisible(FindLoggerWindow()), "LogInfo increments unread state without notifying")
 		Assert.Equal(1, GetUnreadLogCounts()["info"])
 

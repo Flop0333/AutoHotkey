@@ -2,6 +2,10 @@
 #Include ..\..\Lib\Core\WebView.ahk
 #Include ..\..\Dashboards\Log Dashboard\Log Dashboard.ahk
 
+DebugLog2(msg) {
+	try FileAppend(A_TickCount " " msg "`n", A_Temp "\ahk_logger_debug.log", "UTF-8")
+}
+
 Class LoggerPopup extends WebViewToo {
 	static WIN_TITLE := "AutoHotkey Logger"
 	static WIDTH := 290
@@ -123,6 +127,7 @@ Class LoggerPopup extends WebViewToo {
 
 	_Poll() {
 		entries := this._ReadAllEntries()
+		DebugLog2("_Poll tick, entries.Length=" entries.Length " lastEntryCount=" this.lastEntryCount " isOpen=" this.isOpen " visible=" (DllCall("IsWindowVisible", "Ptr", this.Gui.Hwnd) ? 1 : 0))
 
 		if (entries.Length < this.lastEntryCount) {
 			; Logs\errors.log was cleared/rotated (e.g. RunStartup's ClearErrorLog) - start fresh.
@@ -131,8 +136,10 @@ Class LoggerPopup extends WebViewToo {
 
 		loop entries.Length - this.lastEntryCount {
 			entry := entries[this.lastEntryCount + A_Index]
+			DebugLog2("  entry notify=" (entry.Has("notify") ? entry["notify"] : "MISSING") " severity=" (entry.Has("severity") ? entry["severity"] : "MISSING"))
 			if (entry.Has("notify") && entry["notify"]) {
 				severity := entry.Has("severity") ? entry["severity"] : "info"
+				DebugLog2("  -> _ShowSeverity(" severity ")")
 				this._ShowSeverity(severity, entry)
 			}
 		}
