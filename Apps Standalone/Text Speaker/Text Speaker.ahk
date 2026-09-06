@@ -11,6 +11,7 @@
 
 #Include ..\..\Lib\Core.ahk
 #Include ..\..\Lib\Tools\WebView\WebViewToo.ahk
+#Include ..\Screen Snip Speaker\Screen Snip Speaker.ahk
 
 ^Space::TextSpeaker.TogglePlay()
 
@@ -38,10 +39,20 @@ class TextSpeaker {
     static _panel := ""
     static _pollCallback := ""
 
+    ; Word-highlighting metadata for the current utterance (set by ScreenSnipSpeaker;
+    ; empty for plain selected-text speech, in which case highlighting is a no-op).
+    ; Each word is an object with charStart/charEnd (offsets into the spoken text) and
+    ; a Highlight(showTime, color, d) / Highlight("clear") method, eg an OCR.Word.
+    static _highlightWords := []
+    static _currentHighlightWord := ""
+
     static __New() {
         this._LoadVoices()
         this._LoadSettings()
         this._pollCallback := ObjBindMethod(this, "_PollPlaybackState")
+        ; SVEEndInputStream (1) | SVEStartInputStream (2) | SVEWordBoundary (16)
+        this._spVoice.EventInterests := 19
+        ComObjConnect(this._spVoice, "TextSpeaker_SAPI_")
     }
 
     ; ---- Voice selection -------------------------------------------------
@@ -136,7 +147,7 @@ class TextSpeaker {
         }
     }
 
-    static Speak(text := "", voice := "") {
+    static Speak(text := "", voice := "", words := []) {
         if text = "" {
             try {
                 text := this._GetSelectedText()
@@ -159,6 +170,8 @@ class TextSpeaker {
 
         try {
             this._spVoice.Speak("", 2) ; cancel anything currently speaking
+            this._ClearCurrentHighlightWord()
+            this._highlightWords := words
             this._currentVoice := voice
             this._spVoice.Voice := voice
             this._spVoice.Volume := this._currentVolume
@@ -176,13 +189,15 @@ class TextSpeaker {
     static Restart() {
         if this._lastText = ""
             return
-        this.Speak(this._lastText, this._currentVoice)
+        this.Speak(this._lastText, this._currentVoice, this._highlightWords)
     }
 
     static Stop() {
         this._spVoice.Speak("", 2)
         this._state := "idle"
         this._HidePanel()
+        this._ClearCurrentHighlightWord()
+        this._highlightWords := []
     }
 
     static Pause() {
@@ -272,9 +287,31 @@ class TextSpeaker {
         if this._state = "speaking" && A_TickCount - this._speechStartTick > 300 && !this._IsSpeaking() {
             this._state := "idle"
             this._HidePanel()
+            this._ClearCurrentHighlightWord()
             return
         }
         this._PushPanelState()
+    }
+
+    ; ---- Word-boundary highlighting (used when speaking OCR'd screen text) --
+
+    static _OnWordBoundary(characterPosition, length) {
+        if !this._highlightWords.Length
+            return
+        this._ClearCurrentHighlightWord()
+        for word in this._highlightWords {
+            if characterPosition >= word.charStart && characterPosition < word.charEnd {
+                this._currentHighlightWord := word
+                try word.Highlight(0, "Red", 3)
+                break
+            }
+        }
+    }
+
+    static _ClearCurrentHighlightWord() {
+        if this._currentHighlightWord
+            try this._currentHighlightWord.Highlight("clear")
+        this._currentHighlightWord := ""
     }
 
     static _PushPanelState() {
@@ -322,4 +359,14 @@ class TextSpeakerPanel extends WebViewToo {
     }
 
     PushState() => this.ExecuteScript("window.onAhkState && window.onAhkState(" TextSpeaker._GetStateJSON() ")")
+}
+
+; ---- SAPI event sink (ComObjConnect dispatches SpVoiceEvents by name) -----
+
+TextSpeaker_SAPI_Word(voice, streamNumber, streamPosition, characterPosition, length) {
+    TextSpeaker._OnWordBoundary(characterPosition, length)
+}
+
+TextSpeaker_SAPI_EndStream(voice, streamNumber, streamPosition) {
+    TextSpeaker._ClearCurrentHighlightWord()
 }

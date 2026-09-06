@@ -2,33 +2,23 @@
 ; Screen Snip Speaker - Drag-select any part of the screen, hear it read aloud
 ; ============================================================================
 ;
+; Meant to be #Include'd from Text Speaker.ahk, which owns the actual SAPI
+; voice, playback state, and cassette control panel. This file only turns a
+; screen selection into text + word positions and hands them to TextSpeaker.
+;
 ; [FEATURES]
 ;   - Ctrl + Shift + drag (left mouse button) to select a screen region
-;   - The selected region is OCR'd and spoken aloud
+;   - The selected region is OCR'd and spoken aloud via TextSpeaker
 ;   - The word currently being spoken is highlighted directly on screen
 ;   - Ctrl + Shift + Escape stops playback and clears the highlight
 ; ============================================================================
 
-#Requires AutoHotkey v2
-#SingleInstance force
-
-#Include ..\..\Lib\Core.ahk
 #Include ..\..\Lib\Tools\OCR\lib\OCR.ahk
 
 ^+LButton::ScreenSnipSpeaker.StartFromDrag()
-^+Escape::ScreenSnipSpeaker.Stop()
+^+Escape::TextSpeaker.Stop()
 
 class ScreenSnipSpeaker {
-
-    static _spVoice := ComObject("SAPI.SpVoice")
-    static _words := []
-    static _currentWord := ""
-
-    ; SVEEndInputStream (1) | SVEStartInputStream (2) | SVEWordBoundary (16)
-    static __New() {
-        this._spVoice.EventInterests := 19
-        ComObjConnect(this._spVoice, "ScreenSnipSpeaker_SAPI_")
-    }
 
     static StartFromDrag() {
         area := this._SelectDragRegion("LButton")
@@ -38,8 +28,6 @@ class ScreenSnipSpeaker {
     }
 
     static Start(area) {
-        this.Stop()
-
         try {
             result := OCR.FromRect(area.X, area.Y, area.W, area.H, {scale: 2})
         } catch as e {
@@ -47,20 +35,13 @@ class ScreenSnipSpeaker {
             return
         }
 
-        this._words := this._OrderWordsAndBuildText(result, &text)
-        if !this._words.Length {
+        words := this._OrderWordsAndBuildText(result, &text)
+        if !words.Length {
             Info("No text found in selection")
             return
         }
 
-        this._spVoice.Speak("", 2) ; cancel anything currently speaking
-        this._spVoice.Speak(text, 1) ; asynchronous
-    }
-
-    static Stop() {
-        try this._spVoice.Speak("", 2)
-        this._ClearCurrentHighlight()
-        this._words := []
+        TextSpeaker.Speak(text, "", words)
     }
 
     ; ---- Reading order & speech text -----------------------------------
@@ -84,30 +65,6 @@ class ScreenSnipSpeaker {
             text .= "`n"
         }
         return words
-    }
-
-    ; ---- Word-boundary highlighting -------------------------------------
-
-    static _OnWord(characterPosition, length) {
-        this._ClearCurrentHighlight()
-        for word in this._words {
-            if characterPosition >= word.charStart && characterPosition < word.charEnd {
-                this._currentWord := word
-                try word.Highlight(0, "Red", 3)
-                break
-            }
-        }
-    }
-
-    static _OnEnd() {
-        this._ClearCurrentHighlight()
-    }
-
-    static _ClearCurrentHighlight() {
-        if this._currentWord
-            try this._currentWord.Highlight("clear")
-        this._currentWord := ""
-        try OCR.ClearAllHighlights()
     }
 
     ; ---- Screen region drag-selection ------------------------------------
@@ -138,14 +95,4 @@ class ScreenSnipSpeaker {
         guiSSR.Destroy()
         return {X: x, Y: y, W: w, H: h}
     }
-}
-
-; ---- SAPI event sink (ComObjConnect dispatches SpVoiceEvents by name) -----
-
-ScreenSnipSpeaker_SAPI_Word(voice, streamNumber, streamPosition, characterPosition, length) {
-    ScreenSnipSpeaker._OnWord(characterPosition, length)
-}
-
-ScreenSnipSpeaker_SAPI_EndStream(voice, streamNumber, streamPosition) {
-    ScreenSnipSpeaker._OnEnd()
 }
