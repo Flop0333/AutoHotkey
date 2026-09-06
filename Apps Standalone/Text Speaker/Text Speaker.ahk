@@ -5,20 +5,23 @@
 ; [FEATURES]
 ;   - Toggle text-to-speech playback with Ctrl + Space (pauses/resumes in place)
 ;   - Reads selected text aloud, preferring higher-quality installed voices
-;   - Always-on-top control panel: Play/Pause, Restart, Volume, Speed
+;   - Always-on-top cassette-player control panel: Play/Pause, Restart, Volume, Speed
 ;   - Adjust volume with Up/Down arrow keys during playback
 ;   - Adjust speech speed with Left/Right arrow keys during playback
 ;   - Last-used voice/volume/speed persist across restarts
 ; ============================================================================
 
-#Include ..\Lib\Core.ahk
+#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Tools\WebView\WebViewToo.ahk
 
 ^Space::TextSpeaker.TogglePlay()
 
 class TextSpeaker {
 
     static _spVoice := ComObject("SAPI.SpVoice")
-    static _settingsPath := Paths.appsStandalone "\Text Speaker.settings.json"
+    static _appDir := Paths.appsStandalone "\Text Speaker"
+    static _uiPath := this._appDir "\User Interface"
+    static _settingsPath := this._appDir "\Text Speaker.settings.json"
 
     ; SAPI Rate is an integer (-10..10). These are the discrete steps offered in the
     ; control panel, approximated against that range.
@@ -35,7 +38,6 @@ class TextSpeaker {
     static _state := "idle" ; "idle" | "speaking" | "paused" - owned by us, never inferred from SAPI
     static _speechStartTick := 0
     static _panel := ""
-    static _panelControls := {}
     static _pollCallback := ""
 
     static __New() {
@@ -132,7 +134,7 @@ class TextSpeaker {
                 default: this.Speak()
             }
         } catch as Error {
-            MsgBox("Error in TogglePlay: " Error.Message " | " Error.What " at line " Error.Line, "Error")
+            Info("Error in TogglePlay: " Error.Message " at line " Error.Line)
         }
         this._SetupHotkeys()
     }
@@ -155,10 +157,8 @@ class TextSpeaker {
                 return
             }
         }
-        if !text {
-            Info("No text to speak")
+        if !text
             return
-        }
 
         try {
             this._spVoice.Speak("", 2) ; cancel anything currently speaking
@@ -173,7 +173,6 @@ class TextSpeaker {
             this._ShowPanel()
         } catch as Error {
             Info("Error in Speak: " Error.Message " at line " Error.Line)
-            return
         }
     }
 
@@ -195,7 +194,7 @@ class TextSpeaker {
             return
         this._spVoice.Pause()
         this._state := "paused"
-        this._ShowPanel()
+        this._HidePanel()
     }
 
     static Resume() {
@@ -218,11 +217,11 @@ class TextSpeaker {
     }
 
     static _SetVolume(volume) {
-        volume := Max(0, Min(100, volume))
+        volume := Max(0, Min(100, Round(volume)))
         this._currentVolume := volume
         try this._spVoice.Volume := volume
         this._SaveSettings()
-        this._UpdatePanel()
+        this._PushPanelState()
         DarkToolTip("Volume: " volume)
     }
 
@@ -234,78 +233,55 @@ class TextSpeaker {
         this._SetSpeedIndex(this._speedIndex - 1)
     }
 
-    static _MakeSpeedButtonHandler(buttonIndex) {
-        return (*) => this._SetSpeedIndex(buttonIndex)
-    }
-
     static _SetSpeedIndex(index) {
-        Info("_SetSpeedIndex called with: " index)
-        index := Max(0, Min(this.speedOptions.Length - 1, index))
+        index := Max(0, Min(this.speedOptions.Length - 1, Round(index)))
         this._speedIndex := index
-        try {
-            this._spVoice.Rate := this.speedOptions[index + 1].rate
-            Info("Speed set to: " this.speedOptions[index + 1].label)
-        } catch as Error {
-            Info("Error setting speed: " Error.Message)
-        }
+        try this._spVoice.Rate := this.speedOptions[index + 1].rate
         this._SaveSettings()
-        this._UpdatePanel()
+        this._PushPanelState()
         DarkToolTip("Speed: " this.speedOptions[index + 1].label)
     }
 
     static _GetSelectedText() {
         backupClipboard := A_Clipboard
-        backupWindow := WinExist("A")  ; Save current active window
+        backupWindow := WinExist("A") ; Speaking is triggered from whatever window has the selection
         A_Clipboard := ""
         try Send("^c")
-        Sleep(100)  ; Wait for clipboard to fill
+        Sleep(100) ; Give the target app time to fill the clipboard
         highlightedText := A_Clipboard
         A_Clipboard := backupClipboard
         if backupWindow
-            WinActivate(backupWindow)  ; Restore focus
+            WinActivate(backupWindow) ; Restore focus, since copying can steal it
         return highlightedText
     }
 
-    static _SetupHotkeys(onOff := "") {
-        if onOff = ""
-            onOff := (this._state != "idle") ? "On" : "Off"
-        Hotkey("Up", (*) => this._VolumeUp(), onOff)
-        Hotkey("Down", (*) => this._VolumeDown(), onOff)
-        Hotkey("Left", (*) => this._SpeedDown(), onOff)
-        Hotkey("Right", (*) => this._SpeedUp(), onOff)
-    }
-
-    static _DisplayVoiceOptions() {
-        for voice in this.voices
-            MsgBox(voice.description)
-    }
-
-    ; ---- Control panel -----------------------------------------------------
+    ; ---- Control panel (WebView cassette player) ---------------------------
 
     static _ShowPanel() {
         try {
-            if !this._panel {
-                this._BuildPanel()
-            }
-            this._UpdatePanel()
-            this._panel.Show("w500 h200 y100 NoActivate")
-            SetTimer(this._pollCallback, 200)
-        } catch as Error {
-            Info("Error showing panel: " Error.Message " at line " Error.Line)
+            if !this._panel
+                this._panel := TextSpeakerPanel()
+            this._panel.ShowPanel()
+        } catch {
+            ; The panel's underlying window may have been destroyed out from under us
+            ; (e.g. Alt+F4 slipping past the Close handler) - rebuild it once and retry.
+            this._panel := TextSpeakerPanel()
+            this._panel.ShowPanel()
         }
+        this._PushPanelState()
+        SetTimer(this._pollCallback, 200)
     }
 
     static _HidePanel() {
         try {
             if this._panel {
-                this._panel.Destroy()
-                this._panel := ""
-                this._panelControls := {}
+                this._panel.Opt("-AlwaysOnTop")
+                this._panel.Hide()
             }
-            SetTimer(this._pollCallback, 0)
         } catch as Error {
             Info("Error hiding panel: " Error.Message)
         }
+        SetTimer(this._pollCallback, 0)
     }
 
     static _PollPlaybackState() {
@@ -319,60 +295,61 @@ class TextSpeaker {
             this._SetupHotkeys()
             return
         }
-        this._UpdatePanel()
+        this._PushPanelState()
     }
 
-    static _BuildPanel() {
-        panel := DarkGui("+AlwaysOnTop -Caption +ToolWindow", "Text Speaker")
-        panel.MarginX := 15, panel.MarginY := 12
-
-        panel.SetFont("s11 bold")
-        panel.AddText("w230", "Text Speaker")
-
-        panel.SetFont("s10 norm")
-        controls := {}
-        controls.playPauseButton := panel.AddButton("w80 y+10", "Pause")
-        controls.playPauseButton.OnEvent("Click", (*) => this.TogglePlay())
-
-        controls.restartButton := panel.AddButton("w80 x+10", "Restart")
-        controls.restartButton.OnEvent("Click", (*) => this.Restart())
-
-        controls.closeButton := panel.AddButton("w60 x+10", "Close")
-        controls.closeButton.OnEvent("Click", (*) => this.Stop())
-
-        controls.volumeLabel := panel.AddText("w230 y+15", "Volume: " this._currentVolume)
-        controls.volumeSlider := panel.AddSlider("w230 y+2 Range0-100", this._currentVolume)
-        controls.volumeSlider.OnEvent("Change", (ctrl, *) => this._SetVolume(ctrl.Value))
-
-        controls.speedLabel := panel.AddText("w230 y+15", "Speed: " this.speedOptions[this._speedIndex + 1].label)
-        speedButtons := []
-        x := "y+2"
-        for i, option in this.speedOptions {
-            try {
-                btn := panel.AddButton((i = 1 ? x : "x+5") " w42", option.label)
-                ; Use a factory function to properly capture the index
-                handler := this._MakeSpeedButtonHandler(i - 1)
-                btn.OnEvent("Click", handler)
-                speedButtons.Push(btn)
-            } catch as Error {
-                Info("Error creating speed button " i ": " Error.Message)
-            }
-        }
-        controls.speedButtons := speedButtons
-
-        panel.OnEvent("Close", (*) => this.Stop())
-
-        this._panel := panel
-        this._panelControls := controls
+    static _SetupHotkeys(onOff := "") {
+        if onOff = ""
+            onOff := (this._state != "idle") ? "On" : "Off"
+        Hotkey("Up", (*) => this._VolumeUp(), onOff)
+        Hotkey("Down", (*) => this._VolumeDown(), onOff)
+        Hotkey("Left", (*) => this._SpeedDown(), onOff)
+        Hotkey("Right", (*) => this._SpeedUp(), onOff)
     }
 
-    static _UpdatePanel() {
-        if !this._panel
-            return
-        controls := this._panelControls
-        controls.playPauseButton.Text := (this._state = "paused") ? "Play" : "Pause"
-        controls.volumeLabel.Text := "Volume: " this._currentVolume
-        controls.volumeSlider.Value := this._currentVolume
-        controls.speedLabel.Text := "Speed: " this.speedOptions[this._speedIndex + 1].label
+    static _PushPanelState() {
+        if this._panel
+            try this._panel.PushState()
     }
+
+    static _GetStateJSON() {
+        return JSON.stringify(Map(
+            "state", this._state,
+            "volume", this._currentVolume,
+            "speedIndex", this._speedIndex,
+            "speedLabel", this.speedOptions[this._speedIndex + 1].label,
+            "speedOptions", this.speedOptions
+        ))
+    }
+}
+
+; A retro cassette-deck styled control panel, rendered as HTML/CSS/JS in a WebView2
+; window. The AHK side owns all playback state; this class just mirrors it to the page
+; and relays button clicks back.
+class TextSpeakerPanel extends WebViewToo {
+
+    __New() {
+        super.__New()
+        this.SetVirtualHostNameToFolderMapping("textspeaker.local", TextSpeaker._uiPath, 0)
+        this.Load("http://textspeaker.local/index.html")
+
+        this.AddCallbackToScript("TogglePlay", (*) => TextSpeaker.TogglePlay())
+        this.AddCallbackToScript("Restart", (*) => TextSpeaker.Restart())
+        this.AddCallbackToScript("StopSpeaking", (*) => TextSpeaker.Stop())
+        this.AddCallbackToScript("SetVolume", (wv, volume) => TextSpeaker._SetVolume(volume))
+        this.AddCallbackToScript("SetSpeedIndex", (wv, index) => TextSpeaker._SetSpeedIndex(index))
+        this.AddCallbackToScript("GetState", (*) => TextSpeaker._GetStateJSON())
+
+        ; Registering a Close handler suppresses AHK's default destroy-on-close, so an
+        ; Alt+F4 (or anything else that slips past the in-page Close button) just hides
+        ; the window instead of tearing down the WebView instance.
+        this.Gui.OnEvent("Close", (*) => TextSpeaker.Stop())
+    }
+
+    ShowPanel() {
+     this.Show("w420 h520 y80", "Text Speaker")
+     this.Opt("+AlwaysOnTop")
+    }
+
+    PushState() => this.ExecuteScript("window.onAhkState && window.onAhkState(" TextSpeaker._GetStateJSON() ")")
 }
