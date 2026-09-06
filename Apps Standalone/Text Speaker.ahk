@@ -32,13 +32,16 @@ class TextSpeaker {
 
     static _speedIndex := 0
     static _lastText := ""
-    static _isPaused := false
+    static _state := "idle" ; "idle" | "speaking" | "paused" - owned by us, never inferred from SAPI
+    static _speechStartTick := 0
     static _panel := ""
     static _panelControls := {}
+    static _pollCallback := ""
 
     static __New() {
         this._LoadVoices()
         this._LoadSettings()
+        this._pollCallback := ObjBindMethod(this, "_PollPlaybackState")
     }
 
     ; ---- Voice selection -------------------------------------------------
@@ -115,14 +118,20 @@ class TextSpeaker {
     }
 
     ; ---- Playback ----------------------------------------------------------
+    ;
+    ; Playback state is tracked ourselves in `_state` rather than re-derived from
+    ; SAPI's Status.RunningState on every keypress: RunningState transitions
+    ; asynchronously (a few hundred ms of lag around Speak()/Stop()), so deciding
+    ; Play-vs-Pause-vs-Resume from it directly is a race - it can land on the wrong
+    ; branch and get stuck "paused" with nothing actually playing and no panel shown.
+    ; RunningState is still polled, but only to notice natural end-of-speech.
 
     static TogglePlay() {
-        if this._IsSpeaking()
-            this.Pause()
-        else if this._isPaused
-            this.Resume()
-        else
-            this.Speak()
+        switch this._state {
+            case "speaking": this.Pause()
+            case "paused": this.Resume()
+            default: this.Speak()
+        }
         this._SetupHotkeys()
     }
 
@@ -143,7 +152,8 @@ class TextSpeaker {
         this._spVoice.Volume := this._currentVolume
         this._spVoice.Rate := this.speedOptions[this._speedIndex + 1].rate
         this._lastText := text
-        this._isPaused := false
+        this._state := "speaking"
+        this._speechStartTick := A_TickCount
         this._spVoice.Speak(text, 1) ; asynchronous
 
         this._ShowPanel()
@@ -157,24 +167,26 @@ class TextSpeaker {
 
     static Stop() {
         this._spVoice.Speak("", 2)
-        this._isPaused := false
+        this._state := "idle"
         this._HidePanel()
+        this._SetupHotkeys()
     }
 
     static Pause() {
-        if !this._IsSpeaking()
+        if this._state != "speaking"
             return
         this._spVoice.Pause()
-        this._isPaused := true
-        this._UpdatePanel()
+        this._state := "paused"
+        this._ShowPanel()
     }
 
     static Resume() {
-        if !this._isPaused
+        if this._state != "paused"
             return
         this._spVoice.Resume()
-        this._isPaused := false
-        this._UpdatePanel()
+        this._state := "speaking"
+        this._speechStartTick := A_TickCount
+        this._ShowPanel()
     }
 
     static _IsSpeaking() => (this._spVoice.Status.RunningState = 2)
@@ -224,9 +236,8 @@ class TextSpeaker {
     }
 
     static _SetupHotkeys(onOff := "") {
-        Sleep(700) ; Wait until speaking starts
         if onOff = ""
-            onOff := (this._IsSpeaking() || this._isPaused) ? "On" : "Off"
+            onOff := (this._state != "idle") ? "On" : "Off"
         Hotkey("Up", (*) => this._VolumeUp(), onOff)
         Hotkey("Down", (*) => this._VolumeDown(), onOff)
         Hotkey("Left", (*) => this._SpeedDown(), onOff)
@@ -245,19 +256,25 @@ class TextSpeaker {
             this._BuildPanel()
         }
         this._UpdatePanel()
-        this._panel.Show("w260 h175 NoActivate")
-        SetTimer(ObjBindMethod(this, "_PollPlaybackState"), 200)
+        this._panel.Show("w500 h200 NoActivate")
+        SetTimer(this._pollCallback, 200)
     }
 
     static _HidePanel() {
         if this._panel
             this._panel.Hide()
-        SetTimer(ObjBindMethod(this, "_PollPlaybackState"), 0)
+        SetTimer(this._pollCallback, 0)
     }
 
     static _PollPlaybackState() {
-        if !this._IsSpeaking() && !this._isPaused {
+        ; Only speech we started ourselves ever naturally "finishes"; while paused,
+        ; RunningState is not reliable, so skip the finish-check entirely then. A short
+        ; grace period after Speak()/Resume() avoids a false finish before SAPI's
+        ; RunningState has actually flipped to "speaking".
+        if this._state = "speaking" && A_TickCount - this._speechStartTick > 300 && !this._IsSpeaking() {
+            this._state := "idle"
             this._HidePanel()
+            this._SetupHotkeys()
             return
         }
         this._UpdatePanel()
@@ -305,7 +322,7 @@ class TextSpeaker {
         if !this._panel
             return
         controls := this._panelControls
-        controls.playPauseButton.Text := this._isPaused ? "Play" : "Pause"
+        controls.playPauseButton.Text := (this._state = "paused") ? "Play" : "Pause"
         controls.volumeLabel.Text := "Volume: " this._currentVolume
         controls.volumeSlider.Value := this._currentVolume
         controls.speedLabel.Text := "Speed: " this.speedOptions[this._speedIndex + 1].label
