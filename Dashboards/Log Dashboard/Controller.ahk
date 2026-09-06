@@ -34,17 +34,17 @@ Class LogDashboard extends WebViewToo {
 	}
 
 	static TestMessages := Map(
-		"error", "Test error message",
 		"info", "Test info message",
-		"success", "Test success message"
+		"warning", "Test warning message",
+		"error", "Test error message"
 	)
 
 	LogTestMessage(severity) {
 		message := LogDashboard.TestMessages.Get(severity, "Test message")
 		switch severity {
-			case "info": LogInfo(message)
-			case "warning": LogWarning(message)
-			case "error": LogError(message)
+			case "info": LogAndNotifyInfo(message)
+			case "warning": LogAndNotifyWarning(message)
+			case "error": LogAndNotifyError(message)
 			default: AppendLogEntry(severity, message)
 		}
 	}

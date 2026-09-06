@@ -152,7 +152,7 @@ body {
 }
 
 .severity-error { color: #f14c4c; }
-.severity-warning { color: #cca700; }
+.severity-warning { color: #ff9800; }
 .severity-info { color: #3794ff; }
 .severity-success { color: #89d185; }
 
