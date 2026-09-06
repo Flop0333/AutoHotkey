@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="title-bar">
+    <div class="drag-region" onmousedown="ahk.DragWindow()">
+      <span class="title-text">Test Dashboard</span>
+    </div>
+    <div class="title-btn-container">
+      <span class="title-btn" onclick="ahk.Minimize()">0</span>
+      <span class="title-btn title-btn-maximize" onclick="ahk.Maximize()">1</span>
+      <span class="title-btn title-btn-close" onclick="ahk.Close()">r</span>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button id="run-tests-btn">Run All Tests</button>
+    <span id="run-count"></span>
+  </div>
+  <div id="status-banner" class="status-banner" hidden>
+    <span class="spinner"></span>
+    <span>Running all tests&hellip; this can take a minute.</span>
+  </div>
+  <div class="layout">
+    <table id="run-table">
+      <thead>
+        <tr><th>Time</th><th>Result</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="detail-panel">
+      <p class="empty-state">Select a run to see suite results.</p>
+    </div>
+  </div>
+  <div id="toast"></div>
+  <script src="index.js"></script>
+  <script src="AhkDataService.js"></script>
+</body>
+</html>

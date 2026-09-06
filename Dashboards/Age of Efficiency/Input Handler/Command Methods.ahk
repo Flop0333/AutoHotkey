@@ -40,3 +40,6 @@ StartPictureInPicture() => PictureInPicture()
 CloseOnAllDesktops() => DesktopsDDL.CloseOnAllDesktops()
 
 OpenAutoHotkeyDashboard() => ShowLogDashboard()
+
+; RunTests() is defined in Dashboards\Test Dashboard\Test Dashboard.ahk, pulled
+; in transitively via the Startup.ahk include above.

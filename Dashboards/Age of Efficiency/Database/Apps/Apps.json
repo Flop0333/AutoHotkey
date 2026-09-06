@@ -118,5 +118,15 @@
 		"icon": "AutoHotkey",
 		"id": 18,
 		"title": "AutoHotkey Log Dashboard"
+	},
+	{
+		"action": "RunTests",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "Dev Tools",
+		"command": "Test",
+		"icon": "AutoHotkey",
+		"id": 19,
+		"title": "Run Tests"
 	}
 ]

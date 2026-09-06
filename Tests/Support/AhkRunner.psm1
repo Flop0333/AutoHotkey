@@ -5,14 +5,29 @@
 #>
 
 function Get-AhkExecutable {
-    # AutoHotkey.exe (v2) must already be on PATH - see the setup step in
-    # .github/workflows/ahk-tests.yml for how CI installs it.
+    # Prefer PATH (this is how CI installs it - see the setup step in
+    # .github/workflows/ahk-tests.yml) but a local install rarely adds itself
+    # to PATH, so fall back to the default v2 install locations before giving up.
     $ahkExe = Get-Command "AutoHotkey.exe" -ErrorAction SilentlyContinue
     if (-not $ahkExe) {
         $ahkExe = Get-Command "AutoHotkey64.exe" -ErrorAction SilentlyContinue
     }
     if (-not $ahkExe) {
-        throw "Could not find AutoHotkey.exe or AutoHotkey64.exe on PATH."
+        $candidates = @(
+            (Join-Path $env:ProgramFiles "AutoHotkey\v2\AutoHotkey64.exe")
+            (Join-Path $env:ProgramFiles "AutoHotkey\v2\AutoHotkey.exe")
+            (Join-Path ${env:ProgramFiles(x86)} "AutoHotkey\v2\AutoHotkey64.exe")
+            (Join-Path ${env:ProgramFiles(x86)} "AutoHotkey\v2\AutoHotkey.exe")
+        )
+        foreach ($candidate in $candidates) {
+            if ($candidate -and (Test-Path $candidate)) {
+                $ahkExe = [pscustomobject]@{ Source = $candidate }
+                break
+            }
+        }
+    }
+    if (-not $ahkExe) {
+        throw "Could not find AutoHotkey.exe or AutoHotkey64.exe on PATH or in the default AutoHotkey v2 install location."
     }
     return $ahkExe
 }
