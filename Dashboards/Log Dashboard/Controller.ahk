@@ -2,12 +2,14 @@
 #Include ..\..\Lib\Core\WebView.ahk
 
 Class LogDashboard extends WebViewToo {
-	static WIN_TITLE := "Log Dashboard"
+	static WIN_TITLE := "AutoHotkey Error Logger - Log Dashboard"
 	static SHOW_OPTIONS := Format("w{} h{}", Round(A_ScreenWidth * 0.85), Round(A_ScreenHeight * 0.75))
 
 	__New() {
 		super.__New()
-		this.SetVirtualHostNameToFolderMapping("app.local", USER_INTERFACE_PATH, 0) ; block cors error, allow loading local files
+		this.Gui.Title := LogDashboard.WIN_TITLE
+		this.Gui.OnEvent("Close", (*) => this.Hide())
+		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Log Dashboard\User Interface", 0) ; block cors error, allow loading local files
 		this.Load("http://app.local/index.html")
 		this.AddCallbackToScript("GetLogEntries", (*) => this.GetLogEntriesForWeb())
 		this.AddCallbackToScript("SetClipboard", (webview, text) => A_Clipboard := text)
@@ -19,6 +21,9 @@ Class LogDashboard extends WebViewToo {
 	}
 
 	Show() => super.Show(LogDashboard.SHOW_OPTIONS, LogDashboard.WIN_TITLE)
+	InitializeHidden() => super.Show(LogDashboard.SHOW_OPTIONS " Hide", LogDashboard.WIN_TITLE)
+
+	Close() => this.Hide()
 
 	GetLogEntriesForWeb() {
 		entries := []

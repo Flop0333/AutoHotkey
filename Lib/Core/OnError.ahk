@@ -8,10 +8,6 @@ HandleUnhandledError(error, mode) {
     return true ; Suppress the default modal error dialog; the failed thread ends.
 }
 
-OpenLogDashboard() {
-    Run(Paths.dashboards '\Log Dashboard\Log Dashboard.ahk')
-}
-
 ErrorLogFile() => Paths.autohotkey "\Logs\errors.log"
 
 ; --- Log only: append a structured entry. The Logger popup counts these ---

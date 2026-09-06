@@ -14,6 +14,45 @@
 #Include ..\..\Lib\Core.ahk
 #Include Controller.ahk
 
-USER_INTERFACE_PATH := Paths.dashboards "\Log Dashboard\User Interface"
+ShowLogDashboard() {
+	dashboardWindow := FindLogDashboardWindow()
+	if !dashboardWindow {
+		StartLogDashboard()
+		dashboardWindow := WaitForLogDashboardWindow()
+	}
+	if dashboardWindow {
+		WinShow("ahk_id " dashboardWindow)
+		WinActivate("ahk_id " dashboardWindow)
+	}
+}
 
-myLogDashboard := LogDashboard()
+HideLogDashboard() {
+	if dashboardWindow := FindLogDashboardWindow()
+		WinHide("ahk_id " dashboardWindow)
+}
+
+FindLogDashboardWindow() {
+	hiddenWindowsWereDetected := A_DetectHiddenWindows
+	previousTitleMatchMode := A_TitleMatchMode
+	DetectHiddenWindows(true)
+	SetTitleMatchMode(3)
+	dashboardWindow := WinExist(LogDashboard.WIN_TITLE)
+	SetTitleMatchMode(previousTitleMatchMode)
+	DetectHiddenWindows(hiddenWindowsWereDetected)
+	return dashboardWindow
+}
+
+StartLogDashboard() {
+	dashboardScript := Paths.dashboards "\Log Dashboard\Dashboard.ahk"
+	Run('"' A_AhkPath '" "' dashboardScript '"')
+}
+
+WaitForLogDashboardWindow(timeoutMs := 5000) {
+	startedAt := A_TickCount
+	while (A_TickCount - startedAt < timeoutMs) {
+		if dashboardWindow := FindLogDashboardWindow()
+			return dashboardWindow
+		Sleep(25)
+	}
+	return 0
+}

@@ -39,4 +39,4 @@ StartPictureInPicture() => PictureInPicture()
 
 CloseOnAllDesktops() => DesktopsDDL.CloseOnAllDesktops()
 
-OpenAutoHotkeyDashboard() => OpenLogDashboard()
+OpenAutoHotkeyDashboard() => ShowLogDashboard()

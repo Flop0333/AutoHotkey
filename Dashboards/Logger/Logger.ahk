@@ -14,6 +14,40 @@
 #Include ..\..\Lib\Core.ahk
 #Include Controller.ahk
 
-USER_INTERFACE_PATH := Paths.dashboards "\Logger\User Interface"
+ShowLogger() {
+	loggerWindow := FindLoggerWindow()
+	if !loggerWindow {
+		StartLogger()
+		loggerWindow := WaitForLoggerWindow()
+	}
+	if loggerWindow
+		WinShow("ahk_id " loggerWindow)
+}
 
-myLogger := LoggerPopup()
+HideLogger() {
+	if loggerWindow := FindLoggerWindow()
+		WinHide("ahk_id " loggerWindow)
+}
+
+FindLoggerWindow() {
+	hiddenWindowsWereDetected := A_DetectHiddenWindows
+	previousTitleMatchMode := A_TitleMatchMode
+	DetectHiddenWindows(true)
+	SetTitleMatchMode(3)
+	loggerWindow := WinExist(LoggerPopup.WIN_TITLE)
+	SetTitleMatchMode(previousTitleMatchMode)
+	DetectHiddenWindows(hiddenWindowsWereDetected)
+	return loggerWindow
+}
+
+StartLogger() => Run('"' A_AhkPath '" "' Paths.dashboards '\Logger\Logger Host.ahk"')
+
+WaitForLoggerWindow(timeoutMs := 5000) {
+	startedAt := A_TickCount
+	while (A_TickCount - startedAt < timeoutMs) {
+		if loggerWindow := FindLoggerWindow()
+			return loggerWindow
+		Sleep(25)
+	}
+	return 0
+}

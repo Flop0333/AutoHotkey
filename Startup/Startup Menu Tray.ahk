@@ -18,13 +18,12 @@
 ; ============================================================================
 
 #Include ..\Lib\Helpers\System.ahk
-
 class StartupMenuTray {
     __New() {
         A_TrayMenu.Delete()
         A_TrayMenu.Add("Reload", (*) => Reload())
         this._AddProfilesToTrayMenu()
-        A_TrayMenu.Add("Log Dashboard", (*) => OpenLogDashboard())
+        A_TrayMenu.Add("Log Dashboard", (*) => ShowLogDashboard())
         A_TrayMenu.Add("Exit", (*) => System.KillAllAHkProcesses())
     }
 
