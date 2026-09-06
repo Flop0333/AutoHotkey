@@ -17,7 +17,6 @@ Class LoggerPopup extends WebViewToo {
 		super.__New()
 		this.Gui.Opt("+AlwaysOnTop +ToolWindow -SysMenu")
 		this.SetVirtualHostNameToFolderMapping("app.local", USER_INTERFACE_PATH, 0) ; block cors error, allow loading local files
-		this.Load("http://app.local/index.html")
 		this.AddCallbackToScript("Dismiss", (*) => this.Dismiss())
 		this.AddCallbackToScript("OpenDashboard", (*) => this.OpenDashboard())
 
@@ -26,6 +25,22 @@ Class LoggerPopup extends WebViewToo {
 		}
 
 		this._Seed()
+		; Don't start polling until the page has actually finished loading -
+		; window.updateCounts/expandRow don't exist before then, so an
+		; ExecuteScript() call that races the navigation fails silently and
+		; is never retried. That's not just _Seed()'s initial push: _Poll()
+		; itself could win that same race on its very first tick if something
+		; gets logged within the first moment after construction, which is
+		; exactly what happens at startup - leaving the popup stuck showing
+		; the page's default 0/0/0 until an unrelated later log event
+		; happened to succeed. Deferring the whole poll loop, not just the
+		; first push, closes the race for every ExecuteScript call, not just this one.
+		this.NavigationCompleted((*) => this._OnPageReady())
+		this.Load("http://app.local/index.html")
+	}
+
+	_OnPageReady() {
+		this._PushCounts()
 		SetTimer(this._Poll.Bind(this), 1000)
 	}
 
