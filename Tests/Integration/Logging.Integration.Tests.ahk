@@ -37,6 +37,7 @@ Test_RealHostsAndCrossProcessBehavior() {
 		debugLogPath := A_Temp "\ahk_logger_debug.log"
 		if FileExist(debugLogPath)
 			FileAppend("----- ahk_logger_debug.log (mid-test) -----`n" FileRead(debugLogPath, "UTF-8") "----- end -----`n", "*")
+		FileAppend("----- errors.log raw content -----`n" (FileExist(ErrorLogFile()) ? FileRead(ErrorLogFile(), "UTF-8") : "(no file at " ErrorLogFile() ")") "----- end -----`n", "*")
 		Assert.False(IsVisible(FindLoggerWindow()), "LogInfo increments unread state without notifying")
 		Assert.Equal(1, GetUnreadLogCounts()["info"])
 
