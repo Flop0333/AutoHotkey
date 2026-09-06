@@ -84,22 +84,12 @@ body {
 }
 
 #entry-count {
-	margin-left: auto;
 	color: #888;
 	font-size: 12px;
 }
 
-#refresh-icon {
-	display: inline-block;
-}
-
-#refresh-icon.spinning {
-	animation: spin-refresh 0.5s linear;
-}
-
-@keyframes spin-refresh {
-	from { transform: rotate(0deg); }
-	to { transform: rotate(360deg); }
+.test-buttons {
+	margin-left: auto;
 }
 
 .layout {

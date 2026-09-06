@@ -22,13 +22,12 @@
     <select id="severity-filter"><option value="">All severities</option></select>
     <select id="script-filter"><option value="">All scripts</option></select>
     <button id="sort-time">Time ↓</button>
-    <button id="refresh-btn" title="Reload the log file"><span id="refresh-icon">⟳</span> Refresh</button>
+    <span id="entry-count"></span>
     <span class="test-buttons">
       <button class="test-btn" data-severity="info" title="Log and notify a test info entry">Test Info</button>
       <button class="test-btn" data-severity="warning" title="Log and notify a test warning entry">Test Warning</button>
       <button class="test-btn" data-severity="error" title="Log and notify a test error entry">Test Error</button>
     </span>
-    <span id="entry-count"></span>
   </div>
   <div class="layout">
     <table id="log-table">

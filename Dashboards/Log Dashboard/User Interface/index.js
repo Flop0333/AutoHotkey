@@ -16,8 +16,6 @@ class LogDashboardView {
 		this.severityFilter = document.querySelector('#severity-filter');
 		this.scriptFilter = document.querySelector('#script-filter');
 		this.sortButton = document.querySelector('#sort-time');
-		this.refreshButton = document.querySelector('#refresh-btn');
-		this.refreshIcon = document.querySelector('#refresh-icon');
 		this.entryCount = document.querySelector('#entry-count');
 		this.toast = document.querySelector('#toast');
 		this.gitStatus = document.querySelector('#git-status');
@@ -105,12 +103,6 @@ class LogDashboardView {
 			this.sortDescending = !this.sortDescending;
 			this.sortButton.textContent = `Time ${this.sortDescending ? '↓' : '↑'}`;
 			this._renderRows();
-		});
-		this.refreshButton.addEventListener('click', () => {
-			this.refreshIcon.classList.remove('spinning');
-			void this.refreshIcon.offsetWidth; // restart the animation even if it's still running
-			this.refreshIcon.classList.add('spinning');
-			this._refresh();
 		});
 		this.testButtons.forEach(button => {
 			button.addEventListener('click', () => {
