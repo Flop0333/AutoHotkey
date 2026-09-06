@@ -23,6 +23,10 @@ Test_RealHostsAndCrossProcessBehavior() {
 		loggerPid := WinGetPID("ahk_id " hosts["logger"])
 		dashboardPid := WinGetPID("ahk_id " hosts["dashboard"])
 		Assert.NotEqual(loggerPid, dashboardPid, "Logger and dashboard must have separate host processes")
+		loggerStyle := WinGetStyle("ahk_id " hosts["logger"])
+		loggerMinMax := WinGetMinMax("ahk_id " hosts["logger"])
+		debugLine := "DEBUG screen=" A_ScreenWidth "x" A_ScreenHeight " style=" Format("0x{:X}", loggerStyle) " wsVisible=" (loggerStyle & 0x10000000 ? 1 : 0) " isWindowVisible=" (DllCall("IsWindowVisible", "Ptr", hosts["logger"]) ? 1 : 0) " minmax=" loggerMinMax
+		FileAppend(debugLine "`n", "*")
 		Assert.False(IsVisible(hosts["logger"]), "Logger starts hidden")
 		Assert.False(IsVisible(hosts["dashboard"]), "Dashboard starts hidden")
 
