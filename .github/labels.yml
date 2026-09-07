@@ -38,3 +38,11 @@
 - name: "risk: destructive"
   color: "#B60205"
   description: Requires human execution, not agent-eligible.
+
+- name: "agent-in-progress"
+  color: "#FEF2C0"
+  description: An automated agent has claimed this issue and is working on it.
+
+- name: "agent-authored"
+  color: "#1D76DB"
+  description: This PR was opened by an automated agent, not a human.
