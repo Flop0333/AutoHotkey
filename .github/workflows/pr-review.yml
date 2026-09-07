@@ -1,0 +1,73 @@
+name: PR review agent
+
+# Requires the same ANTHROPIC_API_KEY secret as daily-agent.yml (see that
+# workflow's header). Advisory only: posts a COMMENT-event review, never
+# APPROVE or REQUEST_CHANGES, so it can never block or approve a PR itself.
+#
+# Dedup approach for re-pushes (issue #48's "doesn't spam duplicate
+# comments" requirement): on `synchronize`, the prompt tells Claude to find
+# its own prior review (if any) and only review the diff since that
+# review's commit, not the whole PR again. This is a prompt-level
+# instruction, not something a script enforces - not fully verified
+# without a live multi-push test, same caveat as daily-agent.yml's Claude
+# Code step.
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+concurrency:
+  group: pr-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Review pull request #${{ github.event.pull_request.number }}
+            in ${{ github.repository }} (head commit
+            ${{ github.event.pull_request.head.sha }}).
+
+            Scope: correctness bugs, and simplification/efficiency/reuse
+            cleanups - the bar a careful human reviewer would use. Do not
+            comment on style nits or anything a linter would already catch.
+
+            Steps:
+            1. Check for a review you (this GitHub Actions bot identity)
+               already left on this PR:
+               `gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews`.
+            2. If none exists, review the full PR diff:
+               `gh pr diff ${{ github.event.pull_request.number }}`.
+            3. If one already exists, only review what changed between
+               that review's commit_id and the current head commit - do
+               not re-flag findings in code that hasn't changed since your
+               last review on this PR.
+            4. If you find issues, submit exactly one review with inline
+               comments in a single call:
+               `gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews`
+               (POST, event=COMMENT, a comments[] array with one
+               {path, line, body} entry per finding) - not separate API
+               calls per finding, and not one comment body listing
+               everything.
+            5. If you find nothing (whether reviewing the full diff or
+               just the incremental one), submit a short COMMENT-event
+               review with a body like "No issues found in this review."
+               so there's a visible record the review ran.
+            6. Never use event=REQUEST_CHANGES or event=APPROVE - COMMENT
+               only, always. Never edit any files in this repository.
+          claude_args: |
+            --max-turns 20
+            --allowedTools Bash,Read,Grep,Glob

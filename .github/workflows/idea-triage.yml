@@ -1,0 +1,74 @@
+name: Idea triage agent
+
+# Requires the same ANTHROPIC_API_KEY secret as daily-agent.yml (see that
+# workflow's header).
+#
+# Deliberately restricted to Bash/Read/Grep/Glob (no Edit/Write): this
+# agent only ever changes issue metadata (labels, body, comments) via the
+# gh CLI - it has no reason to touch any file in the repository checkout,
+# so it isn't given the tools to.
+
+on:
+  # Weekly, Monday 07:00 UTC - ahead of stale-nudges.yml's 09:00 run, so a
+  # freshly-triaged needs-human-decision issue isn't immediately flagged as
+  # stale by that workflow.
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch: {}
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Claude Code triage
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            List open issues in ${{ github.repository }} labeled "idea"
+            that do NOT also carry "needs-human-decision":
+            `gh issue list --repo ${{ github.repository }} --state open --label idea --json number,title,body,labels`,
+            then filter out any result whose labels already include
+            "needs-human-decision".
+
+            For each remaining issue, decide whether it's concrete enough
+            to scope into an actionable task. The target shape is
+            .github/ISSUE_TEMPLATE/agent-task.yml (What needs to happen /
+            Acceptance criteria / Files-areas touched / Risk level / Size
+            estimate).
+
+            If it IS scopable:
+            - Rewrite the issue body with `gh issue edit --body` to follow
+              that template's structure (matching ### headers), grounded
+              only in what the idea actually describes - do not invent
+              requirements it doesn't support.
+            - Pick one risk label (risk: read / risk: reversible /
+              risk: sensitive / risk: destructive) and one size label
+              (size: S / size: M / size: L) - see .github/labels.yml for
+              what each means.
+            - Replace the "idea" label with "agent-ready" plus the risk
+              and size labels you picked (`gh issue edit --add-label
+              --remove-label`).
+            - Leave a comment noting it was auto-triaged, summarizing the
+              risk/size you picked and why, so a human can sanity-check
+              your judgment before it's ever picked up for implementation.
+
+            If it is NOT scopable (genuinely needs a judgment call, is too
+            vague, or depends on something only a human would know):
+            - Do not force a scope onto it or guess acceptance criteria it
+              doesn't support.
+            - Add the "needs-human-decision" label, keeping "idea".
+            - Leave a comment explaining specifically what's missing or
+              what decision is needed - not just "too vague".
+
+            Never close, merge, or delete anything. Never touch an issue
+            that isn't labeled "idea", and never touch pull requests.
+          claude_args: |
+            --max-turns 30
+            --allowedTools Bash,Read,Grep,Glob
