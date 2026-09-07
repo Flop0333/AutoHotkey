@@ -40,7 +40,6 @@ class ScreenSnipSpeaker {
             Info("No text found in selection")
             return
         }
-
         TextSpeaker.Speak(text, "", words)
     }
 

@@ -172,6 +172,11 @@ class TextSpeaker {
             return
 
         try {
+            ; If the previous utterance was paused, SAPI leaves its audio output paused:
+            ; Speak() below would queue the new text but never actually play it, and the
+            ; poll timer would then read that silence as "finished" within ~300ms - the
+            ; panel flashing open and immediately closing. Resume() clears that first.
+            this._spVoice.Resume()
             this._spVoice.Speak("", 2) ; cancel anything currently speaking
             this._ClearCurrentHighlightWord()
             this._highlightWords := words
