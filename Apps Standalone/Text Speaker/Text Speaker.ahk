@@ -142,11 +142,19 @@ class TextSpeaker {
                 ; A paused screen-snip utterance isn't resumed in place: unlike selected
                 ; text, the user has likely moved on from the snipped screen area, so a
                 ; second Ctrl+Space re-reads whatever text is currently selected instead.
-                case "paused": this._highlightWords.Length ? this.Speak() : this.Resume()
+                case "paused": this.SpeakOrResume(this._highlightWords.Length)
                 default: this.Speak()
             }
         } catch as Error {
             Info("Error in TogglePlay: " Error.Message " at line " Error.Line)
+        }
+    }
+
+    static SpeakOrResume(highlightWordsLength) {
+        if highlightWordsLength {
+            this.Speak()
+        } else {
+            this.Resume()
         }
     }
 
