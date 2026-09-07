@@ -1,0 +1,133 @@
+name: Daily ticket agent
+
+# Design: agent-plan.md (proposal reviewed and approved on issue #47 before
+# this was written).
+#
+# Requires one new one-time setup step, otherwise the "Run Claude Code" step
+# below will fail loudly rather than silently doing nothing:
+#   - Create a repo secret ANTHROPIC_API_KEY with an Anthropic API key that
+#     has Claude Code access (Settings > Secrets and variables > Actions).
+# Reuses the ADD_TO_PROJECT_PAT secret and PROJECT_URL variable that
+# add-to-project.yml already requires - no separate board setup needed.
+#
+# NOTE FOR THE MAINTAINER: this is new automation that opens PRs
+# unattended. Before relying on the daily schedule, trigger it once by hand
+# (Actions tab -> Daily ticket agent -> Run workflow) against a real
+# agent-ready/size:S/risk:read-or-reversible issue and check the result.
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # daily 08:00 UTC
+  workflow_dispatch: {}
+
+concurrency:
+  group: daily-ticket-agent
+  cancel-in-progress: false
+
+jobs:
+  select:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+    outputs:
+      issue_number: ${{ steps.select.outputs.issue_number }}
+      issue_title: ${{ steps.select.outputs.issue_title }}
+      branch_prefix: ${{ steps.select.outputs.branch_prefix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: select
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./.github/scripts/Select-AgentIssue.ps1 -Repo "${{ github.repository }}"
+
+  implement:
+    needs: select
+    if: needs.select.outputs.issue_number != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Claim issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh issue edit ${{ needs.select.outputs.issue_number }} --add-label agent-in-progress --repo ${{ github.repository }}
+
+      - name: Move board item to In Progress
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+        run: |
+          ./.github/scripts/Set-BoardStatus.ps1 `
+            -ProjectUrl "${{ vars.PROJECT_URL }}" `
+            -IssueNumber ${{ needs.select.outputs.issue_number }} `
+            -Status "In Progress"
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          branch_prefix: ${{ needs.select.outputs.branch_prefix }}
+          prompt: |
+            Implement GitHub issue #${{ needs.select.outputs.issue_number }}
+            in this repository ("${{ needs.select.outputs.issue_title }}").
+
+            Rules:
+            - Implement only what the issue's "What needs to happen" and
+              "Acceptance criteria" sections describe. Do not expand scope
+              beyond the "Files / areas touched" section without a clear,
+              stated reason.
+            - Treat the acceptance criteria checklist as the definition of
+              done. Address every item.
+            - If this repo has tests relevant to what you changed, run them
+              (see Tests/Invoke-*.ps1 for this repo's AHK test suite) before
+              finishing.
+            - Open a pull request with your changes. In the PR body:
+              - Start with a one-paragraph summary of what changed and why.
+              - If you ran relevant tests and they passed, end with
+                "Closes #${{ needs.select.outputs.issue_number }}".
+              - If you could not run tests, or they failed, or you're only
+                partially done, end with
+                "Relates to #${{ needs.select.outputs.issue_number }}"
+                instead, and explain what's incomplete or unverified.
+            - Do not merge the PR yourself. A human always reviews and
+              merges.
+          claude_args: |
+            --max-turns 25
+            --allowedTools Edit,Read,Write,Bash
+
+      - name: Label the resulting PR
+        if: always()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # gh pr list --head only matches an exact branch name, and the
+          # action picks its own suffix after our prefix, so list open PRs
+          # and filter client-side instead.
+          $prefix = "${{ needs.select.outputs.branch_prefix }}"
+          $lines = gh pr list --repo "${{ github.repository }}" --state open --json number,headRefName
+          $prs = @(($lines -join "`n") | ConvertFrom-Json)
+          $match = $prs | Where-Object { $_.headRefName.StartsWith($prefix) } | Select-Object -First 1
+          if ($match) {
+            gh pr edit $match.number --repo "${{ github.repository }}" --add-label agent-authored
+            Write-Host "Labelled PR #$($match.number) (branch $($match.headRefName)) as agent-authored."
+          } else {
+            Write-Host "No open PR found with a branch starting '$prefix' - nothing to label."
+          }
+
+      - name: On failure, free up the issue for retry
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ needs.select.outputs.issue_number }} --remove-label agent-in-progress --repo ${{ github.repository }}
+          gh issue comment ${{ needs.select.outputs.issue_number }} --repo ${{ github.repository }} --body "Automated implementation run failed (workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}). Removed \`agent-in-progress\` so this can be retried."

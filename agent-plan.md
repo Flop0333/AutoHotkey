@@ -46,16 +46,33 @@ concurrency:
 1. Query: `gh issue list --label agent-ready --label "risk: read" --state open`
    plus the same for `risk: reversible` (GitHub's label filter is AND, so this
    needs two queries, unioned).
-2. Exclude any issue that already has a linked open PR (check via
-   `gh issue view <n> --json linkedBranches,timelineItems` or by searching
-   open PRs whose body contains `Closes #<n>` / `Relates to #<n>`).
-3. Exclude any issue that already carries a `agent-in-progress` label (new
+2. Filter to `size: S` or `size: M` only — `size: L` issues are hard-excluded
+   from auto-pickup (see §9); they always need a human to kick off.
+3. Exclude any issue that already carries an `agent-in-progress` label (new
    label, added to `labels.yml` — see §7) so a slow-running task from
-   yesterday isn't picked up again before its PR lands.
-4. Sort remaining candidates: `size: S` before `size: M` before `size: L`,
-   then oldest `created_at` first within the same size. Small, old issues
-   surface first — this keeps individual runs fast and predictable.
+   yesterday isn't picked up again before its PR lands. **Simplification vs.
+   the original proposal**: dropped the separate "exclude if already has a
+   linked open PR" check — GitHub doesn't expose a simple, reliable way to
+   query that (Projects/timeline APIs are either preview-only or fragile to
+   parse), and `agent-in-progress` already prevents the one case that check
+   was really guarding against (the daily agent re-picking its own
+   in-flight work). A human opening a competing PR against the same issue
+   independently is an acceptable edge case for v1 — it just means the
+   agent's PR and the human's PR both reference the same issue, which a
+   reviewer resolves normally.
+4. Sort remaining candidates: `size: S` before `size: M`, then oldest
+   `created_at` first within the same size. Small, old issues surface first —
+   this keeps individual runs fast and predictable.
 5. Take the first candidate. If none, log "no eligible issue" and exit 0.
+
+Implemented in
+[`.github/scripts/Select-AgentIssue.ps1`](.github/scripts/Select-AgentIssue.ps1).
+Note for anyone touching this script: avoid `Sort-Object <property> -Unique`
+on objects built from `ConvertFrom-Json` — it was found (by hand, while
+building this) to silently drop legitimate entries when combining a
+single-object JSON result with an array JSON result, which is exactly the
+shape two `gh issue list` calls with different result counts produce. Dedupe
+explicitly with a hashtable instead, as the script does.
 
 This logic lives in a small script (`.github/scripts/Select-AgentIssue.ps1`,
 mirroring the style of `Generate-Dashboard.ps1`) rather than inline YAML, so
@@ -76,10 +93,16 @@ it's testable and readable.
 - Immediately after selecting an issue, the workflow:
   1. Adds the `agent-in-progress` label to the issue (claims it, so a
      concurrent/next-day run skips it).
-  2. Moves its Project board item to **In Progress** via the same GraphQL
-     approach `add-to-project.yml` / #49 use, reusing the existing
-     `ADD_TO_PROJECT_PAT` secret and `PROJECT_URL` variable — no new secrets
-     for board access.
+  2. Moves its Project board item to **In Progress** via
+     [`.github/scripts/Set-BoardStatus.ps1`](.github/scripts/Set-BoardStatus.ps1)
+     (Projects v2 GraphQL, written for this ticket and reusable by #49),
+     reusing the existing `ADD_TO_PROJECT_PAT` secret and `PROJECT_URL`
+     variable — no new secrets for board access. Note for anyone reusing
+     this script: `gh api graphql`'s `-f query=<text>` mangles a query
+     containing double quotes when the value is built up in PowerShell and
+     forwarded to the native `gh.exe`; pass the query from a temp file via
+     `-F query=@<path>` instead (`-F`, not `-f` — only `-F/--field` supports
+     the `@file` form). Found by hand while building this.
 - Checks out a new branch: `agent/issue-<number>-<slugified-title>`.
 - Runs the agent (Claude Code, via `anthropics/claude-code-action` or the CLI
   directly) with the issue's title + body as the task prompt, plus a fixed
@@ -151,15 +174,11 @@ Add to `.github/labels.yml` (synced automatically by the existing
 - Retrying a failed run automatically (a human re-triggers via
   `workflow_dispatch` after fixing whatever broke).
 
-## 9. Open questions for review
+## 9. Decisions (resolved 2026-09-07)
 
-1. **Agent runner**: use `anthropics/claude-code-action`, or shell out to the
-   `claude` CLI directly on the runner? The action is less code to maintain;
-   the CLI gives more control over exact flags. Leaning toward the action
-   unless there's a reason not to.
-2. **Schedule time**: 08:00 UTC is a placeholder — happy to change to
-   whenever fits best.
-3. **`size: L` issues**: proposal excludes them implicitly by sort order but
-   doesn't hard-block them — should `size: L` be excluded entirely from
-   auto-pickup (multi-session work seems like a bad fit for one unattended
-   run), leaving it purely for size S/M?
+1. **Agent runner**: `anthropics/claude-code-action`.
+2. **Schedule time**: 08:00 UTC, as proposed.
+3. **`size: L` issues**: hard-excluded from auto-pickup. The selection query
+   (§3) filters to `size: S` or `size: M` only — `size: L` issues are never
+   eligible for unattended pickup regardless of age, and always need a human
+   to kick off manually.
