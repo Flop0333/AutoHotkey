@@ -11,7 +11,7 @@
 
 #Include ..\..\Lib\Core.ahk
 #Include ..\..\Lib\Tools\WebView\WebViewToo.ahk
-#Include ..\Screen Snip Speaker\Screen Snip Speaker.ahk
+#Include Screen Snip Speaker.ahk
 
 ^Space::TextSpeaker.TogglePlay()
 
