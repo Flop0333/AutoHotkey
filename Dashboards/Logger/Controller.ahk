@@ -34,23 +34,31 @@ Class LoggerPopup extends WebViewToo {
 			this.hideTimerFns[severity] := this._OnSeverityTimeout.Bind(this, severity)
 		}
 
-		this._Seed()
 		this.InitializeHidden()
-		; Don't start polling until the page has actually finished loading -
-		; window.updateCounts/expandRow don't exist before then, so an
-		; ExecuteScript() call that races the navigation fails silently and
-		; is never retried. That's not just _Seed()'s initial push: _Poll()
-		; itself could win that same race on its very first tick if something
-		; gets logged within the first moment after construction, which is
-		; exactly what happens at startup - leaving the popup stuck showing
-		; the page's default 0/0/0 until an unrelated later log event
-		; happened to succeed. Deferring the whole poll loop, not just the
-		; first push, closes the race for every ExecuteScript call, not just this one.
 		this.NavigationCompleted((*) => this._OnPageReady())
+		
 	}
 
+	; Don't start polling until the page has actually finished loading -
+	; window.updateCounts/expandRow don't exist before then, so an
+	; ExecuteScript() call that races the navigation fails silently and
+	; is never retried. That's not just _Seed()'s initial push: _Poll()
+	; itself could win that same race on its very first tick if something
+	; gets logged within the first moment after construction, which is
+	; exactly what happens at startup - leaving the popup stuck showing
+	; the page's default 0/0/0 until an unrelated later log event
+	; happened to succeed. Deferring the whole poll loop, not just the
+	; first push, closes the race for every ExecuteScript call, not just this one.
+
+	; Poll once immediately instead of only pushing counts - a periodic
+	; SetTimer's first tick doesn't fire until its full interval has elapsed,
+	; which would leave any severity already unread at startup (e.g. warnings
+	; logged before this host even started) sitting un-expanded for a second
+	; for no reason. Polling now expands those rows the moment the page can
+	; actually render them.
 	_OnPageReady() {
-		this._PushState()
+		this._Seed()
+		this._Poll()
 		SetTimer(this._Poll.Bind(this), 1000)
 	}
 
@@ -99,10 +107,14 @@ Class LoggerPopup extends WebViewToo {
 	}
 
 	; Restore unread totals if the logger host is restarted during a session.
+	; lastEntryCount starts at the *read* count, not the total - any entries
+	; still unread (e.g. warnings/errors logged during startup, before this
+	; host even started) must look "new" to the first _Poll() tick so their
+	; row actually expands, instead of just being silently counted.
 	_Seed() {
 		entries := this._ReadAllEntries()
 		this._RefreshUnreadCounts(entries)
-		this.lastEntryCount := entries.Length
+		this.lastEntryCount := Min(GetReadLogEntryCount(), entries.Length)
 	}
 
 	_ReadAllEntries() {

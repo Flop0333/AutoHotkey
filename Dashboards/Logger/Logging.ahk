@@ -11,8 +11,6 @@
 #Include ..\Log Dashboard\Log Dashboard.ahk
 
 InitializeLogging() {
-	ClearErrorLog()
-
 	; Both host scripts use #SingleInstance Force. Starting them here replaces
 	; instances left over from an earlier startup with fresh session-owned hosts.
 	StartLogger()

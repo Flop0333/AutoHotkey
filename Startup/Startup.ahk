@@ -20,39 +20,46 @@
 #Include Startup Menu Tray.ahk
 
 RunStartup(profile?) {
-    try {
-        TraySetIcon(Paths.autoHotkeyIcon)
-        StartupMessage()
-        StartupMenuTray()
-        InitializeLogging()
-        SecretsFileManager.Initialize()
+    steps := [
+        () => ClearErrorLog(),
+        () => TraySetIcon(Paths.autoHotkeyIcon),
+        () => StartupMessage(),
+        () => StartupMenuTray(),
+        () => SecretsFileManager.Initialize(),
+        () => IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetByComputerName(),
 
-        IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetByComputerName()
+        () => Run(Paths.appsStandalone "\Capslock Service.ahk"), ; Run this before scripts that set a capslock hotkey
+        () => Run(Paths.dashboards "\Age of Efficiency\Age of Efficiency.ahk"),
+        () => Run(Paths.dashboards "\Macro Board\Macro Board.ahk"),
 
-        Run(Paths.appsStandalone "\Capslock Service.ahk") ; Run this before scripts that set a capslock hotkey
-        Run(Paths.dashboards "\Age of Efficiency\Age of Efficiency.ahk")
-        Run(Paths.dashboards "\Macro Board\Macro Board.ahk")
+        () => Run(Paths.appsStandalone "\Desktops Manager\Desktops Manager.ahk"),
+        () => Run(Paths.appsStandalone "\Emoji Sender\Emoji Sender.ahk"),
+        () => Run(Paths.appsStandalone "\Mouse Gestures\Mouse Gestures.ahk"),
+        () => Run(Paths.appsStandalone "\Screen Snipper\Screen Snipper.ahk"),
+        () => Run(Paths.appsStandalone "\Key Bindings.ahk"),
+        () => Run(Paths.appsStandalone "\Text Speaker\Text Speaker.ahk"),
+        () => Run(Paths.appsStandalone "\Window Manager.ahk"),
 
-        Run(Paths.appsStandalone "\Desktops Manager\Desktops Manager.ahk")
-        Run(Paths.appsStandalone "\Emoji Sender\Emoji Sender.ahk")
-        Run(Paths.appsStandalone "\Mouse Gestures\Mouse Gestures.ahk")
-        Run(Paths.appsStandalone "\Screen Snipper\Screen Snipper.ahk")
-        Run(Paths.appsStandalone "\Key Bindings.ahk")
-        Run(Paths.appsStandalone "\Text Speaker\Text Speaker.ahk")
-        Run(Paths.appsStandalone "\Window Manager.ahk")
+        () => Run(Paths.appsIntegrated "\Command Storer\Command Storer.ahk"),
+        () => Run(Paths.appsIntegrated "\App Hotkeys.ahk"),
+        () => Run(Paths.appsIntegrated "\Hotkeys.ahk"),
+        () => Run(Paths.appsIntegrated "\Mouse Toys.ahk"),
+    ]
 
-        Run(Paths.appsIntegrated "\Command Storer\Command Storer.ahk")
-        Run(Paths.appsIntegrated "\App Hotkeys.ahk")
-        Run(Paths.appsIntegrated "\Hotkeys.ahk")
-        Run(Paths.appsIntegrated "\Mouse Toys.ahk")
-    } catch as startupError {
-        ; A failure here aborts the rest of RunStartup silently unless we show
-        ; it ourselves - OnError's handler suppresses the modal dialog and only
-        ; logs/notifies, which is easy to miss when nothing else came up.
-        MsgBox("Startup failed and did not finish:`n`n" startupError.Message,
-            "AutoHotkey Startup Error", "IconX")
-        throw startupError
+    failuresCounter := 0
+    for step in steps {
+        try
+            step()
+        catch as startupError {
+            failuresCounter++
+            LogAndNotifyError("Startup step failed: " startupError.Message, startupError)
+        }
     }
+
+    InitializeLogging()
+    
+    if failuresCounter
+        MsgBox failuresCounter " startup step(s) failed. See the error log for details.", "AutoHotkey Startup Error", 16
 }
 
 ; Auto-run only when in Startup folder or run as standalone (not when #Include'd)
