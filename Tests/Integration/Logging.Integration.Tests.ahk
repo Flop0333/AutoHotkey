@@ -87,6 +87,22 @@ Test_RealHostsAndCrossProcessBehavior() {
 		; warning can be delayed past both of this file's two earlier fixes
 		; by mutex contention between the two hosts.
 		Assert.True(WaitForLogQuiescence(), "Startup logging (e.g. the hosts' own missing-secret notices) should settle before this test's own log calls")
+
+		; Quiescence alone still isn't enough: if that startup warning did
+		; show the popup, ClearErrorLog() straight after doesn't hide it.
+		; _Poll() only hides on GetReadLogEntryCount() >= entries.Length, and
+		; going straight from clearing (entries.Length briefly 0) into this
+		; test's own LogInfo() call below means the Logger's poll never
+		; actually observes that "0 >= 0" moment - it only ever sees the
+		; count back above 0 again (this test's own entry) once it does look,
+		; so a popup shown by the earlier warning would otherwise never be
+		; told it's safe to hide until that severity's own 5s timer expires,
+		; long after this test's 1250ms wait. MarkAllLogsRead() first, then
+		; actively waiting for the resulting hide, closes that gap: it
+		; doesn't need the file to be empty, only for the read cursor to
+		; catch up to whatever's already there.
+		MarkAllLogsRead()
+		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Logger should hide once existing entries are marked read")
 		ClearErrorLog()
 
 		LogInfo("silent unread info")
