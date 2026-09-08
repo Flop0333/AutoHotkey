@@ -37,6 +37,17 @@ Test_RealHostsAndCrossProcessBehavior() {
 		; log calls are visible from here on. The Logger's _Poll() already
 		; handles the file shrinking out from under it (see the entries.Length
 		; < lastEntryCount branch), so this is safe post-construction.
+		;
+		; The window existing (what InitializeLogging waited for) only means
+		; the host's Gui got constructed - it doesn't guarantee every
+		; module-load-time side effect in that process has finished yet. A
+		; secret lookup that fires LogAndNotifyWarning slightly later than
+		; that can otherwise land after this clear but before the assertion
+		; below, popping the Logger for a reason unrelated to LogInfo and
+		; intermittently failing this test. Sleeping past the Logger's own
+		; 1000ms poll interval first gives any such straggler a chance to
+		; actually land so this clear catches it too.
+		Sleep(1500)
 		ClearErrorLog()
 
 		LogInfo("silent unread info")
