@@ -31,23 +31,30 @@ Test_RealHostsAndCrossProcessBehavior() {
 		Assert.False(IsVisible(hosts["logger"]), "Logger starts hidden")
 		Assert.False(IsVisible(hosts["dashboard"]), "Dashboard starts hidden")
 
-		; Both hosts may have already logged their own incidental startup
-		; warnings by now (e.g. missing-secret notices from unrelated modules
-		; pulled in via Core.ahk) - clear those out so only this test's own
-		; log calls are visible from here on. The Logger's _Poll() already
-		; handles the file shrinking out from under it (see the entries.Length
-		; < lastEntryCount branch), so this is safe post-construction.
+		; This test is intermittently flaky on CI at the assertions just below
+		; (both the visibility check and the unread-count check have each
+		; failed on separate runs), consistent with something occasionally
+		; logging a stray LogAndNotify* entry during host startup that this
+		; test didn't cause. The exact source isn't confirmed - nothing in
+		; the Logger/Dashboard hosts' own include chain (Core.ahk -> Secrets
+		; Service.ahk) calls Secret.Get() eagerly, so "missing-secret
+		; notices" (the original suspicion) doesn't hold up under inspection;
+		; a transient WebView2/COM hiccup during first-run init, caught by
+		; the global OnError handler and logged as a notifying error, is
+		; another candidate. It reproduces on CI but not locally after
+		; several attempts, which points at something timing/environment-
+		; specific rather than a logic bug in LogInfo/Controller.ahk (traced
+		; through both - the notify gating there is correct).
 		;
-		; The window existing (what InitializeLogging waited for) only means
-		; the host's Gui got constructed - it doesn't guarantee every
-		; module-load-time side effect in that process has finished yet. A
-		; secret lookup that fires LogAndNotifyWarning slightly later than
-		; that can otherwise land after this clear but before the assertion
-		; below, popping the Logger for a reason unrelated to LogInfo and
-		; intermittently failing this test. Sleeping past the Logger's own
-		; 1000ms poll interval first gives any such straggler a chance to
-		; actually land so this clear catches it too.
-		Sleep(1500)
+		; Whatever the source, clearing the log doesn't retroactively hide a
+		; popup a stray notify already made visible - that only happens once
+		; the Logger's own independent poll loop notices the clear and
+		; reacts (see _Poll's GetReadLogEntryCount() >= entries.Length
+		; check), which takes up to its own 1000ms tick, not however long we
+		; guess we'd need to wait beforehand. So actively wait for that
+		; settle to actually happen (an instant no-op if nothing stray
+		; fired) instead of assuming a fixed delay covers it.
+		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Logger should settle back to hidden after any incidental startup logging")
 		ClearErrorLog()
 
 		LogInfo("silent unread info")
