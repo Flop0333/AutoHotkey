@@ -4,8 +4,7 @@ name: Daily ticket agent
 # this was written).
 #
 # Requires one new one-time setup step, otherwise the "Run Claude Code" step
-# below is skipped with a ::warning:: annotation each run (not a failed
-# check - a missing key is an expected, not-yet-configured state, not a bug):
+# below will fail loudly rather than silently doing nothing:
 #   - Create a repo secret ANTHROPIC_API_KEY with an Anthropic API key that
 #     has Claude Code access (Settings > Secrets and variables > Actions).
 # Reuses the ADD_TO_PROJECT_PAT secret and PROJECT_URL variable that
@@ -71,21 +70,8 @@ jobs:
             -IssueNumber ${{ needs.select.outputs.issue_number }} `
             -Status "In Progress"
 
-      - name: Check for ANTHROPIC_API_KEY
-        id: check_key
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          if [ -z "$ANTHROPIC_API_KEY" ]; then
-            echo "::warning::ANTHROPIC_API_KEY secret is not set (Settings > Secrets and variables > Actions) - skipping the Claude Code step for this run. The issue stays labelled agent-in-progress until it's set, rather than failing this check."
-            echo "has_key=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_key=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Run Claude Code
         id: claude
-        if: steps.check_key.outputs.has_key == 'true'
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}

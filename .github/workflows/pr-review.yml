@@ -1,10 +1,8 @@
 name: PR review agent
 
 # Requires the same ANTHROPIC_API_KEY secret as daily-agent.yml (see that
-# workflow's header) - if it's not set, the review step is skipped with a
-# ::warning:: annotation rather than failing this check. Advisory even once
-# it's running: posts a COMMENT-event review, never APPROVE or
-# REQUEST_CHANGES, so it can never block or approve a PR itself.
+# workflow's header). Advisory only: posts a COMMENT-event review, never
+# APPROVE or REQUEST_CHANGES, so it can never block or approve a PR itself.
 #
 # Dedup approach for re-pushes (issue #48's "doesn't spam duplicate
 # comments" requirement): on `synchronize`, the prompt tells Claude to find
@@ -34,20 +32,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check for ANTHROPIC_API_KEY
-        id: check_key
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          if [ -z "$ANTHROPIC_API_KEY" ]; then
-            echo "::warning::ANTHROPIC_API_KEY secret is not set (Settings > Secrets and variables > Actions) - skipping the PR review for this run instead of failing this check."
-            echo "has_key=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_key=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Run Claude Code review
-        if: steps.check_key.outputs.has_key == 'true'
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
