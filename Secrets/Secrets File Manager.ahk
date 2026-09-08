@@ -7,14 +7,25 @@ class SecretsFileManager {
     static MUTEX_NAME := "Local\AutoHotkey.SecretsFileManager"
     static MUTEX_TIMEOUT_MS := 10000
     static _initialized := false
+    static _initError := ""
 
     ; Load all values once, create the local file, and add newly required keys.
+    ; Every secret ends up routing through here (Secret.Get/GetOrSet call it on
+    ; every access), so a broken secrets file must fail fast and consistently:
+    ; cache the failure instead of re-parsing and re-throwing on every access.
     static Initialize(force := false) {
         if this._initialized && !force
             return
+        if this._initError && !force
+            throw this._initError
 
         ; Synchronization is a read-modify-write operation shared by all AHK processes.
-        return this._WithFileLock(() => this._Initialize(force))
+        try {
+            return this._WithFileLock(() => this._Initialize(force))
+        } catch as initError {
+            this._initError := initError
+            throw initError
+        }
     }
 
     ; Synchronize in-memory secrets, active values, removed values, and catalog definitions.
@@ -91,6 +102,7 @@ class SecretsFileManager {
             this._WriteJsonFile(this.REMOVED_FILE_PATH, removedSecrets)
 
         this._initialized := true
+        this._initError := ""
     }
 
     ; Lock the complete read-modify-write cycle so concurrent updates cannot overwrite each other.
