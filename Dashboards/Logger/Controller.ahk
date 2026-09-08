@@ -46,8 +46,7 @@ Class LoggerPopup extends WebViewToo {
 		; the page's default 0/0/0 until an unrelated later log event
 		; happened to succeed. Deferring the whole poll loop, not just the
 		; first push, closes the race for every ExecuteScript call, not just this one.
-		this._PushState()
-		SetTimer(this._Poll.Bind(this), 1000)
+		this.NavigationCompleted((*) => this._OnPageReady())
 	}
 
 	_OnPageReady() {
