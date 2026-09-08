@@ -61,7 +61,7 @@ profileButtons := Map(
         Button(CommandStorer_ShowMainGui, "Command Storer", "tetris.gif"),
     ],
     Profiles.default, [
-        Button(MsgBox, "Pizza Default")
+        Button(MsgBox, "Pizza Default", "pizza.gif")
     ]
 )
 
