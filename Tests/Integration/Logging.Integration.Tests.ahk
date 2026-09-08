@@ -17,6 +17,19 @@ WaitUntil(predicate, timeoutMs := 4000) {
 	return false
 }
 
+; Diagnostic only, for the two assertions below that have actually failed on
+; CI (in different combinations across different runs) despite two attempted
+; fixes based on static analysis that didn't hold up. Rather than guess a
+; third time, this surfaces the real log content - including which script
+; wrote each entry - directly in the failure message on the next occurrence.
+DumpEntries() {
+	text := ""
+	for entry in ReadLogEntries()
+		text .= Format("`n  [{1}] script={2} notify={3} msg={4}",
+			entry.Get("severity", "?"), entry.Get("script", "?"), entry.Get("notify", "?"), entry.Get("message", "?"))
+	return text ? text : "`n  (no entries)"
+}
+
 Test_RealHostsAndCrossProcessBehavior() {
 	if FindLoggerWindow() || FindLogDashboardWindow()
 		return ; Never replace or close a developer's currently running hosts.
@@ -59,8 +72,8 @@ Test_RealHostsAndCrossProcessBehavior() {
 
 		LogInfo("silent unread info")
 		Sleep(1250)
-		Assert.False(IsVisible(FindLoggerWindow()), "LogInfo increments unread state without notifying")
-		Assert.Equal(1, GetUnreadLogCounts()["info"])
+		Assert.False(IsVisible(FindLoggerWindow()), "LogInfo increments unread state without notifying." DumpEntries())
+		Assert.Equal(1, GetUnreadLogCounts()["info"], "Unexpected unread info count." DumpEntries())
 
 		LogAndNotifyWarning("visible warning")
 		Assert.True(WaitUntil(() => IsVisible(FindLoggerWindow())), "Notify log should show logger")
