@@ -47,7 +47,7 @@ function Format-IssueRows($issues) {
     }
     ($issues | ForEach-Object {
         $labels = ($_.labels | ForEach-Object { $_.name }) -join ", "
-        "<tr><td><a href='$($_.html_url)'>#$($_.number) $($_.title)</a></td><td>$labels</td><td>$($_.updated_at.Substring(0,10))</td></tr>"
+        "<tr><td><a href='$($_.html_url)'>#$($_.number) $($_.title)</a></td><td>$labels</td><td>$(([datetime]$_.updated_at).ToString('yyyy-MM-dd'))</td></tr>"
     }) -join "`n"
 }
 
@@ -58,7 +58,7 @@ function Format-RunRows($runs) {
     ($runs | ForEach-Object {
         $status = if ($_.conclusion) { $_.conclusion } else { $_.status }
         $cls = switch ($status) { "success" { "ok" }; "failure" { "fail" }; default { "pending" } }
-        "<tr><td><a href='$($_.html_url)'>$($_.display_title)</a></td><td class='$cls'>$status</td><td>$($_.created_at.Substring(0,16).Replace('T',' '))</td></tr>"
+        "<tr><td><a href='$($_.html_url)'>$($_.display_title)</a></td><td class='$cls'>$status</td><td>$(([datetime]$_.created_at).ToString('yyyy-MM-dd HH:mm'))</td></tr>"
     }) -join "`n"
 }
 
@@ -84,7 +84,7 @@ function Format-AgentPRRows($prs) {
     ($prs | Sort-Object created_at -Descending | Select-Object -First 10 | ForEach-Object {
         $status = if ($_.merged_at) { "merged" } else { "closed" }
         $cls = if ($_.merged_at) { "ok" } else { "fail" }
-        "<tr><td><a href='$($_.html_url)'>#$($_.number) $($_.title)</a></td><td class='$cls'>$status</td><td>$($_.created_at.Substring(0,10))</td></tr>"
+        "<tr><td><a href='$($_.html_url)'>#$($_.number) $($_.title)</a></td><td class='$cls'>$status</td><td>$(([datetime]$_.created_at).ToString('yyyy-MM-dd'))</td></tr>"
     }) -join "`n"
 }
 
