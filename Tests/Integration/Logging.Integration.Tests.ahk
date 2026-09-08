@@ -17,6 +17,38 @@ WaitUntil(predicate, timeoutMs := 4000) {
 	return false
 }
 
+; Waits for GetLogEntryCount() to stop changing for quietMs, instead of
+; assuming any single checkpoint (a fixed sleep, or "is the popup hidden
+; right now") is late enough to have seen everything. Confirmed necessary,
+; not just defensive: Profiles.work's static initializer
+; (Profiles/Profile Manager.ahk) eagerly calls Secrets.WorkDeviceNames.Get(),
+; which calls SecretsFileManager.Initialize() - and that acquires a
+; cross-process named mutex shared by every AHK process on the machine,
+; doing a full first-time sync of My Secrets.json while holding it (empty/
+; nonexistent on a fresh CI checkout, so every catalog entry needs writing).
+; Since both the Logger and Dashboard hosts call this independently at
+; startup, whichever one loses that mutex race can be delayed by however
+; long the winner's first-time sync takes - which is why this warning was
+; still observed arriving *after* both of this file's two previous fixes
+; (a fixed sleep, then "wait until already hidden") had already moved on.
+; Waiting for quiet, not a fixed point, absorbs that delay whatever it is.
+WaitForLogQuiescence(quietMs := 1200, timeoutMs := 8000) {
+	startedAt := A_TickCount
+	lastCount := -1
+	lastChangeAt := A_TickCount
+	while (A_TickCount - startedAt < timeoutMs) {
+		count := GetLogEntryCount()
+		if (count != lastCount) {
+			lastCount := count
+			lastChangeAt := A_TickCount
+		} else if (A_TickCount - lastChangeAt >= quietMs) {
+			return true
+		}
+		Sleep(100)
+	}
+	return false
+}
+
 ; Diagnostic only, for the two assertions below that have actually failed on
 ; CI (in different combinations across different runs) despite two attempted
 ; fixes based on static analysis that didn't hold up. Rather than guess a
@@ -44,30 +76,17 @@ Test_RealHostsAndCrossProcessBehavior() {
 		Assert.False(IsVisible(hosts["logger"]), "Logger starts hidden")
 		Assert.False(IsVisible(hosts["dashboard"]), "Dashboard starts hidden")
 
-		; This test is intermittently flaky on CI at the assertions just below
-		; (both the visibility check and the unread-count check have each
-		; failed on separate runs), consistent with something occasionally
-		; logging a stray LogAndNotify* entry during host startup that this
-		; test didn't cause. The exact source isn't confirmed - nothing in
-		; the Logger/Dashboard hosts' own include chain (Core.ahk -> Secrets
-		; Service.ahk) calls Secret.Get() eagerly, so "missing-secret
-		; notices" (the original suspicion) doesn't hold up under inspection;
-		; a transient WebView2/COM hiccup during first-run init, caught by
-		; the global OnError handler and logged as a notifying error, is
-		; another candidate. It reproduces on CI but not locally after
-		; several attempts, which points at something timing/environment-
-		; specific rather than a logic bug in LogInfo/Controller.ahk (traced
-		; through both - the notify gating there is correct).
-		;
-		; Whatever the source, clearing the log doesn't retroactively hide a
-		; popup a stray notify already made visible - that only happens once
-		; the Logger's own independent poll loop notices the clear and
-		; reacts (see _Poll's GetReadLogEntryCount() >= entries.Length
-		; check), which takes up to its own 1000ms tick, not however long we
-		; guess we'd need to wait beforehand. So actively wait for that
-		; settle to actually happen (an instant no-op if nothing stray
-		; fired) instead of assuming a fixed delay covers it.
-		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Logger should settle back to hidden after any incidental startup logging")
+		; Confirmed via a diagnostic dump of the actual log on a real CI
+		; failure: both hosts independently trigger a
+		; "Secret not found: Work Device Names" LogAndNotify*Warning at
+		; startup (Profiles.work's eager Secrets.WorkDeviceNames.Get() -
+		; every real machine running this repo has that secret set, so it
+		; never fires there, but a clean CI checkout never does). See
+		; WaitForLogQuiescence's own comment for why this needs an active
+		; wait for quiet rather than a single fixed checkpoint - on CI, this
+		; warning can be delayed past both of this file's two earlier fixes
+		; by mutex contention between the two hosts.
+		Assert.True(WaitForLogQuiescence(), "Startup logging (e.g. the hosts' own missing-secret notices) should settle before this test's own log calls")
 		ClearErrorLog()
 
 		LogInfo("silent unread info")
