@@ -42,7 +42,9 @@ class Secret {
             SecretsFileManager.Initialize()
             return true
         } catch as initError {
-            LogAndNotifyError("Secret '" . this.name . "' unavailable - the secrets file failed to load: " . initError.Message,
+            ; Never let reporting the failure become a second failure - Get()/
+            ; GetOrSet() must always return a value, not throw.
+            try LogAndNotifyError("Secret '" . this.name . "' unavailable - the secrets file failed to load: " . initError.Message,
                 initError.HasProp("Stack") ? initError.Stack : "")
             return false
         }

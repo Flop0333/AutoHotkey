@@ -24,10 +24,23 @@ Class Profile {
 }
 
 Class Profiles {
-    static work := Profile("Work", Secrets.WorkDeviceNames.Get())
+    ; Static field initializers run top-to-bottom the moment this class is
+    ; defined (auto-execute, in every process that includes this file) - if
+    ; Secrets.WorkDeviceNames.Get() ever throws, every field below "work"
+    ; (including "default") never gets assigned, and anything reading
+    ; Profiles.default (ProfileManager.current's own initializer) then fails
+    ; too. Guard this one lookup so a broken secrets file can't take out the
+    ; rest of the class.
+    static work := Profile("Work", Profiles._SafeWorkDeviceNames())
     static devbox := Profile("Dev Box", ["DESKTOP-2NC1KCL", "CPC-fbrem-HLWU3"]) ; [VM, Dev Box]
     static woonkamerLaptops := Profile("Woonkamer Laptops", ["FLOPLAPTOP", "LAPTOP-LNTJIJKB"]) ; [Amyrion, Magneet]
     static default := Profile("Default", "")
+
+    static _SafeWorkDeviceNames() {
+        try return Secrets.WorkDeviceNames.Get()
+        catch
+            return ""
+    }
 }
 
 Class ProfileManager {
