@@ -36,21 +36,21 @@ class SecretsFileManager {
             displayNames[secretDefinition.name] := true
             secretDefinition.key := propertyName
 
-            if secrets.Has(propertyName) && Type(secrets[propertyName]) = "String" {
+            if secrets.Has(propertyName) && this._IsValidSecretValue(secrets[propertyName]) {
                 secretDefinition._value := secrets[propertyName]
                 ; An active catalog entry must not also remain in the archive.
                 if removedSecrets.Has(propertyName) {
                     removedSecrets.Delete(propertyName)
                     removedFileNeedsUpdate := true
                 }
-            } else if removedSecrets.Has(propertyName) && Type(removedSecrets[propertyName]) = "String" {
+            } else if removedSecrets.Has(propertyName) && this._IsValidSecretValue(removedSecrets[propertyName]) {
                 ; Restore a preserved value when a removed catalog key is reintroduced.
                 secretDefinition._value := removedSecrets[propertyName]
                 secrets[propertyName] := secretDefinition._value
                 removedSecrets.Delete(propertyName)
                 fileNeedsUpdate := true
                 removedFileNeedsUpdate := true
-            } else if secrets.Has(secretDefinition.name) && Type(secrets[secretDefinition.name]) = "String" {
+            } else if secrets.Has(secretDefinition.name) && this._IsValidSecretValue(secrets[secretDefinition.name]) {
                 ; Migrate files created by the earlier display-name-keyed format.
                 secretDefinition._value := secrets[secretDefinition.name]
                 secrets[propertyName] := secretDefinition._value
@@ -112,9 +112,21 @@ class SecretsFileManager {
         return true
     }
 
+    ; A secret value is either a plain string, or an array of strings.
+    static _IsValidSecretValue(value) {
+        if Type(value) = "String"
+            return true
+        if Type(value) != "Array"
+            return false
+        for item in value
+            if Type(item) != "String"
+                return false
+        return true
+    }
+
     ; Read the active local secrets file.
     static _ReadSecrets() => this._ReadJsonFile(this.FILE_PATH)
-    
+
 
     ; Read and validate a secrets JSON file, returning an empty map when it does not exist.
     static _ReadJsonFile(filePath) {
@@ -143,9 +155,10 @@ class SecretsFileManager {
         return values
     }
 
-    ; Check that JSON follows the supported string-key/string-value object format.
+    ; Check that JSON follows the supported string-key/value object format,
+    ; where each value is either a string or an array of strings.
     static _IsValidSecretsJson(jsonText) {
-        ; Small bounded parser: only { "key": "value" } pairs are allowed here.
+        ; Small bounded parser: only { "key": "value" } / { "key": ["value", ...] } pairs are allowed here.
         position := 1
         this._SkipJsonWhitespace(jsonText, &position)
         if SubStr(jsonText, position, 1) != "{"
@@ -169,9 +182,9 @@ class SecretsFileManager {
 
             position += 1
             this._SkipJsonWhitespace(jsonText, &position)
-            value := this._ConsumeJsonString(jsonText, &position)
-            if value = false
-                return "for property: " . key . " (expected string only)"
+            valueValidation := this._ConsumeJsonValue(jsonText, &position)
+            if valueValidation !== true
+                return "for property: " . key . " (expected a string or an array of strings)"
             this._SkipJsonWhitespace(jsonText, &position)
 
             delimiter := SubStr(jsonText, position, 1)
@@ -186,6 +199,38 @@ class SecretsFileManager {
             position += 1
             this._SkipJsonWhitespace(jsonText, &position)
         }
+    }
+
+    ; Validate one JSON value (a string, or an array of strings) and advance
+    ; the parser position past it. Returns true, or false when invalid.
+    static _ConsumeJsonValue(jsonText, &position) {
+        if SubStr(jsonText, position, 1) = "[" {
+            position += 1
+            this._SkipJsonWhitespace(jsonText, &position)
+            if SubStr(jsonText, position, 1) = "]" {
+                position += 1
+                return true
+            }
+
+            loop {
+                if this._ConsumeJsonString(jsonText, &position) = false
+                    return false
+                this._SkipJsonWhitespace(jsonText, &position)
+
+                delimiter := SubStr(jsonText, position, 1)
+                if delimiter = "]" {
+                    position += 1
+                    return true
+                }
+                if delimiter != ","
+                    return false
+
+                position += 1
+                this._SkipJsonWhitespace(jsonText, &position)
+            }
+        }
+
+        return this._ConsumeJsonString(jsonText, &position) != false
     }
 
     ; Validate one JSON string token and advance the parser position past it.
