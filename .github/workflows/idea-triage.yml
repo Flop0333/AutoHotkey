@@ -1,7 +1,8 @@
 name: Idea triage agent
 
 # Requires the same ANTHROPIC_API_KEY secret as daily-agent.yml (see that
-# workflow's header).
+# workflow's header) - if it's not set, this is skipped with a ::warning::
+# annotation rather than failing this check.
 #
 # Deliberately restricted to Bash/Read/Grep/Glob (no Edit/Write): this
 # agent only ever changes issue metadata (labels, body, comments) via the
@@ -26,7 +27,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check for ANTHROPIC_API_KEY
+        id: check_key
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::warning::ANTHROPIC_API_KEY secret is not set (Settings > Secrets and variables > Actions) - skipping idea triage for this run instead of failing this check."
+            echo "has_key=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_key=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Run Claude Code triage
+        if: steps.check_key.outputs.has_key == 'true'
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
