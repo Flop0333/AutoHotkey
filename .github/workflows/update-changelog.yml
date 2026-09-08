@@ -1,0 +1,43 @@
+name: Update changelog
+
+# Commits straight to main rather than opening a PR: a changelog entry is a
+# pure, easily-revertable text addition (not code), and pushes made with
+# the default GITHUB_TOKEN don't trigger other `push`-type workflow runs,
+# so this can't recurse into itself through GitHub's own anti-recursion
+# rule. The commit-message check below is a second, explicit guard against
+# that in case that assumption ever changes.
+#
+# On its very first run there's no CHANGELOG.md yet, so it back-fills the
+# entire merged-PR history in one section - see Update-Changelog.ps1's
+# header for why that's treated as expected, not a bug.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  changelog:
+    if: "!startsWith(github.event.head_commit.message, 'docs: update changelog')"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./.github/scripts/Update-Changelog.ps1 -Repo "${{ github.repository }}"
+
+      - name: Commit changelog if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          if git diff --cached --quiet; then
+            echo "No changelog changes."
+          else
+            git commit -m "docs: update changelog"
+            git push
+          fi

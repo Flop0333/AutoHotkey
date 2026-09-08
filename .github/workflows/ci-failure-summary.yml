@@ -1,0 +1,32 @@
+name: CI failure summary
+
+# Only reacts to AHK Tests runs that were themselves triggered by a pull
+# request - a push-to-main run has no PR to comment on, and
+# Send-CIFailureSummary.ps1 also no-ops gracefully in that case as a
+# second line of defense.
+
+on:
+  workflow_run:
+    workflows: ["AHK Tests"]
+    types: [completed]
+
+jobs:
+  summarize:
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./.github/scripts/Send-CIFailureSummary.ps1 `
+            -Repo "${{ github.repository }}" `
+            -RunId ${{ github.event.workflow_run.id }} `
+            -HeadBranch "${{ github.event.workflow_run.head_branch }}" `
+            -Conclusion "${{ github.event.workflow_run.conclusion }}"

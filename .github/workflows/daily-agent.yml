@@ -115,7 +115,15 @@ jobs:
           # and filter client-side instead.
           $prefix = "${{ needs.select.outputs.branch_prefix }}"
           $lines = gh pr list --repo "${{ github.repository }}" --state open --json number,headRefName
-          $prs = @(($lines -join "`n") | ConvertFrom-Json)
+          # Two statements, not `@((...) | ConvertFrom-Json)`: wrapping a
+          # pipeline expression directly with @() doesn't flatten it like
+          # wrapping an already-materialized array variable does - with
+          # zero open PRs this produced a 1-element array wrapping an empty
+          # array, and $_.headRefName below then threw on that phantom
+          # element instead of finding no match. Found and fixed while
+          # building the #48-51 workflows, which hit the same pattern.
+          $parsedPrs = ($lines -join "`n") | ConvertFrom-Json
+          $prs = @($parsedPrs)
           $match = $prs | Where-Object { $_.headRefName.StartsWith($prefix) } | Select-Object -First 1
           if ($match) {
             gh pr edit $match.number --repo "${{ github.repository }}" --add-label agent-authored

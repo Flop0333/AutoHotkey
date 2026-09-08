@@ -17,6 +17,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. "$PSScriptRoot/Invoke-GitHubGraphQL.ps1"
 
 if ($ProjectUrl -notmatch '^https://github\.com/(users|orgs)/([^/]+)/projects/(\d+)/?$') {
     throw "PROJECT_URL '$ProjectUrl' doesn't look like a Project (v2) URL (expected https://github.com/users|orgs/<owner>/projects/<number>)."
@@ -25,30 +26,6 @@ $ownerType = $Matches[1]   # "users" or "orgs"
 $owner = $Matches[2]
 $projectNumber = [int]$Matches[3]
 $ownerField = if ($ownerType -eq "users") { "user" } else { "organization" }
-
-function Invoke-GraphQL($query, [hashtable]$vars) {
-    # Passed via a temp file, not inline -f query="...", because PowerShell's
-    # argument marshalling to the native gh.exe mangles embedded double
-    # quotes (e.g. `name: "Status"`), producing invalid GraphQL.
-    $queryFile = New-TemporaryFile
-    Set-Content -Path $queryFile -Value $query -NoNewline
-    try {
-        # -F (not -f) is required here: only -F/--field does the "@file reads
-        # the value from a file" substitution that -f/--raw-field lacks.
-        $args = @("api", "graphql", "-F", "query=@$queryFile")
-        foreach ($key in $vars.Keys) {
-            $isInt = $vars[$key] -is [int]
-            $flag = if ($isInt) { "-F" } else { "-f" }
-            $args += $flag
-            $args += "$key=$($vars[$key])"
-        }
-        $out = gh @args
-        if ($LASTEXITCODE -ne 0) { throw "gh api graphql failed: $out" }
-        $out | ConvertFrom-Json
-    } finally {
-        Remove-Item $queryFile -ErrorAction SilentlyContinue
-    }
-}
 
 $projectQuery = @"
 query(`$owner: String!, `$number: Int!) {
@@ -65,7 +42,7 @@ query(`$owner: String!, `$number: Int!) {
   }
 }
 "@
-$result = Invoke-GraphQL $projectQuery @{ owner = $owner; number = $projectNumber }
+$result = Invoke-GitHubGraphQL -Query $projectQuery -Variables @{ owner = $owner; number = $projectNumber }
 $project = $result.data.$ownerField.projectV2
 if (-not $project) { throw "Could not find project $projectNumber for $ownerType/$owner - check PROJECT_URL." }
 
@@ -86,6 +63,6 @@ mutation(`$project: ID!, `$item: ID!, `$field: ID!, `$option: String!) {
   }) { projectV2Item { id } }
 }
 "@
-Invoke-GraphQL $mutation @{ project = $project.id; item = $item.id; field = $project.field.id; option = $option.id } | Out-Null
+Invoke-GitHubGraphQL -Query $mutation -Variables @{ project = $project.id; item = $item.id; field = $project.field.id; option = $option.id } | Out-Null
 
 Write-Host "Moved issue #$IssueNumber to '$Status' on the board."
