@@ -1,0 +1,47 @@
+name: Sync board status on reopen
+
+# Scope note (read before "fixing" this to also handle Done <-> closed):
+#
+# Issue #49 originally asked for three behaviors:
+#   1. Board Status set to "Done" -> issue closes.
+#   2. Issue closed -> board Status set to "Done".
+#   3. Issue reopened -> board Status moves off "Done".
+#
+# While building this, (1) and (2) turned out to already be native GitHub
+# Projects (v2) workflows configured on this board - confirmed by hand:
+# setting a test issue's Status to Done auto-closed it, and separately
+# closing a test issue auto-set its Status to Done, both without any of
+# this repo's code involved. Adding a custom handler for either would
+# duplicate the platform's own automation and can race with it (an early
+# version of this hit "issue is already closed" doing exactly that).
+#
+# So this workflow only covers (3), the one gap: reopening an issue does
+# NOT revert its Status off "Done" on its own. "Todo" was chosen as the
+# reset target (a plain "sensible default", per the ticket) rather than
+# trying to reconstruct whatever status preceded "Done".
+#
+# If this board's native workflows are ever turned off, (1) and (2) would
+# need to move into custom automation too - see the reverted portions of
+# this ticket's history for a starting point (GraphQL query for reading an
+# item's Status + linked issue state, keyed off `projects_v2_item` events).
+
+on:
+  issues:
+    types: [reopened]
+
+jobs:
+  reset-status:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+        run: |
+          ./.github/scripts/Set-BoardStatus.ps1 `
+            -ProjectUrl "${{ vars.PROJECT_URL }}" `
+            -IssueNumber ${{ github.event.issue.number }} `
+            -Status "Todo"

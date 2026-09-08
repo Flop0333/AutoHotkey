@@ -21,7 +21,15 @@ function Get-CandidateIssues($riskLabel) {
     # PowerShell captures native stdout as a string array (one element per
     # line); ConvertFrom-Json needs it rejoined into one string first, or
     # pretty-printed/multi-line JSON parses into garbage silently.
-    ($lines -join "`n") | ConvertFrom-Json
+    #
+    # Also must be two statements, not `return ($lines -join "`n") |
+    # ConvertFrom-Json`: a function whose last statement is that pipeline
+    # expression, called as @(Get-CandidateIssues ...), produces a
+    # 1-element array wrapping an empty array when there are zero results,
+    # not a 0-element array - @() only flattens an already-materialized
+    # array variable, not a pipeline's output. Verified by hand.
+    $parsed = ($lines -join "`n") | ConvertFrom-Json
+    @($parsed)
 }
 
 $combined = @(Get-CandidateIssues "risk: read") + @(Get-CandidateIssues "risk: reversible")
