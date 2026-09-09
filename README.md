@@ -41,7 +41,7 @@ The suite brings several technologies and ideas together:
 - **Local secrets management** that keeps personal values outside Git while maintaining a tracked catalog.
 - **Structured logging and a visual test dashboard** for understanding failures quickly.
 - **Explicit dependency boundaries** that keep includes predictable and activation in executable entry points.
-- **PowerShell test runners and GitHub Actions** for architecture, syntax, unit, and integration checks.
+- **PowerShell test runners and GitHub Actions** for documentation, architecture, syntax, unit, and integration checks.
 - **GitHub Projects and optional scheduled agents** for issue triage, implementation, review, changelogs, and project status. Agent workflows require the [documented GitHub configuration](docs/AUTOMATION.md#required-github-configuration).
 
 ## 🛠️ Try it

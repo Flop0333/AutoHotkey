@@ -18,6 +18,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check documentation
+        shell: pwsh
+        run: .\Tests\Invoke-DocumentationCheck.ps1
+
       - name: Install AutoHotkey v2
         shell: pwsh
         env:

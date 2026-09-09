@@ -58,6 +58,7 @@ A change is ready for review when its acceptance criteria are met, relevant vali
 From PowerShell at the repository root:
 
 ```powershell
+./Tests/Invoke-DocumentationCheck.ps1
 ./Tests/Invoke-IncludeArchitectureCheck.ps1
 ./Tests/Invoke-SyntaxCheck.ps1
 ./Tests/Invoke-UnitTests.ps1

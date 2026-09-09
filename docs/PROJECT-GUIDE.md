@@ -39,7 +39,7 @@ Run the complete local check from PowerShell:
 ./Tests/Invoke-AllTests.ps1
 ```
 
-Individual architecture, syntax, unit, and integration runners are also available. See [testing](TESTING.md) for commands, discovery rules, result files, and instructions for adding tests.
+Individual documentation, architecture, syntax, unit, and integration runners are also available. See [testing](TESTING.md) for commands, discovery rules, result files, and instructions for adding tests.
 
 AI coding agents should begin with [AGENTS.md](../AGENTS.md), which summarizes the architecture, safety boundaries, sources of truth, and validation expectations.
 

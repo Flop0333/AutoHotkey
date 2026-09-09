@@ -7,10 +7,11 @@ The repository uses lightweight AutoHotkey v2 tests and a static include-archite
 From the repository root in PowerShell:
 
 ```powershell
-# Everything: include architecture, syntax, unit, then integration
+# Everything: documentation, include architecture, syntax, unit, then integration
 ./Tests/Invoke-AllTests.ps1
 
 # Individual suites
+./Tests/Invoke-DocumentationCheck.ps1
 ./Tests/Invoke-IncludeArchitectureCheck.ps1
 ./Tests/Invoke-SyntaxCheck.ps1
 ./Tests/Invoke-UnitTests.ps1
@@ -29,6 +30,10 @@ Optional timeout parameters are available when diagnosing a slow machine:
 ```
 
 ## What each suite checks
+
+### Documentation
+
+`Invoke-DocumentationCheck.ps1` validates tracked local Markdown links and checks that the automation and app catalogs cover every workflow and maintained app entry point. It also catches missing document references in issue forms and self-tests its link checker.
 
 ### Include architecture
 
@@ -54,7 +59,7 @@ Targets are discovered from the `Run(...)` calls in `Startup/Startup.ahk`, plus 
 
 Double-click `Tests/Run-Tests.ahk`, choose **Test Dashboard** from the startup tray, or run the `Test` command in Age of Efficiency. The launcher opens the dashboard and runs `Invoke-AllTests.ps1` in a hidden PowerShell process.
 
-The combined runner executes all four suites and writes git-ignored runtime data:
+The combined runner executes all five suites and writes git-ignored runtime data:
 
 - `Logs/test-run-status.json` — current state and most recent result, polled by the dashboard;
 - `Logs/test-run-history.log` — one compact JSON object per completed run, oldest first.
@@ -77,7 +82,7 @@ When adding an application to `RunStartup()`, the syntax runner normally discove
 
 ## CI
 
-`.github/workflows/ahk-tests.yml` runs all four suites on `windows-latest` for pushes and pull requests targeting `main`. It downloads the latest official AutoHotkey v2 release from `AutoHotkey/AutoHotkey` on GitHub and adds it to `PATH`.
+`.github/workflows/ahk-tests.yml` runs all five suites on `windows-latest` for pushes and pull requests targeting `main`. Documentation validation runs before AutoHotkey is installed; the remaining suites use the latest official AutoHotkey v2 release from `AutoHotkey/AutoHotkey` on GitHub.
 
 After a PR test run completes, `.github/workflows/ci-failure-summary.yml` maintains one readable failure-summary comment on that PR. See [Startup and GitHub automation](AUTOMATION.md) for the complete connection map.
 
