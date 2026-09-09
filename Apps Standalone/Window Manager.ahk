@@ -18,11 +18,11 @@
 ; Note: Requires Capslock Service to be running
 ; ============================================================================
 
+#Include ..\Lib\Core\OnError.ahk
 #Include ..\Lib\Helpers\Capslock.ahk
 #Include ..\Lib\Extensions\Win.ahk
 #Include ..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
-#Include ..\Lib\Core\OnError.ahk
-OnError(HandleUnhandledError)
+
 SetWinDelay(0)
 CoordMode("Mouse")
 

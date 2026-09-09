@@ -20,9 +20,9 @@
 ; - Configure hotkey and sensitivity in Gesture Detector.ahk
 ; ============================================================================
 
-#Include Gesture Detector.ahk
 #Include ..\..\Lib\Core\OnError.ahk
-OnError(HandleUnhandledError)
+#Include Gesture Detector.ahk
+
 CoordMode "Mouse", "Screen"
 
 GestureDetector() ; Initialize the gesture detector

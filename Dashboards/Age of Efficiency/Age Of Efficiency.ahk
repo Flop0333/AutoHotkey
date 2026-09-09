@@ -20,14 +20,13 @@
 ;   - Configure items through the user interface
 ; ============================================================================
 
-#Include ..\..\Lib\Core\Paths.ahk
 #Include ..\..\Lib\Core\OnError.ahk
+#Include ..\..\Lib\Core\Paths.ahk
 #Include ..\..\Profiles\Profile Manager.ahk
 #Include Composition.ahk
 #Include User Interface\Controller.ahk
 #Include Input Handler\Command Input.ahk
 
-OnError(HandleUnhandledError)
 Browser.ConfigureDefaultBrowser(ProfileManager.Is(Profiles.work, Profiles.devbox) ? Edge : Brave)
 USER_INTERFACE_PATH := Paths.dashboards "\Age of Efficiency\User Interface"
 TraySetIcon(USER_INTERFACE_PATH "\Library\Icons\Icon.png")

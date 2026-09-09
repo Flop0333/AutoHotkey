@@ -21,13 +21,11 @@
 ; ============================================================================
 
 #Include ..\Lib\Helpers\Capslock.ahk
+#Include ..\Lib\Core\OnError.ahk
 #Include ..\Profiles\Profile Manager.ahk
 #Include ..\Lib\Apps\Notion.ahk
 #Include ..\Lib\Apps\Spotify.ahk
 #Include ..\Lib\Apps\KeePass.ahk
-
-#Include ..\Lib\Core\OnError.ahk
-OnError(HandleUnhandledError)
 
 ; ================================
 ; Generic Hotkeys

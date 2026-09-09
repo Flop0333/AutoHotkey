@@ -23,8 +23,6 @@
 #SingleInstance Force
    #NoTrayIcon
 
-OnError(HandleUnhandledError)
-
 CapsLock:: {
    EnsureHostFocus()                              ; Always return focus to host if in VM
    KeyWait('CapsLock')                               ; wait for Capslock to be released

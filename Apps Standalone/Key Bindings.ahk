@@ -1,6 +1,5 @@
-#Include ..\Secrets\Secrets Service.ahk
 #Include ..\Lib\Core\OnError.ahk
-OnError(HandleUnhandledError)
+#Include ..\Secrets\Secrets Service.ahk
 
 ; Base
 :X:\fl::Secrets.PersonalMail.Send()

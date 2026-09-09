@@ -44,10 +44,10 @@
 #Requires AutoHotkey v2
 #Warn All, Off
 #SingleInstance force
-#Include Screen Snipper OCR.ahk
 #Include ..\..\Lib\Core\OnError.ahk
+#Include Screen Snipper OCR.ahk
 #Include ..\..\Lib\Tools\Info.ahk
-OnError(HandleUnhandledError)
+
 DetectHiddenWindows true
 SetWinDelay(0)
 ;}

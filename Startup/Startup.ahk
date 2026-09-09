@@ -11,16 +11,14 @@
 ;   - Manually set profile on startup (or auto-detect based on computer name)
 ;   - Switch profiles using tray menu
 ; ============================================================================
-#Include ..\Dashboards\Logger\Logging.ahk
 #Include ..\Lib\Core\OnError.ahk
+#Include ..\Dashboards\Logger\Logging.ahk
 #Include ..\Dashboards\Test Dashboard\Test Dashboard.ahk
 #Include ..\Lib\Core\Paths.ahk
 #Include ..\Profiles\Profile Manager.ahk
 #Include ..\Secrets\Secrets File Manager.ahk
 #Include Startup Message.ahk
 #Include Startup Menu Tray.ahk
-
-OnError(HandleUnhandledError)
 
 RunStartup(profile?) {
     steps := [

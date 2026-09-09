@@ -9,15 +9,13 @@
 ;   - Last-used voice/volume/speed persist across restarts
 ; ============================================================================
 
+#Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Paths.ahk
 #Include ..\..\Lib\Extensions\Json.ahk
 #Include ..\..\Lib\Extensions\Dark ToolTip.ahk
 #Include ..\..\Lib\Tools\Info.ahk
-#Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Tools\WebView\WebViewToo.ahk
 #Include Screen Snip Speaker.ahk
-
-OnError(HandleUnhandledError)
 
 ^Space::TextSpeaker.TogglePlay()
 
