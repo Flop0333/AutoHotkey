@@ -3,6 +3,11 @@ description: A scoped, actionable task an AI agent (Claude Code, Copilot) can pi
 title: "[Task]: "
 labels: ["agent-ready"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        After submitting, manually apply exactly one `size:*` label and one `risk:*` label. The dropdown answers below document the choice but do not add labels; those labels are required for daily-agent eligibility.
+
   - type: textarea
     id: summary
     attributes:
@@ -32,7 +37,7 @@ body:
     id: risk
     attributes:
       label: Risk level
-      description: Matches the AgentTool risk taxonomy in agent-plan.md.
+      description: Choose the matching risk label to apply after submission; definitions are summarized in agent-plan.md.
       options:
         - read (no state change)
         - reversible (easy-to-undo local change)
@@ -58,4 +63,4 @@ body:
     id: context
     attributes:
       label: Additional context
-      description: Links to related issues, docs (agent-plan.md, amazing-ideas.md), or prior discussion.
+      description: Links to related issues, agent-plan.md, ROAD MAP.md, or prior discussion.

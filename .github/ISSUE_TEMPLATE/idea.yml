@@ -1,5 +1,5 @@
 name: Idea / exploration
-description: A not-yet-scoped concept, e.g. from amazing-ideas.md, that needs thinking before it becomes a task.
+description: A not-yet-scoped concept from the roadmap or a new discussion that needs thinking before it becomes a task.
 title: "[Idea]: "
 labels: ["idea", "needs-human-decision"]
 body:
@@ -21,4 +21,4 @@ body:
     id: related
     attributes:
       label: Related ideas or docs
-      description: Links to other issues, amazing-ideas.md sections, or ROAD MAP.md entries.
+      description: Links to other issues, ROAD MAP.md, or Dashboards/Macro Board/New Features Ideas.md for Macro Board concepts.
