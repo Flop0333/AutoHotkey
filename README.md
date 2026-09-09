@@ -1,59 +1,67 @@
-Hey everyone! 👋
+# AutoHotkey productivity suite
 
 [![AHK Tests](https://github.com/Flop0333/AutoHotkey/actions/workflows/ahk-tests.yml/badge.svg)](https://github.com/Flop0333/AutoHotkey/actions/workflows/ahk-tests.yml)
 
-I'm excited to show my AutoHotkey v2 workflow system that I've been building! It's a modular collection of productivity tools that's transformed how I work.
+A personal, modular automation suite built for AutoHotkey v2 on Windows. It combines global hotkeys, window and desktop management, small productivity tools, and WebView2 dashboards. Profiles adapt the same checkout to different computers, while local secrets keep personal values out of Git.
 
-**New to this project?** → [Installation Guide](INSTALLATION.md)
+## Quick start
 
-## ✨ Features
+1. Install [AutoHotkey v2](https://www.autohotkey.com/).
+2. Clone this repository on Windows.
+3. Run `Startup/Startup.ahk`.
+4. Select or configure a profile when prompted.
 
-### Core Tools
-- 🖥️ **Virtual Desktops Manager** - Seamlessly auto-launch apps per virtual desktop
-- 🪟 **Window Manager** - Drag, resize & control windows with CapsLock shortcuts
-- ⌨️ **CapsLock Modifier** - Repurpose CapsLock as a powerful modifier key
-- 🖱️ **Mouse Gestures** - Execute quick actions with mouse movements
+See the [installation guide](INSTALLATION.md) for prerequisites, local configuration, and Windows auto-start.
 
+## What is included
 
-### Dashboards
-- 🚀 **Age of Efficiency** - Command launcher for bookmarks, searches, and scripts
-![alt text](<Dashboards/Age of Efficiency/Demo.gif>)
+- **Standalone apps** provide independent tools such as the CapsLock modifier, virtual desktop manager, emoji picker, screen snipper, text speaker, mouse gestures, and window manager.
+- **Integrated apps** provide shared hotkeys and utilities such as Command Storer, spell checking, timers, picture-in-picture, and mouse controls.
+- **Dashboards** provide WebView2 interfaces for launching commands, running macros, viewing logs, and monitoring tests.
+- **Lib** contains shared application wrappers, helpers, extensions, and third-party tools.
+- **Startup, Profiles, and Secrets** coordinate machine-specific configuration and launch the enabled suite.
+- **Tests** contains syntax checks, unit tests, integration tests, and a visual Test Dashboard.
+- **.github** connects issues, the Project board, pull requests, CI, GitHub Pages, labels, changelog generation, and scheduled agents.
 
-- 🎹 **Macro Board** - Stream Deck-like interface with customizable buttons
-![alt text](<Dashboards/Macro Board/Demo.gif>)
+The complete inventory is in the [app and script catalog](docs/APPS.md).
 
+## Featured dashboards
 
-### Productivity Apps
-- 📸 **Screen Snipper with OCR** - Capture and extract text from screens in seconds
-- 🐭 **Mouse Gestures** - Execute quick actions with mouse movements 
-- 🪟 **Window Management** - Drag, resize & control windows with CapsLock shortcuts
-- 🧑‍💻 **Command Storer** - Quick access to frequently used commands
-- 🤓 **Emoji Sender** - Quick emoji picker with keyboard shortcuts
-- ⌨️ **Capslock Modifier** - Capslock as powerful modifier key
-- ♾️ **And much more!**
+**Age of Efficiency** is a command launcher for bookmarks, searches, apps, and scripts.
 
+![Age of Efficiency demo](Dashboards/Age%20of%20Efficiency/Demo.gif)
 
-## 🏗️ Architecture
+**Macro Board** is a customizable, Stream Deck-style panel for frequently used actions.
 
-**Profile System** - Context-aware configurations that adapt behavior per environment (work/home/laptop)
+![Macro Board demo](Dashboards/Macro%20Board/Demo.gif)
 
-**Secrets Management** - Git-ignored file for storing personal data (emails, URLs, credentials)
+## How the suite starts
 
-**Dashboards** - WebView2-powered UIs combining modern web technologies with AHK backend
+`Startup/Startup.ahk` is the source of truth for the local auto-run set. It initializes logging, secrets, and the active profile; starts the CapsLock service first; then launches the configured dashboards, standalone apps, integrated apps, and logger host. Optional scripts remain available to run or include without starting automatically.
 
-**Apps Integrated** - Background services that run continuously and integrate via hotkeys
+GitHub automation is separate from Windows startup. Its workflows run tests, manage Project-board state, maintain repository metadata and pages, and assist with issue and pull-request work. See [repository automation](docs/AUTOMATION.md).
 
-**Apps Standalone** - Independent utilities that can run separately (Window Manager, Command Storer, etc.) 
+## Development
 
+Run the complete local check from PowerShell:
 
-## 💭 Philosophy
-Every component is modular, following OOP/SOLID principles and build with care for maximum flexibility and maintainability.
+```powershell
+./Tests/Invoke-AllTests.ps1
+```
 
-This project embraces **code-first configuration** - sometimes editing code is faster (and more fun) than clicking through UIs.
+Individual syntax, unit, and integration runners are also available. See [testing](docs/TESTING.md) for commands, discovery rules, result files, and instructions for adding tests.
 
+AI coding agents should begin with [AGENTS.md](AGENTS.md), which summarizes the architecture, safety boundaries, sources of truth, and validation expectations.
 
+## Documentation
 
-I can't wait to hear your thoughts, feedback & bug reports.
-Let me know what you think! 💭
+| Document | Purpose |
+|---|---|
+| [Installation](INSTALLATION.md) | Prerequisites, profiles, secrets, startup, and troubleshooting |
+| [Apps and scripts](docs/APPS.md) | Catalog of runnable tools, dashboards, and supporting areas |
+| [Automation](docs/AUTOMATION.md) | Windows auto-run and all GitHub connections and workflows |
+| [Testing](docs/TESTING.md) | Local test suites, dashboard, CI, and test authoring |
+| [Agent guide](AGENTS.md) | Fast repository orientation for AI agents and contributors |
+| [Road map](ROAD%20MAP.md) | Future ideas and resources under consideration |
 
-Discord Post: [https://discord.com/channels/115993023636176902/1471948793359630479]
+This project favors code-first configuration and small, composable AutoHotkey scripts. Contributions, bug reports, and practical feedback are welcome.
