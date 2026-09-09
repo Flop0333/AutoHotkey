@@ -44,10 +44,16 @@ GetLogEntryCount() {
 }
 
 ReadLogEntries() {
-	return ReadLogEntriesFromFile(ErrorLogFile())
+	return WithLoggingLock(() => _ReadLogEntriesFromFileLocked(ErrorLogFile()))
 }
 
 ReadLogEntriesFromFile(logFile) {
+	return WithLoggingLock(() => _ReadLogEntriesFromFileLocked(logFile))
+}
+
+; Caller must hold the logging mutex so rotation cannot move the file between
+; the existence check and the read.
+_ReadLogEntriesFromFileLocked(logFile) {
 	entries := []
 	if !FileExist(logFile)
 		return entries
@@ -64,6 +70,10 @@ ReadLogEntriesFromFile(logFile) {
 }
 
 GetReadLogEntryCount() {
+	return WithLoggingLock(() => _GetReadLogEntryCountLocked())
+}
+
+_GetReadLogEntryCountLocked() {
     if !FileExist(ErrorLogReadStateFile())
         return 0
     try return Max(0, Integer(Trim(FileRead(ErrorLogReadStateFile(), "UTF-8"))))
@@ -75,32 +85,54 @@ MarkAllLogsRead() {
 }
 
 GetLogSessionId() {
+	return WithLoggingLock(() => _GetLogSessionIdLocked())
+}
+
+_GetLogSessionIdLocked() {
 	if !FileExist(ErrorLogSessionStateFile())
 		return ""
 	try return Trim(FileRead(ErrorLogSessionStateFile(), "UTF-8"))
 	return ""
 }
 
+; Return one consistent view for consumers that need entries, the read cursor,
+; and the session identity together.
+ReadLogState() {
+	return WithLoggingLock(() => Map(
+		"entries", _ReadLogEntriesFromFileLocked(ErrorLogFile()),
+		"readEntryCount", _GetReadLogEntryCountLocked(),
+		"sessionId", _GetLogSessionIdLocked()
+	))
+}
+
 _MarkAllLogsReadLocked() {
 	DirCreate(ErrorLogDirectory())
 	readState := FileOpen(ErrorLogReadStateFile(), "w", "UTF-8")
-	try readState.Write(GetLogEntryCount())
+	try readState.Write(_ReadLogEntriesFromFileLocked(ErrorLogFile()).Length)
 	finally readState.Close()
 }
 
-GetUnreadLogEntries(entries?) {
-	if !IsSet(entries)
-		entries := ReadLogEntries()
-	readEntryCount := Min(GetReadLogEntryCount(), entries.Length)
+GetUnreadLogEntries(entries?, readEntryCount?) {
+	if !IsSet(entries) {
+		state := ReadLogState()
+		entries := state["entries"]
+		readEntryCount := state["readEntryCount"]
+	} else if !IsSet(readEntryCount) {
+		readEntryCount := GetReadLogEntryCount()
+	}
+	readEntryCount := Min(readEntryCount, entries.Length)
 	unreadEntries := []
 	loop entries.Length - readEntryCount
 		unreadEntries.Push(entries[readEntryCount + A_Index])
 	return unreadEntries
 }
 
-GetUnreadLogCounts(entries?) {
+GetUnreadLogCounts(entries?, readEntryCount?) {
 	counts := Map("info", 0, "warning", 0, "error", 0)
-	unreadEntries := IsSet(entries) ? GetUnreadLogEntries(entries) : GetUnreadLogEntries()
+	if IsSet(entries)
+		unreadEntries := IsSet(readEntryCount) ? GetUnreadLogEntries(entries, readEntryCount) : GetUnreadLogEntries(entries)
+	else
+		unreadEntries := GetUnreadLogEntries()
 	for entry in unreadEntries {
 		severity := entry.Has("severity") ? entry["severity"] : "info"
 		if counts.Has(severity)

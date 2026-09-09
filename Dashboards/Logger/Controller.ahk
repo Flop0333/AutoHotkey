@@ -92,21 +92,21 @@ Class LoggerPopup {
 	}
 
 	_Seed() {
-		entries := ReadLogEntries()
-		this._RefreshUnreadCounts(entries)
-		this.lastEntryCount := Min(GetReadLogEntryCount(), entries.Length)
-		this.logSessionId := GetLogSessionId()
+		state := ReadLogState()
+		entries := state["entries"]
+		this._RefreshUnreadCounts(entries, state["readEntryCount"])
+		this.lastEntryCount := Min(state["readEntryCount"], entries.Length)
+		this.logSessionId := state["sessionId"]
 	}
 
-	_ReadAllEntries() => ReadLogEntries()
-
-	_RefreshUnreadCounts(entries) {
-		this.counts := GetUnreadLogCounts(entries)
+	_RefreshUnreadCounts(entries, readEntryCount) {
+		this.counts := GetUnreadLogCounts(entries, readEntryCount)
 	}
 
 	_Poll() {
-		entries := this._ReadAllEntries()
-		currentSessionId := GetLogSessionId()
+		state := ReadLogState()
+		entries := state["entries"]
+		currentSessionId := state["sessionId"]
 		if (currentSessionId != this.logSessionId) {
 			this.lastEntryCount := 0
 			this.logSessionId := currentSessionId
@@ -122,8 +122,8 @@ Class LoggerPopup {
 		}
 		this.lastEntryCount := entries.Length
 
-		this._RefreshUnreadCounts(entries)
-		if (GetReadLogEntryCount() >= entries.Length)
+		this._RefreshUnreadCounts(entries, state["readEntryCount"])
+		if (state["readEntryCount"] >= entries.Length)
 			this._HideNotification()
 		else
 			this._Render()

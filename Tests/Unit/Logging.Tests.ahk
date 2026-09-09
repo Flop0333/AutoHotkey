@@ -222,6 +222,16 @@ Test_UnreadCountsCanUseOneEntriesSnapshot() {
 	Assert.Equal(2, GetUnreadLogEntries().Length, "Default API still reads the latest file state")
 }
 
+Test_ReadLogStateReturnsOneConsistentSnapshot() {
+	ResetLogFiles()
+	LogInfo("read")
+	MarkAllLogsRead()
+	state := ReadLogState()
+	Assert.Equal(1, state["entries"].Length)
+	Assert.Equal(1, state["readEntryCount"])
+	Assert.Equal(GetLogSessionId(), state["sessionId"])
+}
+
 Test_SharedParserValidatesArbitraryLogFile() {
 	ResetLogFiles()
 	fixture := testRoot "\parser-fixture.log"
@@ -250,6 +260,7 @@ TestKit.Run("New session archives the active log and resets read state", Test_St
 TestKit.Run("Rapid session rotation avoids archive name collisions", Test_StartNewSessionAvoidsArchiveNameCollisions)
 TestKit.Run("Session rotation prunes the oldest archives", Test_StartNewSessionPrunesOldestArchives)
 TestKit.Run("Unread counts can reuse a single entries snapshot", Test_UnreadCountsCanUseOneEntriesSnapshot)
+TestKit.Run("Log state returns entries, cursor, and session as one snapshot", Test_ReadLogStateReturnsOneConsistentSnapshot)
 TestKit.Run("Shared parser validates an arbitrary JSONL log file", Test_SharedParserValidatesArbitraryLogFile)
 
 TestKit.Report()
