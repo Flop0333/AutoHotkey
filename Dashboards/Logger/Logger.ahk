@@ -5,7 +5,7 @@
 ; [FEATURES]
 ;   - Uses a lightweight native AHK GUI (no resident WebView2 process)
 ;   - Polls Logs\errors.log for new entries (no cross-process messaging needed)
-;   - Shows a small always-on-top popup 5 seconds after the last log entry
+;   - Shows notifying entries immediately, then hides 5 seconds after the latest
 ;   - Collapsed rows for info/warning/error with running counts; the row for
 ;     the latest not-yet-seen entry expands to show its script + message
 ;   - Left-click opens the Log Dashboard; right-click dismisses the popup
@@ -43,8 +43,7 @@ FindLoggerWindow() {
 
 StartLogger() => Run('"' A_AhkPath '" "' Paths.dashboards '\Logger\Logger Host.ahk"')
 
-; A generous timeout - WebView2 first-run init (extracting the loader, spinning
-; up its child process) can take several seconds on a cold/slow machine.
+; Leave enough time for a cold machine or security scanner to start the host.
 WaitForLoggerWindow(timeoutMs := 20000) {
 	startedAt := A_TickCount
 	while (A_TickCount - startedAt < timeoutMs) {
