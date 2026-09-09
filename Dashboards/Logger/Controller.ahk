@@ -1,4 +1,5 @@
-#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\OnError.ahk
+#Include ..\..\Lib\Tools\Info.ahk
 #Include ..\..\Dashboards\Log Dashboard\Log Dashboard.ahk
 
 ; The resident notification host uses a native GUI. The full dashboard remains

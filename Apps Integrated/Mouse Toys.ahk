@@ -2,7 +2,9 @@
 ; === Mouse Toys - Custom mouse button and wheel actions =====================
 ; ============================================================================
 
-#Include ..\Lib\Core.ahk
+#Include ..\Lib\Core\OnError.ahk
+#Include ..\Profiles\Profile Manager.ahk
+
 A_MaxHotkeysPerInterval := 420
 
 

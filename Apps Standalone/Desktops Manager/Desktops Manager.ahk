@@ -23,7 +23,12 @@
 ;   - Multiple RequiredWindow() per desktop supported
 ; ============================================================================
 
-#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\OnError.ahk
+#Include ..\..\Lib\Core\Links.ahk
+#Include ..\..\Lib\Helpers\Capslock.ahk
+#Include ..\..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
+#Include ..\..\Profiles\Profile Manager.ahk
+#Include ..\..\Secrets\Secrets Service.ahk
 #Include Desktop.ahk
 #Include ..\..\Lib\Apps\VsCode.ahk
 #Include ..\..\Lib\Apps\Notion.ahk

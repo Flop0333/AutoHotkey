@@ -1,4 +1,5 @@
-#Include ..\Lib\Core.ahk
+#Include ..\Lib\Core\OnError.ahk
+#Include ..\Secrets\Secrets Service.ahk
 
 ; Base
 :X:\fl::Secrets.PersonalMail.Send()

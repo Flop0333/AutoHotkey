@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2
 #SingleInstance Force
-#Include ..\..\..\Core.ahk
+#Include ..\..\..\Core\Paths.ahk
+#Include ..\..\..\Core\WebView.ahk
+#Include ..\..\..\Extensions\Json.ahk
 #Include ..\..\Info.ahk
 #Include My Model.ahk
 

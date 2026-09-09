@@ -7,15 +7,16 @@
 ; ============================================================================
 
 #Include Internet Searcher.ahk
-#Include ..\User Interface\Controller.ahk
 #Include ..\..\..\Apps Integrated\Fake Working Mode.ahk
 #Include ..\..\..\Apps Integrated\PBI Reformat.ahk
 #Include ..\..\..\Apps Integrated\Timer.ahk
 #Include ..\..\..\Apps Integrated\Status Memes\Status Meme.ahk
 #Include ..\..\..\Apps Integrated\Picture In Picture.ahk
-#Include ..\..\..\Startup\Startup.ahk
+#Include ..\..\Test Dashboard\Test Dashboard.ahk
+#Include ..\..\Log Dashboard\Log Dashboard.ahk
 #Include ..\..\..\Lib\Apps\Notion.ahk
 #Include ..\..\..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
+#Include ..\..\..\Lib\Helpers\System.ahk
 
 StartPBIReformat() => PBIReformat.Start()
 
@@ -40,6 +41,3 @@ StartPictureInPicture() => PictureInPicture()
 CloseOnAllDesktops() => DesktopsDDL.CloseOnAllDesktops()
 
 OpenAutoHotkeyDashboard() => ShowLogDashboard()
-
-; RunTests() is defined in Dashboards\Test Dashboard\Test Dashboard.ahk, pulled
-; in transitively via the Startup.ahk include above.

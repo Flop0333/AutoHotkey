@@ -43,6 +43,10 @@ jobs:
         shell: pwsh
         run: .\Tests\Invoke-SyntaxCheck.ps1
 
+      - name: Check include architecture
+        shell: pwsh
+        run: .\Tests\Invoke-IncludeArchitectureCheck.ps1
+
       - name: Run unit tests
         shell: pwsh
         run: .\Tests\Invoke-UnitTests.ps1

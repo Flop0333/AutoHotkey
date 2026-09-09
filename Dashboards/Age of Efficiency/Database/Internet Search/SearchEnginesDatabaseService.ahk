@@ -1,16 +1,12 @@
 #Include SearchEngine.ahk
-#Include SearchEnginesState.ahk
 #Include ../BaseDatabaseService.ahk
+#Include ..\..\..\..\Lib\Core\Paths.ahk
 
 Class SearchEnginesDatabaseService extends BaseDatabaseService {
 
   STORAGE_FILE_PATH := Paths.dashboards "\Age of Efficiency\Database\Internet Search\SearchEngines.json"
 
-  GetSearchEngines() {
-    result := this.GetItems(SearchEngine)
-    SearchEnginesState.SetUniqueId(result.highestId)
-    return result.items
-  }
+  Load() => this.GetItems(SearchEngine)
 
-  StoreSearchEngines() => this.StoreItems(SearchEnginesState.state)
+  Store(items) => this.StoreItems(items)
 }

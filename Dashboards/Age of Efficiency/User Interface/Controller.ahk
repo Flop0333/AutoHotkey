@@ -1,4 +1,4 @@
-#Include ..\..\..\Lib\Core.ahk
+#Include ..\..\..\Lib\Extensions\Json.ahk
 #Include ..\..\..\Lib\Core\WebView.ahk
 #Include Items\Items.ahk	
 

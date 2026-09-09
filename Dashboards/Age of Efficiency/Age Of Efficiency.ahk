@@ -20,12 +20,15 @@
 ;   - Configure items through the user interface
 ; ============================================================================
 
-#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\OnError.ahk
+#Include ..\..\Lib\Core\Paths.ahk
+#Include Composition.ahk
 #Include User Interface\Controller.ahk
 #Include Input Handler\Command Input.ahk
 
 USER_INTERFACE_PATH := Paths.dashboards "\Age of Efficiency\User Interface"
 TraySetIcon(USER_INTERFACE_PATH "\Library\Icons\Icon.png")
+InitializeAgeOfEfficiencyState()
 
 !space::    CommandInput().WaitForInputAndExecute() ; Woonkamerlaptop
 Insert::	CommandInput().WaitForInputAndExecute() ; Desktop
