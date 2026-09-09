@@ -1,0 +1,77 @@
+# AutoHotkey architecture
+
+This repository uses AutoHotkey v2 `#Include` directives for source composition and ordinary objects and function objects for runtime composition. An include makes a definition available; it should not decide which implementation an application uses or activate optional behavior.
+
+## Dependency direction
+
+Maintained includes form a directed acyclic graph:
+
+```text
+entry point / composition root
+    -> feature controller
+        -> application service
+            -> state or reusable library
+                -> focused helper or extension
+```
+
+- Reusable files include their immediate dependencies rather than `Lib/Core.ahk`.
+- Files outside `Startup/` do not include startup bootstrap files.
+- An application may expose one focused feature root, but broad catch-all barrels are avoided.
+- Vendored examples and the WebView setup template are not application dependencies and are excluded explicitly from the maintained graph check.
+
+`Lib/Core.ahk` remains only as a compatibility facade for external or personal scripts. Repository code must not depend on it.
+
+## Definitions and activation
+
+Library inclusion should be inert apart from explicitly named language extensions. It must not launch applications, start timers, change the working directory, or install process-wide handlers.
+
+Executable entry points own activation. For example:
+
+```ahk
+#Include ..\Lib\Core\OnError.ahk
+
+InstallGlobalErrorHandler()
+```
+
+Optional features follow the same rule: including Spell Checker or Fake Working Mode exposes definitions, while the Macro Board explicitly enables the behavior it owns.
+
+Files under `Lib/Extensions/` that intentionally augment an AutoHotkey prototype or built-in function are process-wide by design. Include those files deliberately and do not hide them behind an unrelated feature.
+
+## Manual dependency injection
+
+AutoHotkey does not need a dependency-injection container. Constructors, objects, and function objects provide the useful part of dependency injection directly.
+
+The Age of Efficiency composition root selects JSON repositories:
+
+```ahk
+AppsState.Initialize(AppsDatabaseService(), LogAndNotifyInfo)
+```
+
+Tests can pass an in-memory repository with the same `Load()` and `Store(items)` methods. Effectful functions use the same pattern; `Browser.ConfigureRunFunction(fakeRun)` lets a test observe a launch without starting a process.
+
+Prefer injection when a dependency performs I/O, starts a process, displays UI, reads machine-specific state, or needs a fake in a unit test. Pure helpers can be called directly.
+
+## Include paths
+
+- Use paths relative to the file containing the directive.
+- Use Windows backslashes consistently in maintained AHK source.
+- Keep the repository's established unquoted relative form; quote only where a tool or parser requires it.
+- Do not use absolute machine paths or change the include directory globally.
+- Use `<LibraryName>` only for a library intentionally installed in an AutoHotkey library search location, not for ordinary repository-local code.
+
+## Validation
+
+Run the dependency check directly:
+
+```powershell
+.\Tests\Invoke-IncludeArchitectureCheck.ps1
+```
+
+It runs fixture-based self-tests, resolves repository-local includes, detects missing targets and cycles, and enforces the `Lib -> Core.ahk` and non-Startup -> Startup boundaries. It also runs as part of `Invoke-AllTests.ps1` and GitHub Actions.
+
+When adding a module:
+
+1. Include only what it directly references.
+2. Keep the dependency direction one-way.
+3. Put runtime construction and activation in the nearest executable composition root.
+4. Add an injection seam for effects that should be tested without touching the real machine.

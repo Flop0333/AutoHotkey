@@ -35,6 +35,8 @@ I'm excited to show my AutoHotkey v2 workflow system that I've been building! It
 
 ## 🏗️ Architecture
 
+See [AutoHotkey architecture](docs/ARCHITECTURE.md) for the include graph, dependency-direction, runtime activation, and manual dependency-injection conventions.
+
 **Profile System** - Context-aware configurations that adapt behavior per environment (work/home/laptop)
 
 **Secrets Management** - Git-ignored file for storing personal data (emails, URLs, credentials)

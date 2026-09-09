@@ -2,7 +2,7 @@
 ; === Picture In Picture - Enables picture-in-picture mode for videos ========
 ; ============================================================================
 
-#Include ..\Lib\Core.ahk
+#Include ..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
 #Include ..\Lib\Core\UIA.ahk
 
 PictureInPicture() {

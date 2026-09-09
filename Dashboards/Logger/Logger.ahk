@@ -12,7 +12,7 @@
 ;     until the next log entry
 ; ============================================================================
 
-#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\Paths.ahk
 #Include Controller.ahk
 
 ShowLogger() {

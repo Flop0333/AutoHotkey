@@ -1,4 +1,6 @@
-#Include ..\Lib\Core.ahk
+#Include ..\Secrets\Secrets Service.ahk
+#Include ..\Lib\Core\OnError.ahk
+InstallGlobalErrorHandler()
 
 ; Base
 :X:\fl::Secrets.PersonalMail.Send()

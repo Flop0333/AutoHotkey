@@ -1,3 +1,5 @@
+#Include ..\Lib\Core\OnError.ahk
+
 class Secret {
     __New(name, description, value := "", key := "") {
         this.name := name

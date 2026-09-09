@@ -47,6 +47,7 @@
 #Include Screen Snipper OCR.ahk
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Tools\Info.ahk
+InstallGlobalErrorHandler()
 DetectHiddenWindows true
 SetWinDelay(0)
 ;}

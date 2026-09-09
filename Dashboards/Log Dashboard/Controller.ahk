@@ -1,4 +1,6 @@
-#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\OnError.ahk
+#Include ..\..\Lib\Core\Paths.ahk
+#Include ..\..\Lib\Extensions\Json.ahk
 #Include ..\..\Lib\Core\WebView.ahk
 
 Class LogDashboard extends WebViewToo {

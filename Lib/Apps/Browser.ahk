@@ -1,18 +1,22 @@
-#Include ..\Core.ahk
 #Include App.ahk
+#Include ..\..\Profiles\Profile Manager.ahk
+#Include ..\Extensions\Dark ToolTip.ahk
 
 Class Browser extends App {
     static defaultBrowser := ProfileManager.Is(Profiles.work) || ProfileManager.Is(Profiles.devbox) ? Edge : Brave
     static browsers := [Brave,Edge,Chrome]
+    static _runFunction := Run
     
     static __New() => this.Init(this.defaultBrowser.winTitle, this.defaultBrowser.ahk_exe)
-    
+
+    static ConfigureRunFunction(runFunction := Run) => this._runFunction := runFunction
+
     ; This needs to take into account if the window is on another desktop
     static OpenURL(url, newTab := true) {
         try { ; try opening on the existing window on the current desktop
             this.Activate()
             WinWaitActive("ahk_exe " this.ahk_exe, "", 5)
-            Run(this.ahk_exe ' "' url '"')
+            this._runFunction.Call(this.ahk_exe ' "' url '"')
         } catch {
             ; continue to run the URL in a new window
             this.OpenInNewBrowser(url)
@@ -21,7 +25,7 @@ Class Browser extends App {
         }
     }
 
-    static OpenInNewBrowser(url) => Run(Browser.defaultBrowser.ahk_exe ' --new-window "' url '"',,"Max")
+    static OpenInNewBrowser(url) => this._runFunction.Call(Browser.defaultBrowser.ahk_exe ' --new-window "' url '"',,"Max")
 
     static OpenUrlUnderMouse(url) {
         ; Get window under mouse
@@ -31,7 +35,7 @@ Class Browser extends App {
         ; Check if the window is a browser and open in that browser
         for index, browserClass in this.browsers {
             if (mouseExe = browserClass.ahk_exe) {
-                Run(mouseExe ' "' url '"')
+                this._runFunction.Call(mouseExe ' "' url '"')
                 return
             }
         }

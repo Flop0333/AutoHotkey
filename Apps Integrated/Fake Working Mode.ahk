@@ -2,31 +2,38 @@
 ; === Fake Working Mode - Simulates activity to prevent system from going idle ===
 ; ================================================================================
 
-#Include ..\Lib\Core.ahk
+#Include ..\Profiles\Profile Manager.ahk
 
-; Set default state for profile
-if ProfileManager.Is(Profiles.devbox)
-    FakeWorkMode.Toggle(true)
+InitializeFakeWorkModeForProfile() {
+    if ProfileManager.Is(Profiles.devbox)
+        FakeWorkMode.Start()
+}
 
 
 Class FakeWorkMode {
     static Enabled := false
+    static _timerFunction := false
 
     static Toggle(state := "") {
-        this.Enabled := state = "" ? !this.Enabled : state
-        if this.Enabled
-            this.Start()
+        enabled := state = "" ? !this.Enabled : state
+        enabled ? this.Start() : this.Stop()
         ; Info("Fake Work Mode " (this.Enabled ? "Enabled" : "Disabled"))
+        return this.Enabled
     }
     
     static Start() {
+        if this.Enabled
+            return true
         this.Enabled := true
-        SetTimer(_TriggerAction, 60000) ; Perform action every min to keep system active
+        this._timerFunction := (*) => Send("{ScrollLock}")
+        SetTimer(this._timerFunction, 60000) ; Perform action every min to keep system active
+        return true
+    }
 
-        _TriggerAction() {
-            Send("{ScrollLock}")
-            if this.Enabled = false
-                SetTimer(_TriggerAction, 0)
-        }
+    static Stop() {
+        if this._timerFunction
+            SetTimer(this._timerFunction, 0)
+        this.Enabled := false
+        return false
     }
 }

@@ -2,6 +2,7 @@
 #Include App.ahk
 #Include ..\Tools\UIA-v2\Lib\UIA.ahk
 #Include ..\Tools\Info.ahk
+#Include ..\..\Secrets\Secrets Service.ahk
 
 class NotionPages {
     static shitFixen := { title: "S H I T    F I X E N", link: Secrets.NotionShitFixenUrl.Get() }

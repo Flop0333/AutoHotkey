@@ -39,6 +39,7 @@ function Write-Status {
 Write-Status "running"
 
 $suites = @(
+    @{ name = "Include Architecture"; script = Join-Path $PSScriptRoot "Invoke-IncludeArchitectureCheck.ps1" }
     @{ name = "Syntax Check"; script = Join-Path $PSScriptRoot "Invoke-SyntaxCheck.ps1" }
     @{ name = "Unit Tests"; script = Join-Path $PSScriptRoot "Invoke-UnitTests.ps1" }
     @{ name = "Integration Tests"; script = Join-Path $PSScriptRoot "Invoke-IntegrationTests.ps1" }

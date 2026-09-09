@@ -11,7 +11,8 @@
 ;   - Opened via the tray menu's "Log Dashboard" item, or by clicking an error TrayTip
 ; ============================================================================
 
-#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\OnError.ahk
+#Include ..\..\Lib\Core\Paths.ahk
 #Include Controller.ahk
 
 ShowLogDashboard() {

@@ -23,13 +23,20 @@
 ;   - Multiple RequiredWindow() per desktop supported
 ; ============================================================================
 
-#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\Links.ahk
+#Include ..\..\Lib\Helpers\Capslock.ahk
+#Include ..\..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
+#Include ..\..\Profiles\Profile Manager.ahk
+#Include ..\..\Secrets\Secrets Service.ahk
+#Include ..\..\Lib\Core\OnError.ahk
 #Include Desktop.ahk
 #Include ..\..\Lib\Apps\VsCode.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
 #Include ..\..\Lib\Apps\Spotify.ahk
 #Include ..\..\Lib\Apps\WhatsApp.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
+
+InstallGlobalErrorHandler()
 
 GetDesktopsForProfile() {
     desktopCounter := 0 ; Start at 0, increment for each desktop added

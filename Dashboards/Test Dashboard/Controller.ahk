@@ -1,4 +1,5 @@
-#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\Paths.ahk
+#Include ..\..\Lib\Extensions\Json.ahk
 #Include ..\..\Lib\Core\WebView.ahk
 
 Class TestDashboard extends WebViewToo {

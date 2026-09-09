@@ -1,7 +1,14 @@
 #Include ..\Extensions\Json.ahk
 #Include Paths.ahk
 
-OnError(HandleUnhandledError)
+InstallGlobalErrorHandler() {
+    static installed := false
+    if !installed {
+        OnError(HandleUnhandledError)
+        installed := true
+    }
+    return installed
+}
 
 HandleUnhandledError(error, mode) {
     try {

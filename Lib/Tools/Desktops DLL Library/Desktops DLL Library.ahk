@@ -1,8 +1,7 @@
 ; Credits to https://github.com/adrian88888888/AHK-Virtual-Desktop-Library/tree/main/lib/AHK-Virtual-Desktop-Library/3rd%20party
 #Include ..\..\Core\Paths.ahk
 #Include ..\..\Extensions\Dark ToolTip.ahk
-SetWorkingDir(A_ScriptDir)
-
+#Include ..\..\Extensions\Win.ahk
 Class DesktopsDDL {
 
 static DESKTOP_ACCESSOR_PATH   := Paths.lib "\Tools\Desktops DLL Library\VirtualDesktopAccessor.dll"

@@ -2,6 +2,8 @@
 #NoTrayIcon
 #Include ..\Lib\Core\OnError.ahk
 
+InstallGlobalErrorHandler()
+
 AppSpecificHotkey.Set("ahk_exe Notion.exe", (*) => Send("^\"), AppSpecificHotkey.PRIMARY_SHORTCUT) ; Toggle sidebar
 
 AppSpecificHotkey.Set("ahk_exe ms-teams.exe", (*) => Send("^+m"), AppSpecificHotkey.PRIMARY_SHORTCUT) ; Mute/unmute voice call

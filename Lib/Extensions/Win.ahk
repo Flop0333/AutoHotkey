@@ -1,9 +1,8 @@
-#Include ..\Tools\Desktops DLL Library\Desktops DLL Library.ahk
 #Include Dark ToolTip.ahk
 
 class Win {
 
-	static ToggleAlwaysOnTop() {
+	static ToggleAlwaysOnTop(isPinnedWindow := (*) => false) {
 		WinSetAlwaysOnTop(-1, this.WinUnderMouse())
 		currentState := this.IsAlwaysOnTop()
 		if this.IsAlwaysOnTop() {
@@ -11,7 +10,7 @@ class Win {
 			DarkToolTip("Set on top").FollowMouse()
 		} else {
 			DarkToolTip("Unset on top").FollowMouse()
-			if !DesktopsDDL.IsWindowPinned(this.WinUnderMouse())
+			if !isPinnedWindow.Call(this.WinUnderMouse())
 				this.RemoveBorder()
 		}
 	}

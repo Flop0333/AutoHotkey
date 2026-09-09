@@ -1,3 +1,5 @@
+#Include ..\Extensions\Dark ToolTip.ahk
+
 Class App {
     static Init(winTitle, ahk_exe, path := "") {
         this.winTitle := winTitle
