@@ -1,67 +1,63 @@
-# AutoHotkey productivity suite
+# Welcome to my AutoHotkey productivity suite 👋
 
 [![AHK Tests](https://github.com/Flop0333/AutoHotkey/actions/workflows/ahk-tests.yml/badge.svg)](https://github.com/Flop0333/AutoHotkey/actions/workflows/ahk-tests.yml)
 
-A personal, modular automation suite built for AutoHotkey v2 on Windows. It combines global hotkeys, window and desktop management, small productivity tools, and WebView2 dashboards. Profiles adapt the same checkout to different computers, while local secrets keep personal values out of Git.
+This is the AutoHotkey v2 system I use to make Windows faster, more personal, and more fun. It combines global hotkeys, mouse controls, virtual desktops, OCR, speech, and modern dashboards in one modular toolkit.
 
-## Quick start
+It started as a collection of small scripts and grew into a profile-aware automation suite with shared libraries, structured logging, automated tests, and GitHub-powered maintenance.
 
-1. Install [AutoHotkey v2](https://www.autohotkey.com/).
-2. Clone this repository on Windows.
-3. Run `Startup/Startup.ahk`.
-4. Confirm the detected profile in the tray menu and customize it if needed.
+## ✨ A few highlights
 
-See the [installation guide](INSTALLATION.md) for prerequisites, local configuration, and Windows auto-start.
+- 🖥️ **Virtual desktop automation** — switch desktops with CapsLock shortcuts and launch the right apps for each workspace.
+- 🪟 **Fast window control** — drag, resize, close, pin, and keep windows on top from the keyboard or mouse.
+- 🚀 **Age of Efficiency** — search bookmarks, launch apps, and run commands from one WebView2-powered interface.
+- 🎹 **Macro Board** — a customizable Stream Deck-style dashboard for frequently used actions.
+- 📸 **Screen Snipper with OCR** — capture the screen, copy or save an image, and extract text.
+- 🔊 **Text Speaker** — read selected text or an OCR screen region aloud with Windows speech synthesis.
+- 🖱️ **Mouse gestures and extra-button actions** — control common tasks without reaching for menus.
+- 🧩 **Profiles and local secrets** — adapt one checkout to different computers without committing personal data.
 
-## What is included
+## 🚀 The dashboards
 
-- **Standalone apps** provide independent tools such as the CapsLock modifier, virtual desktop manager, emoji picker, screen snipper, text speaker, mouse gestures, and window manager.
-- **Integrated apps** provide shared hotkeys and utilities such as Command Storer, spell checking, timers, picture-in-picture, and mouse controls.
-- **Dashboards** provide WebView2 interfaces for launching commands, running macros, viewing logs, and monitoring tests.
-- **Lib** contains shared application wrappers, helpers, extensions, and third-party tools.
-- **Startup, Profiles, and Secrets** coordinate machine-specific configuration and launch the enabled suite.
-- **Tests** contains syntax checks, unit tests, integration tests, and a visual Test Dashboard.
-- **.github** connects issues, the Project board, pull requests, CI, GitHub Pages, labels, changelog generation, and scheduled agents.
+### Age of Efficiency
 
-The complete inventory is in the [app and script catalog](docs/APPS.md).
-
-## Featured dashboards
-
-**Age of Efficiency** is a command launcher for bookmarks, searches, apps, and scripts.
+A keyboard-first command launcher for bookmarks, searches, applications, scripts, timers, and other utilities.
 
 ![Age of Efficiency demo](Dashboards/Age%20of%20Efficiency/Demo.gif)
 
-**Macro Board** is a customizable, Stream Deck-style panel for frequently used actions.
+### Macro Board
+
+A customizable action grid that brings frequently used commands together in a visual, Stream Deck-style interface.
 
 ![Macro Board demo](Dashboards/Macro%20Board/Demo.gif)
 
-## How the suite starts
+## 🏗️ More than a folder of scripts
 
-`Startup/Startup.ahk` is the source of truth for the local auto-run set. It starts the logging UI hosts, synchronizes secrets, selects the active profile, starts the CapsLock service before its consumers, and then launches the configured apps and dashboards. Optional scripts remain available without starting automatically.
+The suite brings several technologies and ideas together:
 
-GitHub automation is separate from Windows startup. Its workflows run tests, manage Project-board state, maintain repository metadata and pages, and assist with issue and pull-request work. See [repository automation](docs/AUTOMATION.md).
+- **AutoHotkey v2** for hotkeys, Windows automation, GUIs, and reusable application wrappers.
+- **WebView2 with HTML, CSS, and JavaScript** for richer dashboard interfaces backed by AutoHotkey controllers.
+- **Profile-aware startup** for machine-specific apps, desktops, hotkeys, and behavior.
+- **Local secrets management** that keeps personal values outside Git while maintaining a tracked catalog.
+- **Structured logging and a visual test dashboard** for understanding failures quickly.
+- **PowerShell test runners and GitHub Actions** for syntax, unit, and integration checks.
+- **GitHub Projects and scheduled agents** for issue triage, implementation, review, changelogs, and project status.
 
-## Development
+## 🛠️ Try it
 
-Run the complete local check from PowerShell:
+1. Install [AutoHotkey v2](https://www.autohotkey.com/) on Windows.
+2. Clone or download this repository.
+3. Run `Startup/Startup.ahk`.
 
-```powershell
-./Tests/Invoke-AllTests.ps1
-```
+The suite is intentionally code-first: editing a clear script can be faster—and more flexible—than clicking through another settings screen.
 
-Individual syntax, unit, and integration runners are also available. See [testing](docs/TESTING.md) for commands, discovery rules, result files, and instructions for adding tests.
+## 📚 Explore the project
 
-AI coding agents should begin with [AGENTS.md](AGENTS.md), which summarizes the architecture, safety boundaries, sources of truth, and validation expectations.
+- [Project guide](docs/PROJECT-GUIDE.md) — structure, startup, development, and documentation map
+- [Installation](INSTALLATION.md) — requirements, profiles, secrets, and Windows auto-start
+- [Apps and scripts](docs/APPS.md) — every maintained user-facing tool and entry point
+- [Testing](docs/TESTING.md) — local tests, CI, and the Test Dashboard
+- [Automation](docs/AUTOMATION.md) — GitHub workflows, board connections, and scheduled agents
+- [AI agent guide](AGENTS.md) — focused instructions for coding agents
 
-## Documentation
-
-| Document | Purpose |
-|---|---|
-| [Installation](INSTALLATION.md) | Prerequisites, profiles, secrets, startup, and troubleshooting |
-| [Apps and scripts](docs/APPS.md) | Catalog of runnable tools, dashboards, and supporting areas |
-| [Automation](docs/AUTOMATION.md) | Windows auto-run and all GitHub connections and workflows |
-| [Testing](docs/TESTING.md) | Local test suites, dashboard, CI, and test authoring |
-| [Agent guide](AGENTS.md) | Fast repository orientation for AI agents and contributors |
-| [Road map](ROAD%20MAP.md) | Future ideas and resources under consideration |
-
-This project favors code-first configuration and small, composable AutoHotkey scripts. Contributions, bug reports, and practical feedback are welcome.
+Feel free to explore, adapt the ideas, report a bug, or share feedback. I hope something here inspires your own Windows workflow. 💭
