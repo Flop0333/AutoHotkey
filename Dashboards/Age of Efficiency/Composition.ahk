@@ -2,13 +2,13 @@
 ; State classes depend only on the repository contract (Load/Store), while this
 ; executable boundary selects the JSON-file implementations.
 
+#Include ..\..\Lib\Core\OnError.ahk
 #Include Database\Apps\AppsState.ahk
 #Include Database\Apps\AppsDatabaseService.ahk
 #Include Database\Bookmarks\BookmarksState.ahk
 #Include Database\Bookmarks\BookmarksDatabaseService.ahk
 #Include Database\Internet Search\SearchEnginesState.ahk
 #Include Database\Internet Search\SearchEnginesDatabaseService.ahk
-#Include ..\..\Lib\Core\OnError.ahk
 
 InitializeAgeOfEfficiencyState() {
     AppsState.Initialize(AppsDatabaseService(), LogAndNotifyInfo)
