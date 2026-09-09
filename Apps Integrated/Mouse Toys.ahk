@@ -4,7 +4,7 @@
 
 #Include ..\Profiles\Profile Manager.ahk
 #Include ..\Lib\Core\OnError.ahk
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 A_MaxHotkeysPerInterval := 420
 
 

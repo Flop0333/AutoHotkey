@@ -17,7 +17,7 @@
 #Include ..\..\Lib\Tools\WebView\WebViewToo.ahk
 #Include Screen Snip Speaker.ahk
 
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 
 ^Space::TextSpeaker.TogglePlay()
 

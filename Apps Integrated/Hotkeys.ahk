@@ -27,7 +27,7 @@
 #Include ..\Lib\Apps\KeePass.ahk
 
 #Include ..\Lib\Core\OnError.ahk
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 
 ; ================================
 ; Generic Hotkeys

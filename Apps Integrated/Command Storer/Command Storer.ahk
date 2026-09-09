@@ -23,7 +23,8 @@
 #Include ..\..\Lib\Extensions\Dark Gui.ahk
 #Include Storage\FileService.ahk
 
-InstallGlobalErrorHandler()
+if A_LineFile = A_ScriptFullPath
+    OnError(HandleUnhandledError)
 
 scriptName := StrSplit(A_ScriptName, '.ahk')[1]
 

@@ -20,7 +20,7 @@
 #Include Startup Message.ahk
 #Include Startup Menu Tray.ahk
 
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 
 RunStartup(profile?) {
     steps := [

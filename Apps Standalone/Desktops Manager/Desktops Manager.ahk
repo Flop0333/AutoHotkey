@@ -36,7 +36,7 @@
 #Include ..\..\Lib\Apps\WhatsApp.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
 
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 Browser.ConfigureDefaultBrowser(ProfileManager.Is(Profiles.work, Profiles.devbox) ? Edge : Brave)
 
 GetDesktopsForProfile() {

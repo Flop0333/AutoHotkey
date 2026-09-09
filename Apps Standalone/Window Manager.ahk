@@ -22,7 +22,7 @@
 #Include ..\Lib\Extensions\Win.ahk
 #Include ..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
 #Include ..\Lib\Core\OnError.ahk
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 SetWinDelay(0)
 CoordMode("Mouse")
 

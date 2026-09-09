@@ -34,7 +34,7 @@
 ; ===========================================================================
 ; === ACTIONS REGISTRATION ==================================================
 ; ===========================================================================
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 Browser.ConfigureDefaultBrowser(ProfileManager.Is(Profiles.work, Profiles.devbox) ? Edge : Brave)
 SpellChecker.Enable()
 InitializeFakeWorkModeForProfile()

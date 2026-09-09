@@ -22,7 +22,7 @@
 
 #Include Gesture Detector.ahk
 #Include ..\..\Lib\Core\OnError.ahk
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 CoordMode "Mouse", "Screen"
 
 GestureDetector() ; Initialize the gesture detector

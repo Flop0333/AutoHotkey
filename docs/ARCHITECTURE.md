@@ -31,7 +31,7 @@ Executable entry points own activation. For example:
 ```ahk
 #Include ..\Lib\Core\OnError.ahk
 
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 ```
 
 Optional features follow the same rule: including Spell Checker or Fake Working Mode exposes definitions, while the Macro Board explicitly enables the behavior it owns.

@@ -2,7 +2,7 @@
 #NoTrayIcon
 #Include ..\Lib\Core\OnError.ahk
 
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 
 AppSpecificHotkey.Set("ahk_exe Notion.exe", (*) => Send("^\"), AppSpecificHotkey.PRIMARY_SHORTCUT) ; Toggle sidebar
 

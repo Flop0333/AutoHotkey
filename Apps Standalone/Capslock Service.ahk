@@ -23,7 +23,7 @@
 #SingleInstance Force
    #NoTrayIcon
 
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 
 CapsLock:: {
    EnsureHostFocus()                              ; Always return focus to host if in VM

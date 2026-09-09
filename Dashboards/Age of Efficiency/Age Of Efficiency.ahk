@@ -27,7 +27,7 @@
 #Include User Interface\Controller.ahk
 #Include Input Handler\Command Input.ahk
 
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 Browser.ConfigureDefaultBrowser(ProfileManager.Is(Profiles.work, Profiles.devbox) ? Edge : Brave)
 USER_INTERFACE_PATH := Paths.dashboards "\Age of Efficiency\User Interface"
 TraySetIcon(USER_INTERFACE_PATH "\Library\Icons\Icon.png")

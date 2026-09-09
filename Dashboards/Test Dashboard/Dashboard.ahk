@@ -3,7 +3,7 @@ Persistent(true)
 
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Paths.ahk
-InstallGlobalErrorHandler()
+OnError(HandleUnhandledError)
 
 TraySetIcon(Paths.autoHotkeyIcon)
 
