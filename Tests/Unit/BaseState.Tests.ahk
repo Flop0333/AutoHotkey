@@ -2,18 +2,40 @@
 #Include ..\Support\Assert.ahk
 #Include ..\..\Lib\Extensions\Array.ahk
 
-; BaseState emits user notifications after mutations. Unit tests exercise its
-; state behavior without starting the shared logger host.
-LogAndNotifyInfo(message) {
-}
-
 #Include ..\..\Dashboards\Age of Efficiency\Database\BaseState.ahk
 
-; BaseState.state and BaseState._uniqueId are shared static fields, so every
-; test resets them first to avoid leaking state between test cases.
+class FakeStateRepository {
+    __New(items := [], highestId := 0) {
+        this.items := items
+        this.highestId := highestId
+        this.storedItems := unset
+    }
+
+    Load() => { items: this.items, highestId: this.highestId }
+
+    Store(items) => this.storedItems := items.Clone()
+}
+
+; BaseState fields are shared static defaults, so every test resets them first
+; to avoid leaking state between test cases.
 ResetState() {
     BaseState.state := []
     BaseState._uniqueId := 0
+    BaseState._repository := FakeStateRepository()
+}
+
+Test_Initialize_LoadsInjectedRepository() {
+    repository := FakeStateRepository([{ id: 7, title: "Loaded" }], 7)
+    BaseState.Initialize(repository)
+    Assert.Equal("Loaded", BaseState.state[1].title)
+    Assert.Equal(8, BaseState.GetUniqueId())
+}
+
+Test_Store_PersistsThroughInjectedRepository() {
+    repository := FakeStateRepository()
+    BaseState.Initialize(repository)
+    BaseState.Create({ title: "Stored" })
+    Assert.Equal("Stored", repository.storedItems[1].title)
 }
 
 Test_Create_AssignsIncrementingIds() {
@@ -104,6 +126,8 @@ Test_Delete_ThrowsWhenNoMatch() {
 }
 
 TestKit.Run("Create assigns incrementing ids to new items", Test_Create_AssignsIncrementingIds)
+TestKit.Run("Initialize loads state from an injected repository", Test_Initialize_LoadsInjectedRepository)
+TestKit.Run("Store persists through the injected repository", Test_Store_PersistsThroughInjectedRepository)
 TestKit.Run("GetById returns the matching item", Test_GetById_ReturnsMatchingItem)
 TestKit.Run("GetById throws when no item matches", Test_GetById_ThrowsWhenNoMatch)
 TestKit.Run("GetByCommandOrTitle matches by command", Test_GetByCommandOrTitle_MatchesByCommand)

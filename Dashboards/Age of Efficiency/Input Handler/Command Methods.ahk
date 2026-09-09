@@ -7,7 +7,6 @@
 ; ============================================================================
 
 #Include Internet Searcher.ahk
-#Include ..\User Interface\Controller.ahk
 #Include ..\..\..\Apps Integrated\Fake Working Mode.ahk
 #Include ..\..\..\Apps Integrated\PBI Reformat.ahk
 #Include ..\..\..\Apps Integrated\Timer.ahk

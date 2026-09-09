@@ -2,11 +2,23 @@
 ; Provides common CRUD operations and ID management
 
 #Include ..\..\..\Lib\Extensions\Singleton.ahk
+#Include ..\..\..\Lib\Extensions\Array.ahk
 
 Class BaseState extends Singleton {
 
   static state := [] ; In-memory storage, override in subclasses
   static _uniqueId := 0 ; Tracks unique IDs for new items
+  static _repository := false
+  static _notifier := false
+
+  static Initialize(repository, notifyFn := false) {
+    result := repository.Load()
+    this._repository := repository
+    this._notifier := notifyFn
+    this.state := result.items
+    this.SetUniqueId(result.highestId)
+    return this
+  }
 
   static GetUniqueId() => ++this._uniqueId
   static SetUniqueId(id) => this._uniqueId := id
@@ -15,7 +27,7 @@ Class BaseState extends Singleton {
     item.id := this.GetUniqueId()
     this.state.Push(item)
     this.Store()
-    LogAndNotifyInfo("Saved " this._KindLabel() ": " item.title)
+    this._SendNotification("Saved " this._KindLabel() ": " item.title)
   }
 
   static GetById(id) {
@@ -61,7 +73,7 @@ Class BaseState extends Singleton {
     for key, value in updatedItem.OwnProps()
         item.%key% := value
     this.Store()
-    LogAndNotifyInfo("Updated " this._KindLabel() ": " item.title)
+    this._SendNotification("Updated " this._KindLabel() ": " item.title)
   }
 
   static Delete(deleteTitle) {
@@ -69,14 +81,22 @@ Class BaseState extends Singleton {
       if item.title = deleteTitle {
         this.state.RemoveAt(index)
         this.Store()
-        LogAndNotifyInfo("Deleted " this._KindLabel() ": " deleteTitle)
+        this._SendNotification("Deleted " this._KindLabel() ": " deleteTitle)
         return
       }
     Throw UnsetError("Item not found. title: " deleteTitle)
   }
 
-  ; Persists state to storage (override in subclasses)
-  static Store() => {}
+  static Store() {
+    if !this._repository
+      throw Error(this.Prototype.__Class " has not been initialized with a repository")
+    this._repository.Store(this.state)
+  }
+
+  static _SendNotification(message) {
+    if this._notifier
+      this._notifier.Call(message)
+  }
 
   ; Friendly noun for log/notify messages, e.g. "BookmarksState" -> "bookmark".
   ; (this.__Class inside a static method resolves to the meta-class "Class" -
