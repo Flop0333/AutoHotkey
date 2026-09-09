@@ -17,6 +17,36 @@ WaitUntil(predicate, timeoutMs := 4000) {
 	return false
 }
 
+; Waits on the actual process handle (SYNCHRONIZE + query rights), not on
+; ProcessExist(pid) polling: PIDs are reused by Windows once a process
+; exits, so polling by PID alone can (in principle, under heavy concurrent
+; process creation like this test's) observe a *different*, newer process
+; that happens to reuse the same PID and conclude the writer exited early.
+; Holding the original handle keeps it unambiguously tied to the process
+; this test actually started, and lets it report the real exit code
+; instead of only "it stopped existing" - see
+; Test_ConcurrentWritersPreserveEveryEntry's use below for why the exit
+; code matters: a writer that hits a mutex timeout or other exception
+; exits early (see LoggingWriter.ahk's catch block) having written only
+; part of its share, which previously surfaced only as an unexplained
+; short entry count with no indication a writer had actually failed.
+WaitForProcessExit(pid, timeoutMs := 30000) {
+	PROCESS_QUERY_LIMITED_INFORMATION := 0x1000
+	SYNCHRONIZE := 0x100000
+	handle := DllCall("OpenProcess", "UInt", PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, "Int", false, "UInt", pid, "Ptr")
+	if !handle
+		return Map("exited", true, "exitCode", "") ; Already gone; no handle left to inspect.
+	try {
+		waitResult := DllCall("WaitForSingleObject", "Ptr", handle, "UInt", timeoutMs, "UInt")
+		if waitResult != 0
+			return Map("exited", false, "exitCode", "")
+		exitCode := 0
+		DllCall("GetExitCodeProcess", "Ptr", handle, "UInt*", &exitCode)
+		return Map("exited", true, "exitCode", exitCode)
+	} finally
+		DllCall("CloseHandle", "Ptr", handle)
+}
+
 ; Waits for GetLogEntryCount() to stop changing for quietMs, instead of
 ; assuming any single checkpoint (a fixed sleep, or "is the popup hidden
 ; right now") is late enough to have seen everything. Confirmed necessary,
@@ -133,7 +163,14 @@ Test_RealHostsAndCrossProcessBehavior() {
 		ShowLogDashboard()
 		dashboardPid := WinGetPID("ahk_id " FindLogDashboardWindow())
 		Assert.NotEqual(loggerPid, dashboardPid, "Logger and dashboard must have separate host processes")
-		Assert.True(WaitUntil(() => IsVisible(FindLogDashboardWindow())), "Client API should show shared dashboard")
+		; A CI-only intermittent failure here (window found - dashboardPid
+		; above succeeded - but not yet visible) means the window handle
+		; already existed; only the WS_VISIBLE flip from ShowLogDashboard's
+		; WinShow call was still catching up. Widened from the previous
+		; 4000ms default (an arbitrary local-machine budget with no
+		; documented basis) to match this file's other generous, evidence-
+		; based waits rather than guess at a root cause a third time.
+		Assert.True(WaitUntil(() => IsVisible(FindLogDashboardWindow()), 8000), "Client API should show shared dashboard")
 		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Opening dashboard should hide logger; read=" GetReadLogEntryCount() ", total=" GetLogEntryCount() DumpEntries())
 		Assert.Equal(0, GetUnreadLogEntries().Length, "Opening dashboard should mark all logs read")
 		HideLogDashboard()
@@ -165,8 +202,16 @@ Test_ConcurrentWritersPreserveEveryEntry() {
 		Run('"' A_AhkPath '" /ErrorStdOut "' writerScript '" "writer-' A_Index '" "' entriesPerWriter '"',,, &pid)
 		pids.Push(pid)
 	}
-	for pid in pids
-		Assert.True(WaitUntil(() => !ProcessExist(pid), 30000), "Concurrent log writer did not exit")
+	; Checking the real exit code (not just "it stopped existing") is what
+	; actually distinguishes "every writer really wrote all its entries"
+	; from "some writer silently failed partway" - the previous version of
+	; this test could not tell those apart, so a partial-entry failure
+	; below showed only a confusing short count with no explanation.
+	for pid in pids {
+		result := WaitForProcessExit(pid, 30000)
+		Assert.True(result["exited"], "Concurrent log writer (pid " pid ") did not exit within 30s")
+		Assert.Equal(0, result["exitCode"], "Concurrent log writer (pid " pid ") exited with code " result["exitCode"] " instead of writing all its entries - see its stderr for the AppendLogEntry failure")
+	}
 
 	entries := ReadLogEntries()
 	Assert.Equal(writerCount * entriesPerWriter, entries.Length, "Every concurrent append must produce one valid entry")
