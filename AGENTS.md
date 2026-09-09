@@ -16,12 +16,12 @@ This is an AutoHotkey v2 productivity suite for Windows. Keep changes scoped, pr
 - `Lib/Core.ahk` is the common include bundle. Shared code is grouped under `Lib/Core`, `Lib/Apps`, `Lib/Extensions`, `Lib/Helpers`, and `Lib/Tools`.
 - `Apps Standalone` contains independent background applications. `Apps Integrated` contains services and callable utilities used by dashboards or hotkeys.
 - `Dashboards` contains WebView2 applications. Keep AHK controllers, HTML/CSS/JS interfaces, and JSON-backed state responsibilities separate.
-- `Profiles` selects machine-specific behavior. `Secrets/Secrets Catalog.ahk` defines supported keys; values are strictly local.
+- `Profiles` selects machine-specific behavior. `Secrets/Secrets Catalog.ahk` defines supported keys; secret values are intended to stay local.
 - `.github/workflows` is the source of truth for automation. Put reusable PowerShell logic in `.github/scripts`.
 
 ## Safety and local state
 
-Never read into documentation, commit, or overwrite these git-ignored personal/runtime files:
+Never copy contents from these git-ignored personal/runtime files into documentation or commits, and do not overwrite them unless the task explicitly requires it:
 
 - `Secrets/My Secrets.json` and `Secrets/Removed Secrets.json`;
 - `Profiles/current_profile.ini`;
@@ -29,7 +29,7 @@ Never read into documentation, commit, or overwrite these git-ignored personal/r
 - `Apps Standalone/Text Speaker/Text Speaker.settings.json`;
 - `Logs/`.
 
-Do not add real email addresses, credentials, private URLs, device-specific values, or secret contents to tracked files. Add a non-secret definition to the secrets catalog when a configurable private value is needed.
+Do not add real email addresses, credentials, private URLs, or secret contents to tracked files. Prefer the secrets catalog for new personal or device-specific values; only track a profile mapping when the task explicitly requires it.
 
 `Lib/Tools/Gdip`, `Lib/Tools/OCR`, and `Lib/Tools/UIA-v2` contain bundled third-party code and examples. Avoid broad formatting or refactors there unless the task specifically targets them.
 

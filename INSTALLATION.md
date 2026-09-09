@@ -4,7 +4,7 @@
 
 - Windows 10 or 11.
 - [AutoHotkey v2](https://www.autohotkey.com/) for the suite and tests.
-- Microsoft Edge WebView2 Runtime for the dashboards and Text Speaker. It is included with current Windows and Microsoft Edge installations; the required loader DLLs are already in this repository.
+- Microsoft Edge WebView2 Runtime for the dashboards and Text Speaker. Install it if it is missing; the loader DLLs are already in this repository.
 - Windows PowerShell 5.1 or newer to run the test wrappers.
 
 `Apps Standalone/Bluetooth Connect.ahk` is a legacy, optional AutoHotkey v1 script. It is not started by the main suite.
@@ -55,6 +55,8 @@ Most features tolerate empty values until that specific action is used.
 7. Start the configured integrated apps.
 
 The exact current list is documented in the [app catalog](docs/APPS.md) and expressed by the `Run(...)` calls inside `RunStartup()`.
+
+Logging initialization deletes the active `Logs/errors.log` and `Logs/errors.read` files. The Log Dashboard therefore shows the current suite session; earlier error sessions are not archived.
 
 To change auto-run behavior, add, remove, or reorder those calls. Keep the CapsLock service ahead of its consumers.
 

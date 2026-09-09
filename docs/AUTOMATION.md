@@ -53,7 +53,7 @@ All cron expressions use UTC. Amsterdam local time is UTC+1 in winter and UTC+2 
 
 ## Agent safeguards
 
-The daily agent processes at most one issue per run. `.github/scripts/Select-AgentIssue.ps1` combines eligible risk queues, excludes size L and claimed issues, prefers size S, and then chooses the oldest task. The workflow has a 20-minute timeout and removes its claim after a failed run so the issue can be retried.
+The daily agent processes at most one issue per run. `.github/scripts/Select-AgentIssue.ps1` combines eligible risk queues, excludes size L and claimed issues, prefers size S, and then chooses the oldest task. The workflow has a 20-minute timeout and removes its claim after an ordinary failed run. A timed-out or cancelled job may leave `agent-in-progress` behind for a maintainer to clear.
 
 The PR reviewer is advisory only. The idea-triage agent may edit issue metadata but receives no repository file-edit tools. These boundaries are encoded in the workflow permissions and Claude Code tool allowlists.
 

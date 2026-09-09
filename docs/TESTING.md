@@ -1,6 +1,6 @@
 # Testing
 
-The repository uses lightweight AutoHotkey v2 tests driven by PowerShell. No external test framework or package installation is required locally beyond AutoHotkey v2.
+The repository uses lightweight AutoHotkey v2 tests driven by PowerShell. No external test framework is required. The logging integration test also needs Microsoft Edge WebView2 Runtime because it starts the real dashboard hosts.
 
 ## Run the tests
 

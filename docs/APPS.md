@@ -36,6 +36,18 @@ Integrated scripts either run as quiet background services or are loaded into a 
 | [Spell Checker](../Apps%20Integrated/Spell%20Checker.ahk) | Loaded by Macro Board | Expands common Dutch and English misspellings; toggle from Macro Board. | Add corrections as AutoHotkey hotstrings. |
 | [Nightlight](../Apps%20Integrated/Nightlight.ahk) | Optional include | Provides a configurable, click-through warm screen overlay. | Not in the current startup include chain; call its functions from a dashboard or hotkey. |
 
+## App companion modules
+
+These files support the entry points above and are not intended to run independently.
+
+| Module | Role |
+|---|---|
+| [FileService.ahk](../Apps%20Integrated/Command%20Storer/Storage/FileService.ahk) | Reads, writes, adds, and removes the command-set text files. |
+| [Desktop.ahk](../Apps%20Standalone/Desktops%20Manager/Desktop.ahk) | Models desktops and the windows that must be opened or activated on them. |
+| [Gesture Detector.ahk](../Apps%20Standalone/Mouse%20Gestures/Gesture%20Detector.ahk) | Tracks mouse movement and converts it into directional gesture strings. |
+| [Screen Snipper OCR.ahk](../Apps%20Standalone/Screen%20Snipper/Screen%20Snipper%20OCR.ahk) | Extracts text from a selected screen region. |
+| [Screen Snip Speaker.ahk](../Apps%20Standalone/Text%20Speaker/Screen%20Snip%20Speaker.ahk) | Connects screen-region selection and OCR to Text Speaker playback. |
+
 ## Dashboards and hosts
 
 | Dashboard | Starts | Open / purpose | Data and configuration |
@@ -43,7 +55,7 @@ Integrated scripts either run as quiet background services or are loaded into a 
 | [Age of Efficiency](../Dashboards/Age%20of%20Efficiency/Age%20Of%20Efficiency.ahk) | Auto | `Alt+Space`, `Insert`, or `Numpad Insert` opens a command launcher for apps, bookmarks, and searches. | JSON databases live under `Database/`; commands call functions under `Input Handler/`. |
 | [Macro Board](../Dashboards/Macro%20Board/Macro%20Board.ahk) | Auto | `CapsLock+Space` opens a Stream Deck-style action grid. | Configure common and profile buttons in the entry point; window state is stored in the ignored profile-settings folder. |
 | [Logger](../Dashboards/Logger/Logger%20Host.ahk) | Auto through logging initialization | Small notification host that surfaces new structured errors. | `Logging.ahk` is the public facade; `Controller.ahk` controls presentation. |
-| [Log Dashboard](../Dashboards/Log%20Dashboard/Dashboard.ahk) | Auto through logging initialization | Open from the startup tray, Macro Board, or Age of Efficiency command `AL` to inspect and copy errors. | Reads the structured files under the git-ignored `Logs/` directory. `Dashboard.ahk` is the process entry point. |
+| [Log Dashboard](../Dashboards/Log%20Dashboard/Dashboard.ahk) | Auto through logging initialization | Open from the startup tray, Macro Board, or Age of Efficiency command `AL` to inspect and copy errors. | `Dashboard.ahk` renders `Logs/errors.log`; the active log is reset on suite startup. |
 | [Test Dashboard](../Dashboards/Test%20Dashboard/Dashboard.ahk) | On demand | Choose **Test Dashboard** in the tray or run `Tests/Run-Tests.ahk` to execute and monitor checks. | Reads test status and history from `Logs/`. See [Testing](TESTING.md). |
 
 ## Startup and configuration scripts

@@ -17,7 +17,7 @@ This is a short historical record for [issue #47](https://github.com/Flop0333/Au
 
 | Risk label | Meaning | Daily-agent eligible |
 |---|---|---|
-| `risk: read` | No state change beyond reporting or documentation. | Yes |
+| `risk: read` | Read-only inspection or reporting. | Yes |
 | `risk: reversible` | A scoped, easy-to-revert repository change. | Yes |
 | `risk: sensitive` | Private context or meaningful external impact. | No |
 | `risk: destructive` | Human execution and judgment required. | Never |

@@ -37,7 +37,7 @@ The complete inventory is in the [app and script catalog](docs/APPS.md).
 
 ## How the suite starts
 
-`Startup/Startup.ahk` is the source of truth for the local auto-run set. It initializes logging, secrets, and the active profile; starts the CapsLock service first; then launches the configured dashboards, standalone apps, integrated apps, and logger host. Optional scripts remain available to run or include without starting automatically.
+`Startup/Startup.ahk` is the source of truth for the local auto-run set. It starts the logging UI hosts, synchronizes secrets, selects the active profile, starts the CapsLock service before its consumers, and then launches the configured apps and dashboards. Optional scripts remain available without starting automatically.
 
 GitHub automation is separate from Windows startup. Its workflows run tests, manage Project-board state, maintain repository metadata and pages, and assist with issue and pull-request work. See [repository automation](docs/AUTOMATION.md).
 
