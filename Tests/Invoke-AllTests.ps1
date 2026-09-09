@@ -51,8 +51,8 @@ New-Item -ItemType Directory -Path $tempDir | Out-Null
 $results = @()
 try {
     foreach ($suite in $suites) {
-        $stdoutPath = Join-Path $tempDir ((New-Guid).Guid + ".stdout.txt")
-        $stderrPath = Join-Path $tempDir ((New-Guid).Guid + ".stderr.txt")
+        $stdoutPath = Join-Path $tempDir ([guid]::NewGuid().Guid + ".stdout.txt")
+        $stderrPath = Join-Path $tempDir ([guid]::NewGuid().Guid + ".stderr.txt")
 
         $proc = Start-Process -FilePath "powershell.exe" `
             -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "`"$($suite.script)`"") `

@@ -45,8 +45,8 @@ New-Item -ItemType Directory -Path $tempDir | Out-Null
 
 try {
     foreach ($testFile in $testFiles) {
-        $stdoutPath = Join-Path $tempDir ((New-Guid).Guid + ".stdout.txt")
-        $stderrPath = Join-Path $tempDir ((New-Guid).Guid + ".stderr.txt")
+        $stdoutPath = Join-Path $tempDir ([guid]::NewGuid().Guid + ".stdout.txt")
+        $stderrPath = Join-Path $tempDir ([guid]::NewGuid().Guid + ".stderr.txt")
 
         $run = Invoke-AhkScript -AhkExePath $ahkExe.Source -ScriptPath $testFile.FullName `
             -StdOutPath $stdoutPath -StdErrPath $stderrPath -TimeoutSeconds $TimeoutSeconds
