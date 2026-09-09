@@ -1,11 +1,10 @@
 <#
 .SYNOPSIS
-    Runs the syntax check, unit tests, and integration tests in one pass and
+    Runs documentation, architecture, syntax, unit, and integration checks and
     logs a structured result for the Test Dashboard to display.
 
 .DESCRIPTION
-    Each suite script (Invoke-SyntaxCheck.ps1, Invoke-UnitTests.ps1,
-    Invoke-IntegrationTests.ps1) calls `exit` directly, so each one is launched
+    Each suite script calls `exit` directly, so each one is launched
     as its own child process rather than dot-sourced or called in-process.
 
     Writes Logs\test-run-status.json (current run state, polled by the Test
@@ -39,6 +38,7 @@ function Write-Status {
 Write-Status "running"
 
 $suites = @(
+    @{ name = "Documentation"; script = Join-Path $PSScriptRoot "Invoke-DocumentationCheck.ps1" }
     @{ name = "Include Architecture"; script = Join-Path $PSScriptRoot "Invoke-IncludeArchitectureCheck.ps1" }
     @{ name = "Syntax Check"; script = Join-Path $PSScriptRoot "Invoke-SyntaxCheck.ps1" }
     @{ name = "Unit Tests"; script = Join-Path $PSScriptRoot "Invoke-UnitTests.ps1" }
@@ -51,8 +51,8 @@ New-Item -ItemType Directory -Path $tempDir | Out-Null
 $results = @()
 try {
     foreach ($suite in $suites) {
-        $stdoutPath = Join-Path $tempDir ((New-Guid).Guid + ".stdout.txt")
-        $stderrPath = Join-Path $tempDir ((New-Guid).Guid + ".stderr.txt")
+        $stdoutPath = Join-Path $tempDir ([guid]::NewGuid().Guid + ".stdout.txt")
+        $stderrPath = Join-Path $tempDir ([guid]::NewGuid().Guid + ".stderr.txt")
 
         $proc = Start-Process -FilePath "powershell.exe" `
             -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "`"$($suite.script)`"") `

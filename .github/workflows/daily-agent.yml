@@ -35,7 +35,7 @@ jobs:
       issue_title: ${{ steps.select.outputs.issue_title }}
       branch_prefix: ${{ steps.select.outputs.branch_prefix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - id: select
         shell: pwsh
@@ -52,8 +52,9 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Claim issue
         env:
@@ -72,7 +73,7 @@ jobs:
 
       - name: Run Claude Code
         id: claude
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@5ccc3a35a6367cdb8e6fbd0728287467540ecfe2 # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           branch_prefix: ${{ needs.select.outputs.branch_prefix }}

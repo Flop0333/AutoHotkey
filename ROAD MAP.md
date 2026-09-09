@@ -1,64 +1,33 @@
-# AutoHotkey Project Roadmap
+# AutoHotkey project roadmap
 
-## Future Projects
+These are ideas to explore, not committed requirements. GitHub issues and the Project board are the source of truth for active work. Macro Board-specific concepts live in [New Features Ideas](Dashboards/Macro%20Board/New%20Features%20Ideas.md).
 
-### Command Storer Enhancement
-- Modern WebView-based frontend
-- Improved CRUD operations and UX
-- JSON storage format for better structure and portability
+## Future projects
 
-### Bluetooth Integration
-- New Bluetooth class for device management
-- Connect to devices by name
-- Integration with Macro Board and Age of Efficiency dashboards
+### Command Storer
 
-### Text Speaker Upgrades
-- Use better voice
-- Show GUI with voice controlls when text is speaking, always on top
+- Build a modern WebView-based interface.
+- Improve command editing and organization.
+- Consider structured JSON storage.
 
+### Text Speaker
 
+- Improve voice quality and selection.
+- Expand the always-on-top playback controls.
 
-## Libraries & Resources to Explore
+### Integrations
 
-### Performance & Optimization
-[DEMON_STACK](https://github.com/tonchi29-a11y/DEMON_STACK) 
-- High-performance library
+- Explore voice-controlled AI function calling.
+- Trigger selected scripts remotely from a phone.
+- Support communication between computers on a local network.
 
-### Window Management
-[Window Snapper](https://gist.github.com/AWMooreCO/1ef708055a11862ca9dc) 
-- Advanced window snapping
+## Libraries and resources to explore
 
-### Development Tools
-[AHK MCP Server](https://github.com/TrueCrimeDev/ahk-mcp?tab=readme-ov-file#installation) 
-- Model Context Protocol integration
-[AHK Dev Tools](https://github.com/zero-plusplus/autohotkey-devtools) 
-- Debugger and development utilities
-
-### UI & Notifications
-[Toast Notifications](https://discord.com/channels/115993023636176902/1443045097255079936) 
-- Modern notification system
-[Colored GUI Buttons](https://www.autohotkey.com/boards/viewtopic.php?f=83&t=93339) 
-- Enhanced button styling
-
-### Hardware Integration
-[Stream Deck Alternative](https://discord.com/channels/115993023636176902/1440433710301446260) 
-- Touchscreen macro board with server support
-
-### AI Integration
-[Integrated AI Assistant](https://discord.com/channels/115993023636176902/1338874340145496168) 
-- Voice-controlled function calling
-- Jarvis-style voice commands
-- Function interpretation and execution
-- Speech-to-text integration
-
-### Remote Control & Communication
-[PushBullet Integration](https://www.autohotkey.com/boards/viewtopic.php?f=83&t=52552) 
-- Trigger scripts from phone
-[Network Chat](https://www.autohotkey.com/boards/viewtopic.php?f=83&t=121560) 
-- Inter-computer communication on LAN
-
-### Image Recognition
-[Image Position Detection](https://www.youtube.com/watch?v=L2Cb1UCJDEg) 
-- Game automation tutorials
-[Advanced Image Search](https://www.youtube.com/watch?v=wIdcF6KUHIE) 
-- Pattern recognition techniques
+- [DEMON_STACK](https://github.com/tonchi29-a11y/DEMON_STACK) — performance-oriented AutoHotkey library.
+- [Window Snapper](https://gist.github.com/AWMooreCO/1ef708055a11862ca9dc) — advanced window snapping.
+- [AHK MCP Server](https://github.com/TrueCrimeDev/ahk-mcp#installation) — Model Context Protocol integration.
+- [AHK Dev Tools](https://github.com/zero-plusplus/autohotkey-devtools) — debugging and development utilities.
+- [Colored GUI Buttons](https://www.autohotkey.com/boards/viewtopic.php?f=83&t=93339) — enhanced button styling.
+- [PushBullet Integration](https://www.autohotkey.com/boards/viewtopic.php?f=83&t=52552) — remote triggers from a phone.
+- [Network Chat](https://www.autohotkey.com/boards/viewtopic.php?f=83&t=121560) — LAN communication.
+- [Image Position Detection](https://www.youtube.com/watch?v=L2Cb1UCJDEg) and [Advanced Image Search](https://www.youtube.com/watch?v=wIdcF6KUHIE) — image-recognition techniques.

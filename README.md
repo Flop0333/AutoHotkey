@@ -1,61 +1,65 @@
-Hey everyone! 👋
+# Welcome to my AutoHotkey productivity suite 👋
 
 [![AHK Tests](https://github.com/Flop0333/AutoHotkey/actions/workflows/ahk-tests.yml/badge.svg)](https://github.com/Flop0333/AutoHotkey/actions/workflows/ahk-tests.yml)
 
-I'm excited to show my AutoHotkey v2 workflow system that I've been building! It's a modular collection of productivity tools that's transformed how I work.
+This is the AutoHotkey v2 system I use to make Windows faster, more personal, and more fun. It combines global hotkeys, mouse controls, virtual desktops, OCR, speech, and modern dashboards in one modular toolkit.
 
-**New to this project?** → [Installation Guide](INSTALLATION.md)
+It started as a collection of small scripts and grew into a profile-aware automation suite with shared libraries, structured logging, automated tests, and GitHub-powered maintenance.
 
-## ✨ Features
+## ✨ A few highlights
 
-### Core Tools
-- 🖥️ **Virtual Desktops Manager** - Seamlessly auto-launch apps per virtual desktop
-- 🪟 **Window Manager** - Drag, resize & control windows with CapsLock shortcuts
-- ⌨️ **CapsLock Modifier** - Repurpose CapsLock as a powerful modifier key
-- 🖱️ **Mouse Gestures** - Execute quick actions with mouse movements
+- 🖥️ **Virtual desktop automation** — switch desktops with CapsLock shortcuts and launch the right apps for each workspace.
+- 🪟 **Fast window control** — drag, resize, close, pin, and keep windows on top from the keyboard or mouse.
+- 🚀 **Age of Efficiency** — search bookmarks, launch apps, and run commands from one WebView2-powered interface.
+- 🎹 **Macro Board** — a customizable Stream Deck-style dashboard for frequently used actions.
+- 📸 **Screen Snipper with OCR** — capture the screen, copy or save an image, and extract text.
+- 🔊 **Text Speaker** — read selected text or an OCR screen region aloud with Windows speech synthesis.
+- 🖱️ **Mouse gestures and extra-button actions** — control common tasks without reaching for menus.
+- 🧩 **Profiles and local secrets** — adapt one checkout to different computers without committing personal data.
 
+## 🚀 The dashboards
 
-### Dashboards
-- 🚀 **Age of Efficiency** - Command launcher for bookmarks, searches, and scripts
-![alt text](<Dashboards/Age of Efficiency/Demo.gif>)
+### Age of Efficiency
 
-- 🎹 **Macro Board** - Stream Deck-like interface with customizable buttons
-![alt text](<Dashboards/Macro Board/Demo.gif>)
+A keyboard-first command launcher for bookmarks, searches, applications, scripts, timers, and other utilities.
 
+![Age of Efficiency demo](Dashboards/Age%20of%20Efficiency/Demo.gif)
 
-### Productivity Apps
-- 📸 **Screen Snipper with OCR** - Capture and extract text from screens in seconds
-- 🐭 **Mouse Gestures** - Execute quick actions with mouse movements 
-- 🪟 **Window Management** - Drag, resize & control windows with CapsLock shortcuts
-- 🧑‍💻 **Command Storer** - Quick access to frequently used commands
-- 🤓 **Emoji Sender** - Quick emoji picker with keyboard shortcuts
-- ⌨️ **Capslock Modifier** - Capslock as powerful modifier key
-- ♾️ **And much more!**
+### Macro Board
 
+A customizable action grid that brings frequently used commands together in a visual, Stream Deck-style interface.
 
-## 🏗️ Architecture
+![Macro Board demo](Dashboards/Macro%20Board/Demo.gif)
 
-See [AutoHotkey architecture](docs/ARCHITECTURE.md) for the include graph, dependency-direction, runtime activation, and manual dependency-injection conventions.
+## 🏗️ More than a folder of scripts
 
-**Profile System** - Context-aware configurations that adapt behavior per environment (work/home/laptop)
+The suite brings several technologies and ideas together:
 
-**Secrets Management** - Git-ignored file for storing personal data (emails, URLs, credentials)
+- **AutoHotkey v2** for hotkeys, Windows automation, GUIs, and reusable application wrappers.
+- **WebView2 with HTML, CSS, and JavaScript** for richer dashboard interfaces backed by AutoHotkey controllers.
+- **Profile-aware startup** for machine-specific apps, desktops, hotkeys, and behavior.
+- **Local secrets management** that keeps personal values outside Git while maintaining a tracked catalog.
+- **Structured logging and a visual test dashboard** for understanding failures quickly.
+- **Explicit dependency boundaries** that keep includes predictable and activation in executable entry points.
+- **PowerShell test runners and GitHub Actions** for documentation, architecture, syntax, unit, and integration checks.
+- **GitHub Projects and optional scheduled agents** for issue triage, implementation, review, changelogs, and project status. Agent workflows require the [documented GitHub configuration](docs/AUTOMATION.md#required-github-configuration).
 
-**Dashboards** - WebView2-powered UIs combining modern web technologies with AHK backend
+## 🛠️ Try it
 
-**Apps Integrated** - Background services that run continuously and integrate via hotkeys
+1. Install [AutoHotkey v2](https://www.autohotkey.com/) on Windows.
+2. Clone or download this repository.
+3. Run `Startup/Startup.ahk`.
 
-**Apps Standalone** - Independent utilities that can run separately (Window Manager, Command Storer, etc.) 
+The suite is intentionally code-first: editing a clear script can be faster—and more flexible—than clicking through another settings screen.
 
+## 📚 Explore the project
 
-## 💭 Philosophy
-Every component is modular, following OOP/SOLID principles and build with care for maximum flexibility and maintainability.
+- [Project guide](docs/PROJECT-GUIDE.md) — structure, startup, development, and documentation map
+- [Architecture](docs/ARCHITECTURE.md) — include direction, activation, composition, and testability
+- [Installation](INSTALLATION.md) — requirements, profiles, secrets, and Windows auto-start
+- [Apps and scripts](docs/APPS.md) — every maintained user-facing tool and entry point
+- [Testing](docs/TESTING.md) — local tests, CI, and the Test Dashboard
+- [Automation](docs/AUTOMATION.md) — GitHub workflows, board connections, and scheduled agents
+- [AI agent guide](AGENTS.md) — focused instructions for coding agents
 
-This project embraces **code-first configuration** - sometimes editing code is faster (and more fun) than clicking through UIs.
-
-
-
-I can't wait to hear your thoughts, feedback & bug reports.
-Let me know what you think! 💭
-
-Discord Post: [https://discord.com/channels/115993023636176902/1471948793359630479]
+Feel free to explore, adapt the ideas, report a bug, or share feedback. I hope something here inspires your own Windows workflow. 💭

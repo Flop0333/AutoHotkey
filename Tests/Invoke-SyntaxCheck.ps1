@@ -80,14 +80,14 @@ try {
             continue
         }
 
-        $wrapperPath = Join-Path $tempDir ((New-Guid).Guid + ".ahk")
+        $wrapperPath = Join-Path $tempDir ([guid]::NewGuid().Guid + ".ahk")
         @"
 #Requires AutoHotkey v2
 ExitApp(0)
 #Include $target
 "@ | Set-Content -Path $wrapperPath -Encoding UTF8
 
-        $stderrPath = Join-Path $tempDir ((New-Guid).Guid + ".stderr.txt")
+        $stderrPath = Join-Path $tempDir ([guid]::NewGuid().Guid + ".stderr.txt")
         $run = Invoke-AhkScript -AhkExePath $ahkExe.Source -ScriptPath $wrapperPath -StdErrPath $stderrPath -TimeoutSeconds $TimeoutSeconds
 
         if (-not $run.Exited) {

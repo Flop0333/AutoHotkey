@@ -1,50 +1,74 @@
-# Installation Guide
+# Installation and startup
 
-## Quick Start
+## Requirements
 
-1. **Clone the repository** to any folder you want
+- Windows 10 or 11.
+- [AutoHotkey v2](https://www.autohotkey.com/) for the suite and tests.
+- Microsoft Edge WebView2 Runtime for the dashboards and Text Speaker. Install it if it is missing; the loader DLLs are already in this repository.
 
-2. **Configure Secrets** (Optional)
-   - `Secrets/My Secrets.json` is created automatically on first run
-   - Fill in your personal values, or let the app prompt for them when needed
-   - Secrets removed from the catalog are moved to the local `Secrets/Removed Secrets.json` archive
+## First run
 
-3. **Run the startup script**
-   ```
-   Startup/Startup.ahk
-   ```
+1. Clone or download the repository to any writable folder of choice.
+2. Run `Startup/Startup.ahk` with AutoHotkey v2.
+3. Check the AutoHotkey tray menu for the detected profile. Use **Profile** in that menu to switch it if necessary.
+4. Fill only the local secret values needed by your chosen features.
 
-4. **Optional:** Create a shortcut in Windows Startup folder for auto-launch
+The tray menu also provides **Reload**, **Log Dashboard**, **Test Dashboard**, and **Exit**.
 
-## Customization
+## Profiles
 
-### Profile Configuration
-Customize behavior per computer:
-- Get your computer name: `MsgBox(A_ComputerName)`
-- Edit `Profiles/Profile Manager.ahk` to add your profile
+Profiles let one checkout behave differently on work machines, personal laptops, and development environments.
 
-### App Configuration
-Review and customize these files before use:
+- Definitions and device-name matching live in `Profiles/Profile Manager.ahk`.
+- Get the current Windows device name with `MsgBox(A_ComputerName)` in an AHK script or `$env:COMPUTERNAME` in PowerShell.
+- Add or adjust a `Profile` in the `Profiles` class, then use `ProfileManager.Is(...)` where behavior differs.
+- The selected display name is saved in `Profiles/current_profile.ini`. This generated file is ignored by Git.
+- At startup the device name is checked to match a profile. An unmatched machine uses the `Default` profile.
 
-| File | Purpose |
-|------|--------|
-| `Apps Integrated/Hotkeys.ahk` | App-specific hotkey behavior |
-| `Apps Standalone/Key Bindings.ahk` | Global keyboard shortcuts |
-| `Dashboards/Macro Board/Macro Board.ahk` | Custom macro buttons |
-| `Apps Standalone/Desktops Manager/Desktops Manager.ahk` | Virtual desktop layouts |
-| `Apps Standalone/Mouse Gestures/Mouse Gestures.ahk` | Gesture actions |
-| `Startup/Startup.ahk` | Which apps launch automatically |
+## Secrets
+
+`Secrets/Secrets Catalog.ahk` is the tracked catalog of supported keys and descriptions. Personal values belong in `Secrets/My Secrets.json`, which is created and synchronized on startup and ignored by Git.
+
+- Store values as one JSON object containing string keys and string values.
+- New catalog keys can be added to the local file with an empty value.
+- Values whose catalog entry was removed are preserved locally in `Secrets/Removed Secrets.json`.
+- Invalid JSON stops synchronization and leaves the original file untouched.
+- Never commit either local secrets file. Do not place credentials directly in tracked scripts.
+
+Most features tolerate empty values until that specific action is used.
+
+## What starts automatically
+
+`Startup/Startup.ahk` is the source of truth. It performs this sequence:
+
+1. Build the tray menu and initialize structured logging.
+2. Synchronize the local secrets files.
+3. Select a requested profile or detect one from the computer name.
+4. Start `Capslock Service.ahk` before scripts that register CapsLock hotkeys.
+5. Start Age of Efficiency and Macro Board.
+6. Start the configured standalone apps.
+7. Start the configured integrated apps.
+
+The exact current list is documented in the [app catalog](docs/APPS.md) and expressed by the `Run(...)` calls inside `RunStartup()`.
+
+Logging initialization deletes the active `Logs/errors.log` and `Logs/errors.read` files. The Log Dashboard therefore shows the current suite session; earlier error sessions are not archived.
+
+To change auto-run behavior, add, remove, or reorder those calls. Keep the CapsLock service ahead of its consumers.
+
+## Start with Windows
+
+Press `Win+R`, enter `shell:startup`, and create a shortcut there targeting the repository's `Startup/Startup.ahk`. Logging in to Windows will then launch the suite through that shortcut.
+
+To disable automatic launch, remove the shortcut; the repository and settings remain intact. You can always run `Startup/Startup.ahk` manually.
+
+## Optional environment override
+
+Shared path resolution normally derives the repository root from `Lib/Core/Paths.ahk`. Set the `AUTOHOTKEY_BASE` environment variable only when a launcher or unusual include layout needs to override that location.
 
 ## Troubleshooting
 
-**Scripts not working?**
-- Ensure AutoHotkey v2 is installed
-- Check file paths match the expected Documents location
-- Missing keys in `My Secrets.json` are restored with an empty value
-- Invalid JSON is reported and left untouched so existing secret data is not overwritten
-
-**Need Help?**
-- Open an issue or reach out directly
-- Contributions and feedback welcome!
-
-Happy automating! 🚀
+- **A dashboard does not open:** install or repair Microsoft Edge WebView2 Runtime, then inspect the Log Dashboard.
+- **The wrong profile is active:** select one from the tray menu and verify its device names in `Profiles/Profile Manager.ahk`.
+- **A secret-backed action does nothing:** check that the matching key in `Secrets/My Secrets.json` contains a string value.
+- **The suite behaves inconsistently after edits:** choose **Reload** from the tray menu.
+- **Before reporting a code problem:** run `./Tests/Invoke-AllTests.ps1`; see the [testing guide](docs/TESTING.md).
