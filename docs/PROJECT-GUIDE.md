@@ -52,7 +52,6 @@ AI coding agents should begin with [AGENTS.md](../AGENTS.md), which summarizes t
 | [Apps and scripts](APPS.md) | Catalog of runnable tools, dashboards, and supporting areas |
 | [Automation](AUTOMATION.md) | Windows auto-run and all GitHub connections and workflows |
 | [Testing](TESTING.md) | Local test suites, dashboard, CI, and test authoring |
-| [Contributing](../CONTRIBUTING.md) | Ticket, board, branch, pull-request, and review workflow |
 | [Agent guide](../AGENTS.md) | Fast repository orientation for AI agents and contributors |
 | [Road map](../ROAD%20MAP.md) | Future ideas and resources under consideration |
 

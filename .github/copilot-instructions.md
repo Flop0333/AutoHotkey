@@ -3,7 +3,7 @@
 This is a Windows productivity and automation suite written for AutoHotkey v2.
 
 - Treat `AGENTS.md` as the canonical repository guide and consult its focused documentation links when relevant.
-- Follow the contribution workflow and definition of done in `CONTRIBUTING.md`.
+- Follow the working agreement and definition of done in `AGENTS.md`.
 - Inspect the working tree before editing and preserve unrelated or user-owned changes.
 - Use AutoHotkey v2 syntax; do not introduce v1 compatibility code.
 - Preserve the CapsLock startup ordering described in `AGENTS.md`.

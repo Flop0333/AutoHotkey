@@ -10,7 +10,6 @@ This is an AutoHotkey v2 productivity suite for Windows. Keep changes scoped, pr
 - [docs/APPS.md](docs/APPS.md) — user-facing entry points and invocation.
 - [docs/AUTOMATION.md](docs/AUTOMATION.md) — GitHub workflows, Project board, credentials, and schedules.
 - [docs/TESTING.md](docs/TESTING.md) — test architecture and commands.
-- [CONTRIBUTING.md](CONTRIBUTING.md) — ticket, branch, pull-request, and definition-of-done workflow.
 
 ## Architecture
 
@@ -48,9 +47,9 @@ Do not add real email addresses, credentials, private URLs, or secret contents t
 
 ## Working agreement
 
-For tracked changes, follow [CONTRIBUTING.md](CONTRIBUTING.md): work from an issue and focused branch, keep the Project status current, open a pull request, and review the complete diff. Do not merge a pull request unless the maintainer explicitly requests it.
+For tracked work, start from an issue with clear acceptance criteria, keep its Project status current, and use a focused branch. Open a pull request that explains the change and validation, then review the complete diff. Do not merge unless the maintainer explicitly requests it.
 
-A change is ready for review when its acceptance criteria are met, relevant validation passes or is reported, affected documentation is updated, and the diff contains no unrelated changes, personal data, secrets, or generated runtime files.
+A change is ready for review when its acceptance criteria are met, relevant validation passes or is reported, affected documentation is updated, and the diff contains no unrelated changes, personal data, secrets, or generated files.
 
 ## Validation
 
