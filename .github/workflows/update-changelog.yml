@@ -1,11 +1,15 @@
 name: Update changelog
 
-# Commits straight to main rather than opening a PR: a changelog entry is a
-# pure, easily-revertable text addition (not code), and pushes made with
-# the default GITHUB_TOKEN don't trigger other `push`-type workflow runs,
-# so this can't recurse into itself through GitHub's own anti-recursion
-# rule. The commit-message check below is a second, explicit guard against
-# that in case that assumption ever changes.
+# Opens/updates a bot-owned pull request rather than pushing straight to
+# main, because the main-branch ruleset requires changes to land through a
+# pull request. See issue #89 - the previous direct-push design (see this
+# workflow's git history) failed every run once that ruleset was added.
+#
+# The branch name below is reused across runs (never a per-run/dated
+# name): the branch is fully regenerated from main's current CHANGELOG.md
+# on every run and force-pushed, so there is at most one open changelog PR
+# at a time, and Update-Changelog.ps1 excludes that branch's own merged
+# PRs from future changelog entries (see its header).
 #
 # On its very first run there's no CHANGELOG.md yet, so it back-fills the
 # entire merged-PR history in one section - see Update-Changelog.ps1's
@@ -16,28 +20,49 @@ on:
     branches: [main]
   workflow_dispatch: {}
 
+env:
+  CHANGELOG_BRANCH: automation/update-changelog
+
 jobs:
   changelog:
-    if: "!startsWith(github.event.head_commit.message, 'docs: update changelog')"
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
       - shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./.github/scripts/Update-Changelog.ps1 -Repo "${{ github.repository }}"
+        run: ./.github/scripts/Update-Changelog.ps1 -Repo "${{ github.repository }}" -ChangelogBranch "${{ env.CHANGELOG_BRANCH }}"
 
-      - name: Commit changelog if changed
+      - name: Open or update changelog pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # `git add` first so a brand-new (untracked) CHANGELOG.md on the
+          # very first run is detected too - plain `git diff` ignores
+          # untracked files.
           git add CHANGELOG.md
           if git diff --cached --quiet; then
             echo "No changelog changes."
+            exit 0
+          fi
+
+          git checkout -B "$CHANGELOG_BRANCH"
+          git commit -m "docs: update changelog"
+          git push --force origin "$CHANGELOG_BRANCH"
+
+          existing=$(gh pr list --repo "${{ github.repository }}" --head "$CHANGELOG_BRANCH" --state open --json number --jq 'length')
+          if [ "$existing" -eq 0 ]; then
+            gh pr create --repo "${{ github.repository }}" \
+              --base main --head "$CHANGELOG_BRANCH" \
+              --title "docs: update changelog" \
+              --body "Automated changelog update from merged pull requests. Never auto-merged - review and merge by hand."
           else
-            git commit -m "docs: update changelog"
-            git push
+            echo "Existing changelog PR updated by the force-push above."
           fi
