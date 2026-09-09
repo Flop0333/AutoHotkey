@@ -7,13 +7,15 @@
 Class PBIReformat {
 
     static reformatGui := DarkGui
+    static clipboardChangeCallback := ""
 
     static Start() {
         this.reformatGui := DarkGui("+AlwaysOnTop -MinimizeBox -MaximizeBox", "Please copy PBI")
-        this.reformatGui.OnEvent("Close", (*) => OnClipboardChange(ClipboardChange, 0)) ; Unregister clipboard change on close
+        this.reformatGui.OnEvent("Close", (*) => this.Stop())
         this.reformatGui.Show("w400 h200")
 
-        OnClipboardChange(ClipboardChange)
+        this.clipboardChangeCallback := ClipboardChange
+        OnClipboardChange(this.clipboardChangeCallback)
         Return
 
         ClipboardChange(type) {
@@ -82,9 +84,12 @@ Class PBIReformat {
             Sleep(count -= 0.25)
             this.reformatGui["MyProgress"].Value -= 1
         }
+        this.Stop()
     }
 
-    static ExitAppWhenClosingGui(*) {
+    static Stop(*) {
+        if this.clipboardChangeCallback
+            OnClipboardChange(this.clipboardChangeCallback, 0) ; Unregister clipboard change monitor
         this.reformatGui.Destroy()
     }
 }
