@@ -17,25 +17,28 @@ WaitUntil(predicate, timeoutMs := 4000) {
 	return false
 }
 
-; Waits on the actual process handle (SYNCHRONIZE + query rights), not on
-; ProcessExist(pid) polling: PIDs are reused by Windows once a process
-; exits, so polling by PID alone can (in principle, under heavy concurrent
-; process creation like this test's) observe a *different*, newer process
-; that happens to reuse the same PID and conclude the writer exited early.
-; Holding the original handle keeps it unambiguously tied to the process
-; this test actually started, and lets it report the real exit code
-; instead of only "it stopped existing" - see
-; Test_ConcurrentWritersPreserveEveryEntry's use below for why the exit
-; code matters: a writer that hits a mutex timeout or other exception
-; exits early (see LoggingWriter.ahk's catch block) having written only
-; part of its share, which previously surfaced only as an unexplained
-; short entry count with no indication a writer had actually failed.
-WaitForProcessExit(pid, timeoutMs := 30000) {
+; Opens a lasting handle to a just-started process (SYNCHRONIZE + query
+; rights). Must be called immediately after Run() returns the pid, not
+; later: these writer processes are fast enough to fully exit - and be
+; torn down by Windows, since nothing was keeping a handle open - before
+; a later loop gets around to inspecting them, which is exactly what
+; happened the first time this was tried (OpenProcess failing on an
+; already-gone pid, misreported as "exited with no code" instead of
+; actually observing the writer's real, successful exit). Holding the
+; handle from the start also avoids relying on ProcessExist(pid) polling,
+; since Windows can reuse a PID once a process exits.
+OpenProcessHandle(pid) {
 	PROCESS_QUERY_LIMITED_INFORMATION := 0x1000
 	SYNCHRONIZE := 0x100000
-	handle := DllCall("OpenProcess", "UInt", PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, "Int", false, "UInt", pid, "Ptr")
-	if !handle
-		return Map("exited", true, "exitCode", "") ; Already gone; no handle left to inspect.
+	return DllCall("OpenProcess", "UInt", PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, "Int", false, "UInt", pid, "Ptr")
+}
+
+; Waits on a handle from OpenProcessHandle() and reports the real exit
+; code, so a writer that hits a mutex timeout or other exception and
+; exits early (see LoggingWriter.ahk's catch block) having written only
+; part of its share is named directly instead of only showing up as an
+; unexplained short entry count.
+WaitForProcessExit(handle, timeoutMs := 30000) {
 	try {
 		waitResult := DllCall("WaitForSingleObject", "Ptr", handle, "UInt", timeoutMs, "UInt")
 		if waitResult != 0
@@ -195,22 +198,25 @@ Test_ConcurrentWritersPreserveEveryEntry() {
 	ClearErrorLog()
 	writerCount := 4
 	entriesPerWriter := 10
-	pids := []
+	pidsAndHandles := []
 	writerScript := A_ScriptDir "\..\Support\LoggingWriter.ahk"
 
 	loop writerCount {
 		Run('"' A_AhkPath '" /ErrorStdOut "' writerScript '" "writer-' A_Index '" "' entriesPerWriter '"',,, &pid)
-		pids.Push(pid)
+		; Open the handle right here, before this fast-exiting writer can
+		; fully vanish - see OpenProcessHandle's comment.
+		pidsAndHandles.Push(Map("pid", pid, "handle", OpenProcessHandle(pid)))
 	}
 	; Checking the real exit code (not just "it stopped existing") is what
 	; actually distinguishes "every writer really wrote all its entries"
 	; from "some writer silently failed partway" - the previous version of
 	; this test could not tell those apart, so a partial-entry failure
 	; below showed only a confusing short count with no explanation.
-	for pid in pids {
-		result := WaitForProcessExit(pid, 30000)
-		Assert.True(result["exited"], "Concurrent log writer (pid " pid ") did not exit within 30s")
-		Assert.Equal(0, result["exitCode"], "Concurrent log writer (pid " pid ") exited with code " result["exitCode"] " instead of writing all its entries - see its stderr for the AppendLogEntry failure")
+	for entry in pidsAndHandles {
+		Assert.True(entry["handle"], "Could not open a handle to concurrent log writer (pid " entry["pid"] ") before it exited")
+		result := WaitForProcessExit(entry["handle"], 30000)
+		Assert.True(result["exited"], "Concurrent log writer (pid " entry["pid"] ") did not exit within 30s")
+		Assert.Equal(0, result["exitCode"], "Concurrent log writer (pid " entry["pid"] ") exited with code " result["exitCode"] " instead of writing all its entries - see its stderr for the AppendLogEntry failure")
 	}
 
 	entries := ReadLogEntries()
