@@ -194,6 +194,9 @@
 		"icon": "Azure Devops",
 		"id": 25,
 		"isSecret": 1,
+		"secretDescription": "Azure DevOps Athena Callcenter pull requests",
+		"secretName": "Callcenter Pull Requests",
+		"secretPropertyName": "CallcenterPullRequestsUrl",
 		"title": "Callcenter Pull Requests",
 		"url": "CallcenterPullRequestsUrl"
 	},
