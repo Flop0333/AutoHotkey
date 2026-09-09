@@ -85,12 +85,14 @@ Test_InvalidReadStateFallsBackToZero() {
 
 Test_ClearRemovesLogAndReadState() {
 	ResetLogFiles()
+	previousSessionId := GetLogSessionId()
 	LogInfo("entry")
 	MarkAllLogsRead()
 	ClearErrorLog()
 	Assert.False(FileExist(ErrorLogFile()))
 	Assert.False(FileExist(ErrorLogReadStateFile()))
 	Assert.Equal(0, GetUnreadLogEntries().Length)
+	Assert.NotEqual(previousSessionId, GetLogSessionId(), "Clearing the log must start a distinct session")
 }
 
 Test_UnreadCountsIgnoreUnknownSeverities() {
@@ -164,6 +166,7 @@ Test_AppendRejectsNonStringStack() {
 Test_StartNewSessionArchivesActiveLogAndResetsReadState() {
 	ResetLogFiles()
 	ClearLogArchivesForTest()
+	previousSessionId := GetLogSessionId()
 	LogInfo("previous session")
 	MarkAllLogsRead()
 	StartNewLogSession()
@@ -174,6 +177,7 @@ Test_StartNewSessionArchivesActiveLogAndResetsReadState() {
 		archives.Push(A_LoopFileFullPath)
 	Assert.Equal(1, archives.Length)
 	Assert.True(InStr(FileRead(archives[1], "UTF-8"), "previous session") > 0)
+	Assert.NotEqual(previousSessionId, GetLogSessionId(), "Rotating the log must start a distinct session")
 }
 
 Test_StartNewSessionAvoidsArchiveNameCollisions() {

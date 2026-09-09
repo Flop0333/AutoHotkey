@@ -16,6 +16,7 @@ Class LoggerPopup {
 
 	counts := Map("info", 0, "warning", 0, "error", 0)
 	lastEntryCount := 0
+	logSessionId := ""
 	isOpen := false
 	activeSeverities := Map("info", false, "warning", false, "error", false)
 	hideTimerFns := Map()
@@ -94,6 +95,7 @@ Class LoggerPopup {
 		entries := ReadLogEntries()
 		this._RefreshUnreadCounts(entries)
 		this.lastEntryCount := Min(GetReadLogEntryCount(), entries.Length)
+		this.logSessionId := GetLogSessionId()
 	}
 
 	_ReadAllEntries() => ReadLogEntries()
@@ -104,8 +106,14 @@ Class LoggerPopup {
 
 	_Poll() {
 		entries := this._ReadAllEntries()
-		if (entries.Length < this.lastEntryCount)
+		currentSessionId := GetLogSessionId()
+		if (currentSessionId != this.logSessionId) {
 			this.lastEntryCount := 0
+			this.logSessionId := currentSessionId
+		} else if (entries.Length < this.lastEntryCount) {
+			; Retain a defensive fallback for external/manual log truncation.
+			this.lastEntryCount := 0
+		}
 
 		loop entries.Length - this.lastEntryCount {
 			entry := entries[this.lastEntryCount + A_Index]

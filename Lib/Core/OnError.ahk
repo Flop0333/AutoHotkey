@@ -14,6 +14,7 @@ HandleUnhandledError(error, mode) {
 ErrorLogDirectory() => EnvGet("AUTOHOTKEY_LOG_DIR") != "" ? EnvGet("AUTOHOTKEY_LOG_DIR") : Paths.autohotkey "\Logs"
 ErrorLogFile() => ErrorLogDirectory() "\errors.log"
 ErrorLogReadStateFile() => ErrorLogDirectory() "\errors.read"
+ErrorLogSessionStateFile() => ErrorLogDirectory() "\errors.session"
 ErrorLogArchiveDirectory() => ErrorLogDirectory() "\Archive"
 
 ; Every AHK process writes the same two files. A named mutex keeps append,
@@ -71,6 +72,13 @@ GetReadLogEntryCount() {
 
 MarkAllLogsRead() {
 	WithLoggingLock(() => _MarkAllLogsReadLocked())
+}
+
+GetLogSessionId() {
+	if !FileExist(ErrorLogSessionStateFile())
+		return ""
+	try return Trim(FileRead(ErrorLogSessionStateFile(), "UTF-8"))
+	return ""
 }
 
 _MarkAllLogsReadLocked() {
@@ -143,10 +151,12 @@ ClearErrorLog() {
 }
 
 _ClearErrorLogLocked() {
+	DirCreate(ErrorLogDirectory())
     if FileExist(ErrorLogFile())
         FileDelete(ErrorLogFile())
     if FileExist(ErrorLogReadStateFile())
         FileDelete(ErrorLogReadStateFile())
+	_WriteNewLogSessionIdLocked()
 }
 
 StartNewLogSession(maxArchives := 10) {
@@ -168,7 +178,18 @@ _StartNewLogSessionLocked(maxArchives) {
 	}
 	if FileExist(ErrorLogReadStateFile())
 		FileDelete(ErrorLogReadStateFile())
+	_WriteNewLogSessionIdLocked()
 	_PruneLogArchivesLocked(maxArchives)
+}
+
+_WriteNewLogSessionIdLocked() {
+	static sequence := 0
+	sequence++
+	sessionId := FormatTime(, "yyyyMMdd-HHmmss") "-" DllCall("GetCurrentProcessId") "-" A_TickCount "-" sequence
+	stateFile := FileOpen(ErrorLogSessionStateFile(), "w", "UTF-8")
+	try stateFile.Write(sessionId)
+	finally stateFile.Close()
+	return sessionId
 }
 
 _PruneLogArchivesLocked(maxArchives) {
