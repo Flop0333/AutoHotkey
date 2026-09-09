@@ -15,6 +15,12 @@ Class LogDashboard extends WebViewToo {
 		this.AddCallbackToScript("SetClipboard", (webview, text) => A_Clipboard := text)
 		this.AddCallbackToScript("LogTestMessage", (webview, severity) => this.LogTestMessage(severity))
 		this.AddCallbackToScript("GetGitStatus", (*) => this.GetGitStatusForWeb())
+		this.AddCallbackToScript("OpenLogArchive", (*) => this.OpenLogArchive())
+	}
+
+	OpenLogArchive() {
+		DirCreate(ErrorLogArchiveDirectory())
+		Run('explorer.exe "' ErrorLogArchiveDirectory() '"')
 	}
 
 	Show() => super.Show(LogDashboard.SHOW_OPTIONS, LogDashboard.WIN_TITLE)
@@ -23,16 +29,7 @@ Class LogDashboard extends WebViewToo {
 	Close() => this.Hide()
 
 	GetLogEntriesForWeb() {
-		entries := []
-		if !FileExist(ErrorLogFile())
-			return JSON.Dump(entries)
-
-		for line in StrSplit(FileRead(ErrorLogFile(), "UTF-8"), "`n", "`r") {
-			if (Trim(line) = "")
-				continue
-			try entries.Push(JSON.parse(line))
-		}
-		return JSON.Dump(entries)
+		return JSON.Dump(ReadLogEntries())
 	}
 
 	static TestMessages := Map(

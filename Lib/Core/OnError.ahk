@@ -4,23 +4,53 @@
 OnError(HandleUnhandledError)
 
 HandleUnhandledError(error, mode) {
-    try LogAndNotifyError(error.Message, error.HasProp("Stack") ? error.Stack : "")
-    return true ; Suppress the default modal error dialog; the failed thread ends.
+    try {
+        LogAndNotifyError(error.Message, error.HasProp("Stack") ? error.Stack : "")
+        return true ; Suppress the default dialog only after persistence succeeds.
+    }
+    return false ; Preserve AutoHotkey's fallback when the logging path itself fails.
 }
 
 ErrorLogDirectory() => EnvGet("AUTOHOTKEY_LOG_DIR") != "" ? EnvGet("AUTOHOTKEY_LOG_DIR") : Paths.autohotkey "\Logs"
 ErrorLogFile() => ErrorLogDirectory() "\errors.log"
 ErrorLogReadStateFile() => ErrorLogDirectory() "\errors.read"
+ErrorLogArchiveDirectory() => ErrorLogDirectory() "\Archive"
+
+; Every AHK process writes the same two files. A named mutex keeps append,
+; read-cursor updates, and session reset/rotation atomic across processes.
+LoggingMutexName() => "Local\AutoHotkeySuite.StructuredLogging"
+
+WithLoggingLock(callback, timeoutMs := 15000) {
+	mutex := DllCall("CreateMutexW", "Ptr", 0, "Int", false, "Str", LoggingMutexName(), "Ptr")
+	if !mutex
+		throw OSError()
+	waitResult := DllCall("WaitForSingleObject", "Ptr", mutex, "UInt", timeoutMs, "UInt")
+	if (waitResult != 0 && waitResult != 0x80) {
+		DllCall("CloseHandle", "Ptr", mutex)
+		if (waitResult = 0x102)
+			throw Error("Timed out waiting for the shared logging lock")
+		throw OSError()
+	}
+	try return callback.Call()
+	finally {
+		DllCall("ReleaseMutex", "Ptr", mutex)
+		DllCall("CloseHandle", "Ptr", mutex)
+	}
+}
 
 GetLogEntryCount() {
 	return ReadLogEntries().Length
 }
 
 ReadLogEntries() {
+	return ReadLogEntriesFromFile(ErrorLogFile())
+}
+
+ReadLogEntriesFromFile(logFile) {
 	entries := []
-	if !FileExist(ErrorLogFile())
+	if !FileExist(logFile)
 		return entries
-	for line in StrSplit(FileRead(ErrorLogFile(), "UTF-8"), "`n", "`r") {
+	for line in StrSplit(FileRead(logFile, "UTF-8"), "`n", "`r") {
 		if (Trim(line) = "")
 			continue
 		try {
@@ -40,14 +70,19 @@ GetReadLogEntryCount() {
 }
 
 MarkAllLogsRead() {
-	DirCreate(ErrorLogDirectory())
-    readState := FileOpen(ErrorLogReadStateFile(), "w", "UTF-8")
-    readState.Write(GetLogEntryCount())
-	readState.Close()
+	WithLoggingLock(() => _MarkAllLogsReadLocked())
 }
 
-GetUnreadLogEntries() {
-	entries := ReadLogEntries()
+_MarkAllLogsReadLocked() {
+	DirCreate(ErrorLogDirectory())
+	readState := FileOpen(ErrorLogReadStateFile(), "w", "UTF-8")
+	try readState.Write(GetLogEntryCount())
+	finally readState.Close()
+}
+
+GetUnreadLogEntries(entries?) {
+	if !IsSet(entries)
+		entries := ReadLogEntries()
 	readEntryCount := Min(GetReadLogEntryCount(), entries.Length)
 	unreadEntries := []
 	loop entries.Length - readEntryCount
@@ -55,9 +90,10 @@ GetUnreadLogEntries() {
 	return unreadEntries
 }
 
-GetUnreadLogCounts() {
+GetUnreadLogCounts(entries?) {
 	counts := Map("info", 0, "warning", 0, "error", 0)
-	for entry in GetUnreadLogEntries() {
+	unreadEntries := IsSet(entries) ? GetUnreadLogEntries(entries) : GetUnreadLogEntries()
+	for entry in unreadEntries {
 		severity := entry.Has("severity") ? entry["severity"] : "info"
 		if counts.Has(severity)
 			counts[severity] += 1
@@ -81,6 +117,8 @@ LogAndNotifyError(message, stack := "") => AppendLogEntry("error", message, stac
 ; so past errors stay reviewable instead of only flashing in a toast.
 ; `notify` marks entries the Logger popup should surface, not just count.
 AppendLogEntry(severity, message, stack := "", notify := false) {
+	if !(stack is String)
+		throw TypeError("Log entry stack must be a string", -1, Type(stack))
     entry := Map(
         "timestamp", FormatTime(, "yyyy-MM-dd HH:mm:ss"),
         "script", A_ScriptName,
@@ -89,15 +127,60 @@ AppendLogEntry(severity, message, stack := "", notify := false) {
         "stack", stack,
         "notify", notify
     )
-	DirCreate(ErrorLogDirectory())
-    FileAppend(JSON.Dump(entry) "`n", ErrorLogFile(), "UTF-8")
+	serializedEntry := JSON.Dump(entry) "`n"
+	WithLoggingLock(() => _AppendLogEntryLocked(serializedEntry))
 }
 
-; Called once per full-suite start (see RunStartup) so the dashboard only ever
-; shows errors from the current run, not accumulated history from past runs.
+_AppendLogEntryLocked(serializedEntry) {
+	DirCreate(ErrorLogDirectory())
+	FileAppend(serializedEntry, ErrorLogFile(), "UTF-8")
+}
+
+; Test/reset helper. Full-suite startup uses StartNewLogSession() so history is
+; archived instead of discarded.
 ClearErrorLog() {
+	WithLoggingLock(() => _ClearErrorLogLocked())
+}
+
+_ClearErrorLogLocked() {
     if FileExist(ErrorLogFile())
         FileDelete(ErrorLogFile())
     if FileExist(ErrorLogReadStateFile())
         FileDelete(ErrorLogReadStateFile())
+}
+
+StartNewLogSession(maxArchives := 10) {
+	WithLoggingLock(() => _StartNewLogSessionLocked(maxArchives))
+}
+
+_StartNewLogSessionLocked(maxArchives) {
+	DirCreate(ErrorLogDirectory())
+	if (FileExist(ErrorLogFile()) && FileGetSize(ErrorLogFile()) > 0) {
+		DirCreate(ErrorLogArchiveDirectory())
+		baseName := ErrorLogArchiveDirectory() "\errors-" FormatTime(, "yyyyMMdd-HHmmss")
+		archiveIndex := 0
+		loop files baseName "-*.log", "F" {
+			if RegExMatch(A_LoopFileName, "-(\d+)\.log$", &match)
+				archiveIndex := Max(archiveIndex, Integer(match[1]))
+		}
+		archivePath := baseName "-" Format("{:03}", archiveIndex + 1) ".log"
+		FileMove(ErrorLogFile(), archivePath)
+	}
+	if FileExist(ErrorLogReadStateFile())
+		FileDelete(ErrorLogReadStateFile())
+	_PruneLogArchivesLocked(maxArchives)
+}
+
+_PruneLogArchivesLocked(maxArchives) {
+	if !DirExist(ErrorLogArchiveDirectory())
+		return
+	archiveList := ""
+	loop files ErrorLogArchiveDirectory() "\errors-*.log", "F"
+		archiveList .= A_LoopFileFullPath "`n"
+	if !archiveList
+		return
+	archives := StrSplit(RTrim(Sort(archiveList), "`n"), "`n")
+	deleteCount := Max(0, archives.Length - Max(0, maxArchives))
+	loop deleteCount
+		FileDelete(archives[A_Index])
 }

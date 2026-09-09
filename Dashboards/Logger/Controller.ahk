@@ -1,104 +1,88 @@
 #Include ..\..\Lib\Core.ahk
-#Include ..\..\Lib\Core\WebView.ahk
 #Include ..\..\Dashboards\Log Dashboard\Log Dashboard.ahk
 
-Class LoggerPopup extends WebViewToo {
+; The resident notification host uses a native GUI. The full dashboard remains
+; WebView-based and starts only when requested.
+Class LoggerPopup {
 	static WIN_TITLE := "AutoHotkey Logger"
 	static WIDTH := 290
-	static HEIGHT := 230
 	static MIN_HEIGHT := 34
-	static MARING := 7
-	static Y_POS_MARGIN := 50 + LoggerPopup.MARING ; Taskbar height + margin
-	static VISIBLE_DURATION := 5000 ; ms a severity's detail stays expanded since its last log
+	static MARGIN := 7
+	static Y_POS_MARGIN := 50 + LoggerPopup.MARGIN
+	static VISIBLE_DURATION := 5000
 	static SEVERITIES := ["info", "warning", "error"]
+	static COLORS := Map("info", "3794FF", "warning", "FF9800", "error", "F14C4C")
+	static LABELS := Map("info", ["Info", "Infos"], "warning", ["Warning", "Warnings"], "error", ["Error", "Errors"])
 
 	counts := Map("info", 0, "warning", 0, "error", 0)
 	lastEntryCount := 0
 	isOpen := false
-	currentHeight := LoggerPopup.HEIGHT
 	activeSeverities := Map("info", false, "warning", false, "error", false)
 	hideTimerFns := Map()
+	rows := Map()
 
 	__New() {
-		TraySetIcon "..\..\Lib\icon.png"
-		super.__New()
-		this.Gui.Title := LoggerPopup.WIN_TITLE
-		this.Gui.Opt("+AlwaysOnTop +ToolWindow -SysMenu")
-		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Logger\User Interface", 0) ; block cors error, allow loading local files
-		this.Load("http://app.local/index.html")
-		this.AddCallbackToScript("Dismiss", (*) => this.Dismiss())
-		this.AddCallbackToScript("OpenDashboard", (*) => this.OpenDashboard())
-		this.AddCallbackToScript("Resize", (webview, height) => this.ResizeToContent(height))
+		this.Gui := Gui("+AlwaysOnTop +ToolWindow -SysMenu -Caption", LoggerPopup.WIN_TITLE)
+		this.Gui.BackColor := "1E1E1E"
+		this.Gui.MarginX := 10
+		this.Gui.MarginY := 8
+		this.Gui.SetFont("s9 c0B6623", "Segoe UI")
+		header := this.Gui.AddText("x10 y8 w270 h18", "AutoHotkey")
+		this._BindControl(header)
 
-		for severity in LoggerPopup.SEVERITIES {
+		y := 30
+		for severity in ["error", "warning", "info"] {
+			this.Gui.SetFont("s8 c" LoggerPopup.COLORS[severity], "Segoe UI")
+			label := this.Gui.AddText("x10 y" y " w270 h20 Hidden", "")
+			this.Gui.SetFont("s7 c888888", "Segoe UI")
+			script := this.Gui.AddText("x26 y" (y + 20) " w250 h16 Hidden", "")
+			this.Gui.SetFont("s7 cDDDDDD", "Segoe UI")
+			message := this.Gui.AddText("x26 y" (y + 36) " w250 h18 Hidden", "")
+			for control in [label, script, message]
+				this._BindControl(control)
+			this.rows[severity] := Map("label", label, "script", script, "message", message)
+			y += 56
 			this.hideTimerFns[severity] := this._OnSeverityTimeout.Bind(this, severity)
 		}
 
+		this.Gui.OnEvent("ContextMenu", (*) => this.Dismiss())
 		this.InitializeHidden()
-		this.NavigationCompleted((*) => this._OnPageReady())
-		
-	}
-
-	; Don't start polling until the page has actually finished loading -
-	; window.updateCounts/expandRow don't exist before then, so an
-	; ExecuteScript() call that races the navigation fails silently and
-	; is never retried. That's not just _Seed()'s initial push: _Poll()
-	; itself could win that same race on its very first tick if something
-	; gets logged within the first moment after construction, which is
-	; exactly what happens at startup - leaving the popup stuck showing
-	; the page's default 0/0/0 until an unrelated later log event
-	; happened to succeed. Deferring the whole poll loop, not just the
-	; first push, closes the race for every ExecuteScript call, not just this one.
-
-	; Poll once immediately instead of only pushing counts - a periodic
-	; SetTimer's first tick doesn't fire until its full interval has elapsed,
-	; which would leave any severity already unread at startup (e.g. warnings
-	; logged before this host even started) sitting un-expanded for a second
-	; for no reason. Polling now expands those rows the moment the page can
-	; actually render them.
-	_OnPageReady() {
 		this._Seed()
 		this._Poll()
 		SetTimer(this._Poll.Bind(this), 1000)
 	}
 
-	; Positioned near the tray (bottom-right), shown without stealing focus.
+	_BindControl(control) => control.OnEvent("Click", (*) => this.OpenDashboard())
+
 	Show() {
-		x := A_ScreenWidth - LoggerPopup.WIDTH - LoggerPopup.MARING
-		y := A_ScreenHeight - this.currentHeight - LoggerPopup.Y_POS_MARGIN
-		super.Show(Format("x{} y{} w{} h{} NoActivate", x, y, LoggerPopup.WIDTH, this.currentHeight), LoggerPopup.WIN_TITLE)
+		height := this._Render()
+		x := A_ScreenWidth - LoggerPopup.WIDTH - LoggerPopup.MARGIN
+		y := A_ScreenHeight - height - LoggerPopup.Y_POS_MARGIN
+		this.Gui.Show(Format("x{} y{} w{} h{} NoActivate", x, y, LoggerPopup.WIDTH, height))
 		this.isOpen := true
 	}
 
-	; NoActivate must be omitted here - combined with Hide, AHK's Gui.Show()
-	; treats NoActivate as the show-state and ends up showing the window
-	; (just without activating it) instead of hiding it.
-	InitializeHidden() {
-		x := A_ScreenWidth - LoggerPopup.WIDTH - LoggerPopup.MARING
-		y := A_ScreenHeight - LoggerPopup.HEIGHT - LoggerPopup.Y_POS_MARGIN
-		super.Show(Format("Hide x{} y{} w{} h{}", x, y, LoggerPopup.WIDTH, LoggerPopup.HEIGHT), LoggerPopup.WIN_TITLE)
+	Hide() {
+		this.Gui.Hide()
 		this.isOpen := false
 	}
 
-	ResizeToContent(height) {
-		this.currentHeight := Max(LoggerPopup.MIN_HEIGHT, Round(height))
-		x := A_ScreenWidth - LoggerPopup.WIDTH - LoggerPopup.MARING
-		y := A_ScreenHeight - this.currentHeight - LoggerPopup.Y_POS_MARGIN
-		this.Gui.Move(x, y, LoggerPopup.WIDTH, this.currentHeight)
+	InitializeHidden() {
+		x := A_ScreenWidth - LoggerPopup.WIDTH - LoggerPopup.MARGIN
+		y := A_ScreenHeight - LoggerPopup.MIN_HEIGHT - LoggerPopup.Y_POS_MARGIN
+		this.Gui.Show(Format("Hide x{} y{} w{} h{}", x, y, LoggerPopup.WIDTH, LoggerPopup.MIN_HEIGHT))
+		this.isOpen := false
 	}
 
-	; Dismiss cancels every severity's timer - a right-click closes it outright,
-	; rather than leaving a timer running that would silently reopen it.
 	Dismiss() {
 		MarkAllLogsRead()
 		for severity in LoggerPopup.SEVERITIES {
 			SetTimer(this.hideTimerFns[severity], 0)
 			this.activeSeverities[severity] := false
 		}
-		this.Hide()
-		this.isOpen := false
 		this.counts := Map("info", 0, "warning", 0, "error", 0)
-		this._PushState()
+		this._Render()
+		this.Hide()
 	}
 
 	OpenDashboard() {
@@ -106,93 +90,100 @@ Class LoggerPopup extends WebViewToo {
 		ShowLogDashboard()
 	}
 
-	; Restore unread totals if the logger host is restarted during a session.
-	; lastEntryCount starts at the *read* count, not the total - any entries
-	; still unread (e.g. warnings/errors logged during startup, before this
-	; host even started) must look "new" to the first _Poll() tick so their
-	; row actually expands, instead of just being silently counted.
 	_Seed() {
-		entries := this._ReadAllEntries()
+		entries := ReadLogEntries()
 		this._RefreshUnreadCounts(entries)
 		this.lastEntryCount := Min(GetReadLogEntryCount(), entries.Length)
 	}
 
-	_ReadAllEntries() {
-		return ReadLogEntries()
-	}
-
-	_Count(entry) {
-		severity := entry.Has("severity") ? entry["severity"] : "info"
-		if !this.counts.Has(severity)
-			this.counts[severity] := 0
-		this.counts[severity] += 1
-	}
+	_ReadAllEntries() => ReadLogEntries()
 
 	_RefreshUnreadCounts(entries) {
-		this.counts := GetUnreadLogCounts()
+		this.counts := GetUnreadLogCounts(entries)
 	}
 
 	_Poll() {
 		entries := this._ReadAllEntries()
-
-		if (entries.Length < this.lastEntryCount) {
-			; Logs\errors.log was cleared/rotated (e.g. RunStartup's ClearErrorLog) - start fresh.
+		if (entries.Length < this.lastEntryCount)
 			this.lastEntryCount := 0
-		}
 
 		loop entries.Length - this.lastEntryCount {
 			entry := entries[this.lastEntryCount + A_Index]
-			if (entry.Has("notify") && entry["notify"]) {
-				severity := entry.Has("severity") ? entry["severity"] : "info"
-				this._ShowSeverity(severity, entry)
-			}
+			if (entry.Has("notify") && entry["notify"])
+				this._ShowSeverity(entry.Get("severity", "info"), entry)
 		}
 		this.lastEntryCount := entries.Length
 
 		this._RefreshUnreadCounts(entries)
 		if (GetReadLogEntryCount() >= entries.Length)
 			this._HideNotification()
-		this._PushState()
+		else
+			this._Render()
+	}
+
+	_ShowSeverity(severity, entry) {
+		if !this.rows.Has(severity)
+			return
+		this.activeSeverities[severity] := true
+		this.rows[severity]["script"].Text := entry.Get("script", "")
+		this.rows[severity]["message"].Text := entry.Get("message", "")
+		this.Show()
+		SetTimer(this.hideTimerFns[severity], 0)
+		SetTimer(this.hideTimerFns[severity], -LoggerPopup.VISIBLE_DURATION)
 	}
 
 	_HideNotification() {
 		for severity in LoggerPopup.SEVERITIES {
 			SetTimer(this.hideTimerFns[severity], 0)
 			this.activeSeverities[severity] := false
-			this.ExecuteScript("window.collapseRow('" severity "')")
 		}
+		this._Render()
 		this.Hide()
-		this.isOpen := false
 	}
 
-	; Expands (or re-expands) one severity's row with its latest entry, opens
-	; the popup if it was closed, and (re)starts that severity's own 5s timer.
-	_ShowSeverity(severity, entry) {
-		this.activeSeverities[severity] := true
-		this.Show()
-
-		payload := Map(
-			"script", entry.Has("script") ? entry["script"] : "",
-			"message", entry.Has("message") ? entry["message"] : ""
-		)
-		this.ExecuteScript("window.expandRow('" severity "', " JSON.Dump(payload) ")")
-
-		SetTimer(this.hideTimerFns[severity], 0) ; cancel any pending hide for this severity
-		SetTimer(this.hideTimerFns[severity], -LoggerPopup.VISIBLE_DURATION) ; ...and restart it
-	}
-
-	; Fires 5s after the last log for this severity. Keep every displayed detail
-	; expanded until the final severity timer has expired, then close them all.
 	_OnSeverityTimeout(severity) {
 		this.activeSeverities[severity] := false
-
-		for sev in LoggerPopup.SEVERITIES {
-			if this.activeSeverities[sev]
+		for otherSeverity in LoggerPopup.SEVERITIES {
+			if this.activeSeverities[otherSeverity] {
+				this._Render()
 				return
+			}
 		}
-
 		this._HideNotification()
 	}
 
-	_PushState() => this.ExecuteScript("window.updateCounts(" JSON.Dump(this.counts) ")")
+	_Render() {
+		y := 30
+		for severity in ["error", "warning", "info"] {
+			row := this.rows[severity]
+			count := this.counts.Get(severity, 0)
+			visible := count > 0
+			labels := LoggerPopup.LABELS[severity]
+			row["label"].Text := "●  " count " " labels[count = 1 ? 1 : 2]
+			row["label"].Visible := visible
+			if !visible {
+				row["script"].Visible := false
+				row["message"].Visible := false
+				continue
+			}
+
+			row["label"].Move(10, y, 270, 20)
+			y += 20
+			expanded := this.activeSeverities[severity]
+			row["script"].Visible := expanded
+			row["message"].Visible := expanded
+			if expanded {
+				row["script"].Move(26, y, 250, 16)
+				row["message"].Move(26, y + 16, 250, 18)
+				y += 36
+			}
+		}
+		height := Max(LoggerPopup.MIN_HEIGHT, y + 4)
+		if this.isOpen {
+			x := A_ScreenWidth - LoggerPopup.WIDTH - LoggerPopup.MARGIN
+			windowY := A_ScreenHeight - height - LoggerPopup.Y_POS_MARGIN
+			this.Gui.Move(x, windowY, LoggerPopup.WIDTH, height)
+		}
+		return height
+	}
 }

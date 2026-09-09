@@ -3,6 +3,7 @@
 ; ============================================================================
 ;
 ; [FEATURES]
+;   - Uses a lightweight native AHK GUI (no resident WebView2 process)
 ;   - Polls Logs\errors.log for new entries (no cross-process messaging needed)
 ;   - Shows a small always-on-top popup 5 seconds after the last log entry
 ;   - Collapsed rows for info/warning/error with running counts; the row for

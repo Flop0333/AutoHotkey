@@ -21,7 +21,7 @@
 
 RunStartup(profile?) {
     steps := [
-        () => ClearErrorLog(),
+        () => StartNewLogSession(),
         () => TraySetIcon(Paths.autoHotkeyIcon),
         () => StartupMessage(),
         () => StartupMenuTray(),
@@ -52,11 +52,16 @@ RunStartup(profile?) {
             step()
         catch as startupError {
             failuresCounter++
-            LogAndNotifyError("Startup step failed: " startupError.Message, startupError)
+            LogAndNotifyError("Startup step failed: " startupError.Message,
+                startupError.HasProp("Stack") ? startupError.Stack : "")
         }
     }
 
-    InitializeLogging()
+    try InitializeLogging()
+    catch as loggingError {
+        failuresCounter++
+        LogAndNotifyError("Logger startup failed: " loggingError.Message, loggingError.Stack)
+    }
     
     if failuresCounter
         MsgBox failuresCounter " startup step(s) failed. See the error log for details.", "AutoHotkey Startup Error", 16

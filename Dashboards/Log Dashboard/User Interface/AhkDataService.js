@@ -7,4 +7,6 @@ class AhkDataService {
   static LogTestMessage = (severity) => ahk.LogTestMessage(severity);
 
   static GetGitStatus = () => ahk.GetGitStatus().then(JSON.parse);
+
+  static OpenLogArchive = () => ahk.OpenLogArchive();
 }

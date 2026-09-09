@@ -72,7 +72,12 @@ class WebViewToo {
         this.Gui.BorderSize := 0, this.MaximizedBorderSize := 7
         this.Gui.Add("Button", "x0 y0 vNCLBUTTONDOWN_Sink Hidden", "John Cena")
         this.Gui.Add("Text", "x" this.BorderSize " y" this.BorderSize " vWebViewTooContainer BackgroundTrans", "If you can see this, something went wrong.")
-        this.wvc := !A_IsCompiled ? WebView2.create(this.Gui["WebViewTooContainer"].Hwnd) : WebView2.create(this.Gui["WebViewTooContainer"].Hwnd,,,,,, WebViewToo.DllPath)
+        ; Each host gets its own WebView2 profile. Sharing Edge's browser profile
+        ; can fail when Edge or another AHK dashboard already holds it open.
+        userDataDir := WebViewToo.TempDir "\User Data-" DllCall("GetCurrentProcessId")
+        this.wvc := !A_IsCompiled
+            ? WebView2.create(this.Gui["WebViewTooContainer"].Hwnd,,, userDataDir)
+            : WebView2.create(this.Gui["WebViewTooContainer"].Hwnd,,, userDataDir,,, WebViewToo.DllPath)
         this.IsVisible := 1, this.wv := this.wvc.CoreWebView2
         this.Gui.OnEvent("Size", (*) => this.Fill())
         this.AddCallbackToScript("Close", this.Close)

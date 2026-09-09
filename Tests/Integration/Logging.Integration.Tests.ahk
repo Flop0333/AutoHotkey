@@ -69,12 +69,14 @@ Test_RealHostsAndCrossProcessBehavior() {
 	loggerPid := 0
 	dashboardPid := 0
 	try {
+		; Entries written before the popup exists must be surfaced on its first poll.
+		LogAndNotifyWarning("logged before logger host startup")
 		hosts := InitializeLogging()
 		loggerPid := WinGetPID("ahk_id " hosts["logger"])
-		dashboardPid := WinGetPID("ahk_id " hosts["dashboard"])
-		Assert.NotEqual(loggerPid, dashboardPid, "Logger and dashboard must have separate host processes")
-		Assert.False(IsVisible(hosts["logger"]), "Logger starts hidden")
-		Assert.False(IsVisible(hosts["dashboard"]), "Dashboard starts hidden")
+		Assert.False(FindLogDashboardWindow(), "Dashboard is lazy and must not start with the Logger")
+		Assert.Equal(hosts["logger"], EnsureLoggerRunning(), "Logger initialization reuses the existing host")
+		Assert.Equal(loggerPid, WinGetPID("ahk_id " FindLoggerWindow()), "Reusing the Logger must preserve its process")
+		Assert.True(WaitUntil(() => IsVisible(FindLoggerWindow())), "A notifying entry written before host startup must be surfaced")
 
 		; Confirmed via a diagnostic dump of the actual log on a real CI
 		; failure: both hosts independently trigger a
@@ -115,8 +117,10 @@ Test_RealHostsAndCrossProcessBehavior() {
 		Assert.Equal(1, GetUnreadLogCounts()["warning"])
 
 		ShowLogDashboard()
+		dashboardPid := WinGetPID("ahk_id " FindLogDashboardWindow())
+		Assert.NotEqual(loggerPid, dashboardPid, "Logger and dashboard must have separate host processes")
 		Assert.True(IsVisible(FindLogDashboardWindow()), "Client API should show shared dashboard")
-		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Opening dashboard should hide logger")
+		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Opening dashboard should hide logger; read=" GetReadLogEntryCount() ", total=" GetLogEntryCount() DumpEntries())
 		Assert.Equal(0, GetUnreadLogEntries().Length, "Opening dashboard should mark all logs read")
 		HideLogDashboard()
 		Assert.False(IsVisible(FindLogDashboardWindow()), "Client API should hide shared dashboard")
@@ -136,7 +140,32 @@ Test_RealHostsAndCrossProcessBehavior() {
 	}
 }
 
+Test_ConcurrentWritersPreserveEveryEntry() {
+	ClearErrorLog()
+	writerCount := 4
+	entriesPerWriter := 10
+	pids := []
+	writerScript := A_ScriptDir "\..\Support\LoggingWriter.ahk"
+
+	loop writerCount {
+		Run('"' A_AhkPath '" /ErrorStdOut "' writerScript '" "writer-' A_Index '" "' entriesPerWriter '"',,, &pid)
+		pids.Push(pid)
+	}
+	for pid in pids
+		Assert.True(WaitUntil(() => !ProcessExist(pid), 30000), "Concurrent log writer did not exit")
+
+	entries := ReadLogEntries()
+	Assert.Equal(writerCount * entriesPerWriter, entries.Length, "Every concurrent append must produce one valid entry")
+	seen := Map()
+	for entry in entries {
+		message := entry["message"]
+		Assert.False(seen.Has(message), "Duplicate concurrent log entry: " message)
+		seen[message] := true
+	}
+}
+
 TestKit.Run("Real hosts, unread state, show/hide API, and overlapping timers", Test_RealHostsAndCrossProcessBehavior)
+TestKit.Run("Concurrent writer processes preserve every JSONL entry exactly once", Test_ConcurrentWritersPreserveEveryEntry)
 TestKit.Report()
 
 #Include ..\Support\Assert.ahk
