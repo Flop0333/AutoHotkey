@@ -84,7 +84,9 @@ External Actions and services currently used are:
 - `anthropics/claude-code-action` for the three agent workflows;
 - the official `AutoHotkey/AutoHotkey` GitHub releases API for the CI runtime.
 
-Pin or review third-party action upgrades carefully because Actions code runs with the permissions granted to its job.
+Actions are pinned to full commit SHAs with release comments for readability. Dependabot checks weekly for GitHub Actions updates; review those pull requests carefully because action code runs with the permissions granted to its job.
+
+The complete allowlist required by these workflows is: `actions/checkout`, `actions/add-to-project`, `actions/upload-pages-artifact`, `actions/deploy-pages`, `crazy-max/ghaction-github-labeler`, and `anthropics/claude-code-action`. Once this list is confirmed stable, consider restricting **Repository settings → Actions → General → Allow select actions and reusable workflows** to it, so a compromised or newly introduced Action cannot run without an explicit allowlist change.
 
 ## Changing automation
 
