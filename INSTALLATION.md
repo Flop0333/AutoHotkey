@@ -5,18 +5,15 @@
 - Windows 10 or 11.
 - [AutoHotkey v2](https://www.autohotkey.com/) for the suite and tests.
 - Microsoft Edge WebView2 Runtime for the dashboards and Text Speaker. Install it if it is missing; the loader DLLs are already in this repository.
-- Windows PowerShell 5.1 or newer to run the test wrappers.
-
-`Apps Standalone/Bluetooth Connect.ahk` is a legacy, optional AutoHotkey v1 script. It is not started by the main suite.
 
 ## First run
 
-1. Clone or download the repository to any writable folder. Paths resolve from the checkout; it does not have to live under Documents.
+1. Clone or download the repository to any writable folder of choice.
 2. Run `Startup/Startup.ahk` with AutoHotkey v2.
 3. Check the AutoHotkey tray menu for the detected profile. Use **Profile** in that menu to switch it if necessary.
 4. Fill only the local secret values needed by your chosen features.
 
-The tray menu also provides **Reload**, **Log Dashboard**, **Test Dashboard**, and **Exit**. Exit stops all AutoHotkey processes, not only this suite.
+The tray menu also provides **Reload**, **Log Dashboard**, **Test Dashboard**, and **Exit**.
 
 ## Profiles
 
@@ -26,16 +23,14 @@ Profiles let one checkout behave differently on work machines, personal laptops,
 - Get the current Windows device name with `MsgBox(A_ComputerName)` in an AHK script or `$env:COMPUTERNAME` in PowerShell.
 - Add or adjust a `Profile` in the `Profiles` class, then use `ProfileManager.Is(...)` where behavior differs.
 - The selected display name is saved in `Profiles/current_profile.ini`. This generated file is ignored by Git.
-- At normal startup, the device name is checked again. An unmatched machine uses the `Default` profile.
-
-The `Work` profile gets its device-name list from the local `WorkDeviceNames` secret. Other current device mappings are defined directly in the profile manager.
+- At startup the device name is checked to match a profile. An unmatched machine uses the `Default` profile.
 
 ## Secrets
 
 `Secrets/Secrets Catalog.ahk` is the tracked catalog of supported keys and descriptions. Personal values belong in `Secrets/My Secrets.json`, which is created and synchronized on startup and ignored by Git.
 
 - Store values as one JSON object containing string keys and string values.
-- New catalog keys are added to the local file with an empty value.
+- New catalog keys can be added to the local file with an empty value.
 - Values whose catalog entry was removed are preserved locally in `Secrets/Removed Secrets.json`.
 - Invalid JSON stops synchronization and leaves the original file untouched.
 - Never commit either local secrets file. Do not place credentials directly in tracked scripts.
