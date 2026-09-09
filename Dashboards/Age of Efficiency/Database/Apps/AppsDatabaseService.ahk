@@ -1,16 +1,12 @@
 #Include App.ahk
-#Include AppsState.ahk
 #Include ../BaseDatabaseService.ahk
+#Include ..\..\..\..\Lib\Core\Paths.ahk
 
 Class AppsDatabaseService extends BaseDatabaseService {
 
   STORAGE_FILE_PATH := Paths.dashboards "\Age of Efficiency\Database\Apps\Apps.json"
 
-  GetApps() {
-    result := this.GetItems(CustomApp)
-    AppsState.SetUniqueId(result.highestId)
-    return result.items
-  }
+  Load() => this.GetItems(CustomApp)
 
-  StoreApps() => this.StoreItems(AppsState.state)
+  Store(items) => this.StoreItems(items)
 }

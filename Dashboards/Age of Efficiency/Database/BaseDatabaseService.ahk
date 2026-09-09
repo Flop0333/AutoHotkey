@@ -1,9 +1,16 @@
 ; Base class for database services
 ; Handles loading and storing items to/from JSON files
 
+#Include ..\..\..\Lib\Extensions\Json.ahk
+
 Class BaseDatabaseService {
 
   STORAGE_FILE_PATH := "" ; Override in subclass
+
+  __New(storageFilePath?) {
+    if IsSet(storageFilePath)
+      this.STORAGE_FILE_PATH := storageFilePath
+  }
 
   GetItems(class) {
     jsonItems := JSON.parse(FileRead(this.STORAGE_FILE_PATH))

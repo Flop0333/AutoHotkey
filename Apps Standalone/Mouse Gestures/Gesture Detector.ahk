@@ -1,3 +1,5 @@
+#Include ..\..\Lib\Extensions\Dark ToolTip.ahk
+
 class GestureConfig {
     static Hotkey := "RButton" ; Hotkey to hold while performing gestures
     static MinDistance := 9 ; Minimum px distance to consider a movement as a gesture

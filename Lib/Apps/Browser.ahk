@@ -1,12 +1,13 @@
-#Include ..\Core.ahk
 #Include App.ahk
+#Include ..\..\Profiles\Profile Manager.ahk
+#Include ..\Extensions\Dark ToolTip.ahk
 
 Class Browser extends App {
     static defaultBrowser := ProfileManager.Is(Profiles.work) || ProfileManager.Is(Profiles.devbox) ? Edge : Brave
     static browsers := [Brave,Edge,Chrome]
     
     static __New() => this.Init(this.defaultBrowser.winTitle, this.defaultBrowser.ahk_exe)
-    
+
     ; This needs to take into account if the window is on another desktop
     static OpenURL(url, newTab := true) {
         try { ; try opening on the existing window on the current desktop

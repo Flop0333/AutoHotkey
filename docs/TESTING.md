@@ -1,22 +1,23 @@
 # Testing
 
-The repository uses lightweight AutoHotkey v2 tests driven by PowerShell. No external test framework is required. The logging integration test also needs Microsoft Edge WebView2 Runtime because it starts the real dashboard hosts.
+The repository uses lightweight AutoHotkey v2 tests and a static include-architecture check driven by PowerShell. No external test framework is required. The logging integration test also needs Microsoft Edge WebView2 Runtime because it starts the real dashboard hosts.
 
 ## Run the tests
 
 From the repository root in PowerShell:
 
 ```powershell
-# Everything: syntax, unit, then integration
+# Everything: include architecture, syntax, unit, then integration
 ./Tests/Invoke-AllTests.ps1
 
 # Individual suites
+./Tests/Invoke-IncludeArchitectureCheck.ps1
 ./Tests/Invoke-SyntaxCheck.ps1
 ./Tests/Invoke-UnitTests.ps1
 ./Tests/Invoke-IntegrationTests.ps1
 ```
 
-The runners find `AutoHotkey.exe` or `AutoHotkey64.exe` on `PATH`, then try the normal AutoHotkey v2 installation directories under Program Files. Each command exits `0` on success and `1` on failure, so the same runners work locally and in CI.
+The AutoHotkey-based runners find `AutoHotkey.exe` or `AutoHotkey64.exe` on `PATH`, then try the normal AutoHotkey v2 installation directories under Program Files. Each command exits `0` on success and `1` on failure, so the same runners work locally and in CI.
 
 Optional timeout parameters are available when diagnosing a slow machine:
 
@@ -28,6 +29,10 @@ Optional timeout parameters are available when diagnosing a slow machine:
 ```
 
 ## What each suite checks
+
+### Include architecture
+
+`Invoke-IncludeArchitectureCheck.ps1` resolves maintained repository-local `#Include` directives, reports missing targets, detects cycles, and enforces the dependency boundaries in [Architecture](ARCHITECTURE.md). It excludes vendored examples and the WebView setup template, and runs fixture-based self-tests before checking the repository.
 
 ### Syntax check
 
@@ -49,7 +54,7 @@ Targets are discovered from the `Run(...)` calls in `Startup/Startup.ahk`, plus 
 
 Double-click `Tests/Run-Tests.ahk`, choose **Test Dashboard** from the startup tray, or run the `Test` command in Age of Efficiency. The launcher opens the dashboard and runs `Invoke-AllTests.ps1` in a hidden PowerShell process.
 
-The combined runner writes git-ignored runtime data:
+The combined runner executes all four suites and writes git-ignored runtime data:
 
 - `Logs/test-run-status.json` — current state and most recent result, polled by the dashboard;
 - `Logs/test-run-history.log` — one compact JSON object per completed run, oldest first.
@@ -72,7 +77,7 @@ When adding an application to `RunStartup()`, the syntax runner normally discove
 
 ## CI
 
-`.github/workflows/ahk-tests.yml` runs all three suites on `windows-latest` for pushes and pull requests targeting `main`. It downloads the latest official AutoHotkey v2 release from `AutoHotkey/AutoHotkey` on GitHub and adds it to `PATH`.
+`.github/workflows/ahk-tests.yml` runs all four suites on `windows-latest` for pushes and pull requests targeting `main`. It downloads the latest official AutoHotkey v2 release from `AutoHotkey/AutoHotkey` on GitHub and adds it to `PATH`.
 
 After a PR test run completes, `.github/workflows/ci-failure-summary.yml` maintains one readable failure-summary comment on that PR. See [Startup and GitHub automation](AUTOMATION.md) for the complete connection map.
 

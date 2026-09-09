@@ -14,6 +14,7 @@
 #Include ../Database/Internet Search/SearchEnginesState.ahk
 #Include Command Executor.ahk
 #Include ..\..\..\Lib\Core\Paths.ahk
+#Include ..\..\..\Lib\Extensions\Dark Gui.ahk
 
 Class CommandInput extends DarkGui {
 

@@ -14,7 +14,7 @@
 ;     one step
 ; ============================================================================
 
-#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\Paths.ahk
 #Include Controller.ahk
 
 ShowTestDashboard() {

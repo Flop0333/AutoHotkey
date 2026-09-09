@@ -11,6 +11,7 @@
 ;   - Manually set profile on startup (or auto-detect based on computer name)
 ;   - Switch profiles using tray menu
 ; ============================================================================
+#Include ..\Lib\Core\OnError.ahk
 #Include ..\Dashboards\Logger\Logging.ahk
 #Include ..\Dashboards\Test Dashboard\Test Dashboard.ahk
 #Include ..\Lib\Core\Paths.ahk

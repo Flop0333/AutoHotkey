@@ -8,13 +8,15 @@ This is an AutoHotkey v2 productivity suite for Windows. Keep changes scoped, pr
 - [docs/PROJECT-GUIDE.md](docs/PROJECT-GUIDE.md) — project structure, startup, and development overview.
 - [INSTALLATION.md](INSTALLATION.md) — profiles, secrets, dependencies, and local startup.
 - [docs/APPS.md](docs/APPS.md) — user-facing entry points and invocation.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — include direction, activation, composition roots, and dependency injection.
 - [docs/AUTOMATION.md](docs/AUTOMATION.md) — GitHub workflows, Project board, credentials, and schedules.
 - [docs/TESTING.md](docs/TESTING.md) — test architecture and commands.
 
 ## Architecture
 
 - `Startup/Startup.ahk` owns suite initialization and is the source of truth for automatically launched apps.
-- `Lib/Core.ahk` is the common include bundle. Shared code is grouped under `Lib/Core`, `Lib/Apps`, `Lib/Extensions`, `Lib/Helpers`, and `Lib/Tools`.
+- Maintained files declare their immediate dependencies. `Lib/Core.ahk` is only a compatibility facade for external or personal scripts; repository code must not include it.
+- Shared code is grouped under `Lib/Core`, `Lib/Apps`, `Lib/Extensions`, `Lib/Helpers`, and `Lib/Tools`. Executable entry points own runtime activation.
 - `Apps Standalone` contains independent background applications. `Apps Integrated` contains services and callable utilities used by dashboards or hotkeys.
 - `Dashboards` contains WebView2 applications. Keep AHK controllers, HTML/CSS/JS interfaces, and JSON-backed state responsibilities separate.
 - `Profiles` selects machine-specific behavior. `Secrets/Secrets Catalog.ahk` defines supported keys; secret values are intended to stay local.
@@ -39,7 +41,7 @@ Do not add real email addresses, credentials, private URLs, or secret contents t
 - Target AutoHotkey v2.
 - Inspect the working tree before editing and preserve unrelated or user-owned changes.
 - Preserve the CapsLock startup dependency: `Capslock Service.ahk` starts before scripts that call `CapsLock.Hotkey(...)`.
-- Derive repository paths through `Lib/Core/Paths.ahk`; do not add a fixed checkout location.
+- Use analyzable relative `#Include` paths as described in `docs/ARCHITECTURE.md`. Derive runtime repository paths through `Lib/Core/Paths.ahk`; never add a fixed checkout location.
 - Keep reusable behavior in shared classes/functions and entry points focused on wiring, hotkeys, and startup.
 - Treat `Startup/Startup.ahk`, test discovery code, workflow YAML, and `.github/labels.yml` as authoritative over prose.
 - Update the relevant focused document when changing an app entry point, default hotkey, startup set, test command, workflow trigger, credential, or external connection.
@@ -56,6 +58,7 @@ A change is ready for review when its acceptance criteria are met, relevant vali
 From PowerShell at the repository root:
 
 ```powershell
+./Tests/Invoke-IncludeArchitectureCheck.ps1
 ./Tests/Invoke-SyntaxCheck.ps1
 ./Tests/Invoke-UnitTests.ps1
 ./Tests/Invoke-IntegrationTests.ps1

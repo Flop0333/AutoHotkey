@@ -1,8 +1,8 @@
 #Include ..\Extensions\Json.ahk
 #Include Paths.ahk
 
+; === Global error handling and structured logging =================================
 OnError(HandleUnhandledError)
-
 HandleUnhandledError(error, mode) {
     try {
         LogAndNotifyError(error.Message, error.HasProp("Stack") ? error.Stack : "")
@@ -11,6 +11,7 @@ HandleUnhandledError(error, mode) {
     return false ; Preserve AutoHotkey's fallback when the logging path itself fails.
 }
 
+; === Structured logging to a shared file ==========================================
 ErrorLogDirectory() => EnvGet("AUTOHOTKEY_LOG_DIR") != "" ? EnvGet("AUTOHOTKEY_LOG_DIR") : Paths.autohotkey "\Logs"
 ErrorLogFile() => ErrorLogDirectory() "\errors.log"
 ErrorLogReadStateFile() => ErrorLogDirectory() "\errors.read"

@@ -46,6 +46,7 @@ These files support the entry points above and are not intended to run independe
 | [Gesture Detector.ahk](../Apps%20Standalone/Mouse%20Gestures/Gesture%20Detector.ahk) | Tracks mouse movement and converts it into directional gesture strings. |
 | [Screen Snipper OCR.ahk](../Apps%20Standalone/Screen%20Snipper/Screen%20Snipper%20OCR.ahk) | Extracts text from a selected screen region. |
 | [Screen Snip Speaker.ahk](../Apps%20Standalone/Text%20Speaker/Screen%20Snip%20Speaker.ahk) | Connects screen-region selection and OCR to Text Speaker playback. |
+| [Notion Pages.ahk](../Apps%20Integrated/Notion%20Pages.ahk) | Defines profile-specific Notion destinations at the application boundary for Macro Board actions. |
 
 ## Dashboards and hosts
 
@@ -65,12 +66,12 @@ These files support the entry points above and are not intended to run independe
 | Startup UI | [Startup Message.ahk](../Startup/Startup%20Message.ahk), [Startup Menu Tray.ahk](../Startup/Startup%20Menu%20Tray.ahk) | Shows startup feedback and provides reload, profile, dashboard, and exit controls. |
 | Profiles | [Profile Manager.ahk](../Profiles/Profile%20Manager.ahk) | Detects, persists, and exposes the active machine profile. |
 | Secrets | [Secrets File Manager.ahk](../Secrets/Secrets%20File%20Manager.ahk), [Secrets User Interface.ahk](../Secrets/Secrets%20User%20Interface.ahk) | Synchronizes local values with the tracked catalog and provides editing UI. |
-| Shared imports | [Core.ahk](../Lib/Core.ahk) | Loads the common error handling, configuration, extensions, helpers, desktop integration, and small tools used by most apps. |
+| Compatibility imports | [Core.ahk](../Lib/Core.ahk) | Preserves a broad include facade for external or personal scripts; maintained repository files declare immediate dependencies instead. |
 
 ## Libraries and development tools
 
 - `Lib/Apps/` contains wrappers for browsers, KeePass, MIDI Mixer, Notion, Spotify, Teams, Terminal, VS Code, and WhatsApp. These are called by apps rather than launched directly.
-- `Lib/Core/`, `Lib/Extensions/`, and `Lib/Helpers/` contain shared infrastructure and utilities.
+- `Lib/Core/`, `Lib/Extensions/`, and `Lib/Helpers/` contain shared infrastructure and utilities. Maintained files include only their immediate dependencies; see [Architecture](ARCHITECTURE.md).
 - `Lib/Tools/Development Tools/` contains manually included helpers for inspecting key codes and windows and for constructing message boxes.
 - `Lib/Tools/Gdip/`, `Lib/Tools/OCR/`, and `Lib/Tools/UIA-v2/` include third-party libraries, examples, and their own upstream-oriented READMEs. Examples are references, not part of suite startup or the repo test set.
 - `Lib/Tools/WebView/` contains the WebView2 wrapper, loader DLLs, and a setup template used by HTML/CSS/JS interfaces.

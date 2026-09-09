@@ -13,21 +13,30 @@
 ;   - Put img/gif files in the icons folder (stream deck icons can be used)
 ; ============================================================================
 
-#Include ..\..\Lib\Core.ahk
+#Include ..\..\Lib\Core\OnError.ahk
+#Include ..\..\Lib\Core\Paths.ahk
+#Include ..\..\Lib\Helpers\Capslock.ahk
+#Include ..\..\Lib\Helpers\System.ahk
+#Include ..\..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
+#Include ..\..\Lib\Tools\Info.ahk
+#Include ..\..\Profiles\Profile Manager.ahk
 #Include Button.ahk
 #Include Controller.ahk
 #Include "..\..\Apps Integrated\Command Storer\Command Storer.ahk"
 #Include ..\..\Apps Integrated\Spell Checker.ahk
 #Include ..\..\Apps Integrated\Fake Working Mode.ahk
+#Include "..\..\Apps Integrated\Notion Pages.ahk"
 #Include ..\..\Lib\Apps\Spotify.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
-#Include ..\..\Startup\Startup.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
 #Include ..\Log Dashboard\Log Dashboard.ahk
 
 ; ===========================================================================
 ; === ACTIONS REGISTRATION ==================================================
 ; ===========================================================================
+SpellChecker.Enable()
+InitializeFakeWorkModeForProfile()
+
 ToggleSpellChecker() => SpellChecker.Toggle()
 GetSpellCheckerState() => SpellChecker.Enabled
 KillAllAHkProcesses() => System.KillAllAHkProcesses()

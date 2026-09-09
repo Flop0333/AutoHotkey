@@ -18,14 +18,18 @@
 ; Note: Requires Capslock Service to be running
 ; ============================================================================
 
-#Include ..\Lib\Core.ahk
+#Include ..\Lib\Core\OnError.ahk
+#Include ..\Lib\Helpers\Capslock.ahk
+#Include ..\Lib\Extensions\Win.ahk
+#Include ..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
+
 SetWinDelay(0)
 CoordMode("Mouse")
 
 CapsLock.Hotkey("LButton",  (*) => DragWindow())
 CapsLock.Hotkey("RButton",  (*) => ResizeWindow())
 CapsLock.Hotkey("MButton",  (*) => WinClose(Win.WinUnderMouse()))
-CapsLock.Hotkey("Up",       (*) => Win.ToggleAlwaysOnTop())
+CapsLock.Hotkey("Up",       (*) => Win.ToggleAlwaysOnTop((hwnd) => DesktopsDDL.IsWindowPinned(hwnd)))
 
 DragWindow() {
     MouseGetPos(&origionalMouseX, &origionalMouseY, &winId)

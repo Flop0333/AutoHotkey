@@ -39,7 +39,7 @@ Run the complete local check from PowerShell:
 ./Tests/Invoke-AllTests.ps1
 ```
 
-Individual syntax, unit, and integration runners are also available. See [testing](TESTING.md) for commands, discovery rules, result files, and instructions for adding tests.
+Individual architecture, syntax, unit, and integration runners are also available. See [testing](TESTING.md) for commands, discovery rules, result files, and instructions for adding tests.
 
 AI coding agents should begin with [AGENTS.md](../AGENTS.md), which summarizes the architecture, safety boundaries, sources of truth, and validation expectations.
 
@@ -50,6 +50,7 @@ AI coding agents should begin with [AGENTS.md](../AGENTS.md), which summarizes t
 | [Welcome](../README.md) | Feature showcase and entry point for new visitors |
 | [Installation](../INSTALLATION.md) | Prerequisites, profiles, secrets, startup, and troubleshooting |
 | [Apps and scripts](APPS.md) | Catalog of runnable tools, dashboards, and supporting areas |
+| [Architecture](ARCHITECTURE.md) | Include direction, activation, composition roots, and dependency injection |
 | [Automation](AUTOMATION.md) | Windows auto-run and all GitHub connections and workflows |
 | [Testing](TESTING.md) | Local test suites, dashboard, CI, and test authoring |
 | [Agent guide](../AGENTS.md) | Fast repository orientation for AI agents and contributors |

@@ -40,7 +40,8 @@ The suite brings several technologies and ideas together:
 - **Profile-aware startup** for machine-specific apps, desktops, hotkeys, and behavior.
 - **Local secrets management** that keeps personal values outside Git while maintaining a tracked catalog.
 - **Structured logging and a visual test dashboard** for understanding failures quickly.
-- **PowerShell test runners and GitHub Actions** for syntax, unit, and integration checks.
+- **Explicit dependency boundaries** that keep includes predictable and activation in executable entry points.
+- **PowerShell test runners and GitHub Actions** for architecture, syntax, unit, and integration checks.
 - **GitHub Projects and scheduled agents** for issue triage, implementation, review, changelogs, and project status.
 
 ## 🛠️ Try it
@@ -54,6 +55,7 @@ The suite is intentionally code-first: editing a clear script can be faster—an
 ## 📚 Explore the project
 
 - [Project guide](docs/PROJECT-GUIDE.md) — structure, startup, development, and documentation map
+- [Architecture](docs/ARCHITECTURE.md) — include direction, activation, composition, and testability
 - [Installation](INSTALLATION.md) — requirements, profiles, secrets, and Windows auto-start
 - [Apps and scripts](docs/APPS.md) — every maintained user-facing tool and entry point
 - [Testing](docs/TESTING.md) — local tests, CI, and the Test Dashboard
