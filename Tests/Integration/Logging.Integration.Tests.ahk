@@ -107,6 +107,20 @@ Test_RealHostsAndCrossProcessBehavior() {
 		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Logger should hide once existing entries are marked read")
 		ClearErrorLog()
 
+		; A new session with the same number of entries must not inherit the old
+		; processing cursor. Entry count alone cannot distinguish this rotation.
+		LogAndNotifyWarning("before equal-count rotation")
+		Assert.True(WaitUntil(() => IsVisible(FindLoggerWindow())), "Pre-rotation notification should be processed")
+		MarkAllLogsRead()
+		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Pre-rotation notification should dismiss")
+		StartNewLogSession()
+		LogAndNotifyError("after equal-count rotation")
+		Assert.True(WaitUntil(() => IsVisible(FindLoggerWindow())), "A notifying entry must be processed after an equal-count rotation")
+		Assert.Equal(1, GetUnreadLogCounts()["error"])
+		MarkAllLogsRead()
+		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Post-rotation notification should dismiss")
+		ClearErrorLog()
+
 		LogInfo("silent unread info")
 		Sleep(1250)
 		Assert.False(IsVisible(FindLoggerWindow()), "LogInfo increments unread state without notifying." DumpEntries())
