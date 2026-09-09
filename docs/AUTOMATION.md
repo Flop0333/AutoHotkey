@@ -29,7 +29,7 @@ All cron expressions use UTC. Amsterdam local time is UTC+1 in winter and UTC+2 
 | Workflow | Trigger | Connection and outcome |
 |---|---|---|
 | [Add issues to project](../.github/workflows/add-to-project.yml) | Issue opened | Adds every new repository issue to the configured Projects v2 board using `ADD_TO_PROJECT_PAT` and `PROJECT_URL`. |
-| [AHK Tests](../.github/workflows/ahk-tests.yml) | Push or pull request targeting `main` | On `windows-latest`, downloads the latest official AutoHotkey v2 release and runs syntax, unit, and logging integration tests. Concurrent runs for the same ref cancel older ones. |
+| [AHK Tests](../.github/workflows/ahk-tests.yml) | Push or pull request targeting `main` | On `windows-latest`, downloads the latest official AutoHotkey v2 release and runs architecture, syntax, unit, and logging integration tests. Concurrent runs for the same ref cancel older ones. |
 | [CI failure summary](../.github/workflows/ci-failure-summary.yml) | Completed **AHK Tests** run | For PR-originated runs, posts or updates one plain-English failure comment. When CI recovers, it marks the previous summary resolved. Uses workflow-log and PR access. |
 | [Dashboard](../.github/workflows/dashboard.yml) | Push to `main`, daily 06:00, or manual | Builds a static status page from issues, recent AHK Tests runs, agent PRs, and `CHANGELOG.md`, then deploys it to GitHub Pages. |
 | [Daily ticket agent](../.github/workflows/daily-agent.yml) | Daily 08:00 or manual | Selects one eligible issue, claims it, moves it to In Progress, and asks Claude Code to implement it and open a PR. Never auto-merges. |
