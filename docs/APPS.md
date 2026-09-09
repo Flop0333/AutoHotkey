@@ -16,7 +16,6 @@ Hotkeys reflect the current defaults. Profile conditions and active-window rules
 | [Screen Snipper](../Apps%20Standalone/Screen%20Snipper/Screen%20Snipper.ahk) | Auto | Drag with `Win+LButton` to snip and copy; add Ctrl for copy-only, Alt for save-only, or Shift for OCR-only. | Adapted from the credited AutoHotkey forum tool. `Screen Snipper OCR.ahk` supplies OCR support. |
 | [Text Speaker](../Apps%20Standalone/Text%20Speaker/Text%20Speaker.ahk) | Auto | `Ctrl+Space` reads or pauses selected text; `Ctrl+Shift+drag` reads a screen region; `Ctrl+Shift+Esc` stops. | Uses Windows SAPI, OCR, and a WebView2 control panel. Local voice settings are git-ignored. |
 | [Window Manager](../Apps%20Standalone/Window%20Manager.ahk) | Auto | `CapsLock` plus left/right/middle mouse drags, resizes, or closes; `CapsLock+Up` toggles always-on-top. | Requires CapsLock Service; skips configured VM windows. |
-| [Bluetooth Connect](../Apps%20Standalone/Bluetooth%20Connect.ahk) | Manual | Run to locate and toggle the hard-coded Bluetooth device. | Legacy AutoHotkey v1 exception. Change `deviceName` before use. |
 
 ## Integrated apps
 

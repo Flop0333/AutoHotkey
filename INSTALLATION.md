@@ -67,7 +67,6 @@ Shared path resolution normally derives the repository root from `Lib/Core/Paths
 
 ## Troubleshooting
 
-- **A script opens with AutoHotkey v1:** confirm `.ahk` files are associated with AutoHotkey v2. The Bluetooth utility is the only intentional v1 exception.
 - **A dashboard does not open:** install or repair Microsoft Edge WebView2 Runtime, then inspect the Log Dashboard.
 - **The wrong profile is active:** select one from the tray menu and verify its device names in `Profiles/Profile Manager.ahk`.
 - **A secret-backed action does nothing:** check that the matching key in `Secrets/My Secrets.json` contains a string value.

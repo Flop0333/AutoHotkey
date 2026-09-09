@@ -35,7 +35,7 @@ Do not add real email addresses, credentials, private URLs, or secret contents t
 
 ## Change rules
 
-- Target AutoHotkey v2 unless explicitly working on the isolated legacy `Bluetooth Connect.ahk` v1 script.
+- Target AutoHotkey v2.
 - Preserve the CapsLock startup dependency: `Capslock Service.ahk` starts before scripts that call `CapsLock.Hotkey(...)`.
 - Derive repository paths through `Lib/Core/Paths.ahk`; do not add a fixed checkout location.
 - Keep reusable behavior in shared classes/functions and entry points focused on wiring, hotkeys, and startup.

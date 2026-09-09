@@ -33,7 +33,7 @@ Optional timeout parameters are available when diagnosing a slow machine:
 
 `Invoke-SyntaxCheck.ps1` parses each active AutoHotkey v2 entry point without running its hotkeys, GUIs, or startup actions. It creates a temporary wrapper that exits before including the target; AutoHotkey still parses the complete include tree first.
 
-Targets are discovered from the `Run(...)` calls in `Startup/Startup.ahk`, plus the logging hosts, Test Dashboard host, logging facade, and manual `Tests/Run-Tests.ahk` entry point. A missing file, non-zero exit, or blocked load-error dialog fails the suite. Optional scripts not in that target set, including the AutoHotkey v1 Bluetooth script, are not covered.
+Targets are discovered from the `Run(...)` calls in `Startup/Startup.ahk`, plus the logging hosts, Test Dashboard host, logging facade, and manual `Tests/Run-Tests.ahk` entry point. A missing file, non-zero exit, or blocked load-error dialog fails the suite. Optional scripts outside that target set are not covered.
 
 ### Unit tests
 

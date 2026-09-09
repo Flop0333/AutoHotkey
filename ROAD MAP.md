@@ -7,11 +7,6 @@
 - Improved CRUD operations and UX
 - JSON storage format for better structure and portability
 
-### Bluetooth Integration
-- New Bluetooth class for device management
-- Connect to devices by name
-- Integration with Macro Board and Age of Efficiency dashboards
-
 ### Text Speaker Upgrades
 - Use better voice
 - Show GUI with voice controlls when text is speaking, always on top
