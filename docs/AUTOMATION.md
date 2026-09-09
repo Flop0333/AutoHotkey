@@ -75,7 +75,7 @@ The PowerShell scripts are kept outside workflow YAML so their branching, parsin
 
 ## Permissions and external services
 
-Workflows declare the smallest practical job permissions: read-only checkout by default, issue or PR write access only for metadata operations, content write access only for implementation/changelog commits, and Pages plus OIDC permissions only for deployment.
+Workflows declare the smallest practical job permissions: read-only checkout by default, issue or PR write access only for metadata operations, content write access only for implementation/changelog commits, and Pages plus OIDC permissions only for deployment. The three `anthropics/claude-code-action` jobs (daily agent, idea triage, PR review) also grant `id-token: write`, which the action's default GitHub App authentication requires to fetch its OIDC token; omitting it fails every run with `Could not fetch an OIDC token`.
 
 External Actions and services currently used are:
 
