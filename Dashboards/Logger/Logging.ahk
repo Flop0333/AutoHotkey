@@ -11,17 +11,18 @@
 #Include ..\Log Dashboard\Log Dashboard.ahk
 
 InitializeLogging() {
-	ClearErrorLog()
+	return Map("logger", EnsureLoggerRunning())
+}
 
-	; Both host scripts use #SingleInstance Force. Starting them here replaces
-	; instances left over from an earlier startup with fresh session-owned hosts.
+; The popup is the only logging UI that must stay resident. Reuse an existing
+; host across suite reloads; the dashboard starts lazily from ShowLogDashboard().
+EnsureLoggerRunning() {
+	if loggerWindow := FindLoggerWindow()
+		return loggerWindow
+
 	StartLogger()
-	loggerWindow := WaitForLoggerWindow()
-	StartLogDashboard()
-	dashboardWindow := WaitForLogDashboardWindow()
+	if loggerWindow := WaitForLoggerWindow()
+		return loggerWindow
 
-	if !dashboardWindow || !loggerWindow
-		throw Error("Failed to initialize logger UI hosts (logger=" loggerWindow ", dashboard=" dashboardWindow ")")
-
-	return Map("dashboard", dashboardWindow, "logger", loggerWindow)
+	throw Error("Failed to initialize the Logger host")
 }

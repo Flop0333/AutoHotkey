@@ -3,11 +3,12 @@
 
 Class LogDashboard extends WebViewToo {
 	static WIN_TITLE := "AutoHotkey Error Logger - Log Dashboard"
+	static INITIALIZING_TITLE := "AutoHotkey Log Dashboard - Initializing"
 	static SHOW_OPTIONS := Format("w{} h{}", Round(A_ScreenWidth * 0.85), Round(A_ScreenHeight * 0.75))
 
 	__New() {
 		super.__New()
-		this.Gui.Title := LogDashboard.WIN_TITLE
+		this.Gui.Title := LogDashboard.INITIALIZING_TITLE
 		this.Gui.OnEvent("Close", (*) => this.Hide())
 		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Log Dashboard\User Interface", 0) ; block cors error, allow loading local files
 		this.Load("http://app.local/index.html")
@@ -15,24 +16,28 @@ Class LogDashboard extends WebViewToo {
 		this.AddCallbackToScript("SetClipboard", (webview, text) => A_Clipboard := text)
 		this.AddCallbackToScript("LogTestMessage", (webview, severity) => this.LogTestMessage(severity))
 		this.AddCallbackToScript("GetGitStatus", (*) => this.GetGitStatusForWeb())
+		this.AddCallbackToScript("OpenLogArchive", (*) => this.OpenLogArchive())
+	}
+
+	OpenLogArchive() {
+		DirCreate(ErrorLogArchiveDirectory())
+		Run('explorer.exe "' ErrorLogArchiveDirectory() '"')
 	}
 
 	Show() => super.Show(LogDashboard.SHOW_OPTIONS, LogDashboard.WIN_TITLE)
-	InitializeHidden() => super.Show("Hide " LogDashboard.SHOW_OPTIONS, LogDashboard.WIN_TITLE)
+
+	InitializeHidden() {
+		; WIN_TITLE is also the cross-process readiness signal. Publish it only
+		; after the initial Hide has completed so a waiting caller cannot show
+		; this window just before the host hides it again.
+		super.Show("Hide " LogDashboard.SHOW_OPTIONS, LogDashboard.INITIALIZING_TITLE)
+		this.Gui.Title := LogDashboard.WIN_TITLE
+	}
 
 	Close() => this.Hide()
 
 	GetLogEntriesForWeb() {
-		entries := []
-		if !FileExist(ErrorLogFile())
-			return JSON.Dump(entries)
-
-		for line in StrSplit(FileRead(ErrorLogFile(), "UTF-8"), "`n", "`r") {
-			if (Trim(line) = "")
-				continue
-			try entries.Push(JSON.parse(line))
-		}
-		return JSON.Dump(entries)
+		return JSON.Dump(ReadLogEntries())
 	}
 
 	static TestMessages := Map(
