@@ -36,3 +36,6 @@
 #Include Tools\Multiple Press Detection.ahk
 #Include Tools\User Input.ahk
 #Include Tools\Web.ahk
+
+; Preserve the legacy profile-aware browser default for compatibility-facade users.
+Browser.ConfigureDefaultBrowser(ProfileManager.Is(Profiles.work, Profiles.devbox) ? Edge : Brave)

@@ -1,15 +1,16 @@
 #Include App.ahk
-#Include ..\..\Profiles\Profile Manager.ahk
 #Include ..\Extensions\Dark ToolTip.ahk
 
 Class Browser extends App {
-    static defaultBrowser := ProfileManager.Is(Profiles.work) || ProfileManager.Is(Profiles.devbox) ? Edge : Brave
+    static defaultBrowser := Brave
     static browsers := [Brave,Edge,Chrome]
     static _runFunction := Run
     
     static __New() => this.Init(this.defaultBrowser.winTitle, this.defaultBrowser.ahk_exe)
 
     static ConfigureRunFunction(runFunction := Run) => this._runFunction := runFunction
+
+    static ConfigureDefaultBrowser(browser := Brave) => this.defaultBrowser := browser
 
     ; This needs to take into account if the window is on another desktop
     static OpenURL(url, newTab := true) {

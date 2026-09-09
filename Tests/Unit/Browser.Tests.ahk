@@ -20,5 +20,12 @@ Test_OpenInNewBrowser_UsesInjectedRunFunction() {
     }
 }
 
+Test_DefaultBrowser_CanBeComposedExplicitly() {
+    Browser.ConfigureDefaultBrowser(Edge)
+    try Assert.Equal(Edge, Browser.defaultBrowser)
+    finally Browser.ConfigureDefaultBrowser()
+}
+
 TestKit.Run("OpenInNewBrowser uses the injected run function", Test_OpenInNewBrowser_UsesInjectedRunFunction)
+TestKit.Run("Default browser can be composed explicitly", Test_DefaultBrowser_CanBeComposedExplicitly)
 TestKit.Report()

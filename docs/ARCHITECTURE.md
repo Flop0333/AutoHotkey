@@ -15,6 +15,7 @@ entry point / composition root
 ```
 
 - Reusable files include their immediate dependencies rather than `Lib/Core.ahk`.
+- Reusable files under `Lib/` do not import applications, dashboards, profiles, or secrets. Executable composition roots supply that configuration.
 - Files outside `Startup/` do not include startup bootstrap files.
 - An application may expose one focused feature root, but broad catch-all barrels are avoided.
 - Vendored examples and the WebView setup template are not application dependencies and are excluded explicitly from the maintained graph check.
@@ -56,8 +57,8 @@ Prefer injection when a dependency performs I/O, starts a process, displays UI, 
 - Use paths relative to the file containing the directive.
 - Use Windows backslashes consistently in maintained AHK source.
 - Keep the repository's established unquoted relative form; quote only where a tool or parser requires it.
-- Do not use absolute machine paths or change the include directory globally.
-- Use `<LibraryName>` only for a library intentionally installed in an AutoHotkey library search location, not for ordinary repository-local code.
+- Do not use absolute machine paths, variable-based include paths, or include-directory directives. These cannot be represented reliably in the static dependency graph.
+- Use `<LibraryName>` only for a library intentionally installed in an AutoHotkey library search location, not for ordinary repository-local code. The checker models a matching file under the repository's `Lib/`; otherwise it treats the lookup as external.
 
 ## Validation
 
@@ -67,7 +68,7 @@ Run the dependency check directly:
 .\Tests\Invoke-IncludeArchitectureCheck.ps1
 ```
 
-It runs fixture-based self-tests, resolves repository-local includes, detects missing targets and cycles, and enforces the `Lib -> Core.ahk` and non-Startup -> Startup boundaries. It also runs as part of `Invoke-AllTests.ps1` and GitHub Actions.
+It runs fixture-based self-tests, resolves repository-local includes, detects missing targets and cycles, rejects include forms that cannot be analyzed statically, and enforces the reusable-library and Startup boundaries. It also runs as part of `Invoke-AllTests.ps1` and GitHub Actions.
 
 When adding a module:
 

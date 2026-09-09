@@ -45,36 +45,42 @@ function Test-IsExcluded {
     return $false
 }
 
-function Resolve-IncludeTarget {
-    param(
-        [string]$Root,
-        [IO.FileInfo]$Source,
-        [string]$RawTarget
-    )
-
+function Get-IncludeTargetInfo {
+    param([string]$RawTarget)
     $target = $RawTarget.Trim()
-    if ($target.StartsWith("*i ", [StringComparison]::OrdinalIgnoreCase)) {
-        $target = $target.Substring(3).Trim()
-    }
 
-    if (($target.StartsWith('"') -and $target.EndsWith('"')) -or
-        ($target.StartsWith("'") -and $target.EndsWith("'"))) {
+    if ($target.Length -ge 2 -and
+        (($target.StartsWith('"') -and $target.EndsWith('"')) -or
+         ($target.StartsWith("'") -and $target.EndsWith("'")))) {
         $target = $target.Substring(1, $target.Length - 2)
     }
 
-    if ($target -match '^<(.+)>$') {
-        $libraryPath = $Matches[1]
-        if (-not [IO.Path]::HasExtension($libraryPath)) {
-            $libraryPath += '.ahk'
-        }
-        return [IO.Path]::GetFullPath((Join-Path (Join-Path $Root 'Lib') $libraryPath))
+    $optional = $false
+    if ($target.StartsWith("*i ", [StringComparison]::OrdinalIgnoreCase)) {
+        $optional = $true
+        $target = $target.Substring(3).Trim()
     }
 
-    if ($target.Contains('%')) {
-        return $null
+    if ($target.Length -ge 2 -and
+        (($target.StartsWith('"') -and $target.EndsWith('"')) -or
+         ($target.StartsWith("'") -and $target.EndsWith("'")))) {
+        $target = $target.Substring(1, $target.Length - 2)
     }
 
-    return [IO.Path]::GetFullPath((Join-Path $Source.DirectoryName $target))
+    return [pscustomobject]@{
+        Target = $target
+        Optional = $optional
+        IsLibrary = $target -match '^<.+>$'
+    }
+}
+
+function Resolve-IncludeTarget {
+    param(
+        [IO.FileInfo]$Source,
+        [string]$Target
+    )
+
+    return [IO.Path]::GetFullPath((Join-Path $Source.DirectoryName $Target))
 }
 
 function Get-IncludeGraph {
@@ -83,6 +89,7 @@ function Get-IncludeGraph {
     $resolvedRoot = [IO.Path]::GetFullPath($Root)
     $graph = @{}
     $missing = [Collections.Generic.List[object]]::new()
+    $unsupported = [Collections.Generic.List[object]]::new()
 
     $files = Get-ChildItem -LiteralPath $resolvedRoot -Recurse -Filter '*.ahk' -File
     foreach ($file in $files) {
@@ -99,12 +106,54 @@ function Get-IncludeGraph {
                 continue
             }
 
-            $target = Resolve-IncludeTarget $resolvedRoot $file $Matches[1]
-            if ($null -eq $target) {
+            $include = Get-IncludeTargetInfo $Matches[1]
+            if ($include.IsLibrary) {
+                $libraryPath = $include.Target.Substring(1, $include.Target.Length - 2)
+                if (-not [IO.Path]::HasExtension($libraryPath)) {
+                    $libraryPath += '.ahk'
+                }
+                $repositoryLibraryTarget = [IO.Path]::GetFullPath((Join-Path (Join-Path $resolvedRoot 'Lib') $libraryPath))
+                if (Test-Path -LiteralPath $repositoryLibraryTarget -PathType Leaf) {
+                    $graph[$file.FullName].Add($repositoryLibraryTarget)
+                }
+                continue
+            }
+
+            if ($include.Target.Contains('%')) {
+                $unsupported.Add([pscustomobject]@{
+                    Source = $relativeSource
+                    Line = $lineNumber
+                    Target = $include.Target
+                    Reason = 'Variable-based include paths cannot be validated statically; use a file-relative path.'
+                })
+                continue
+            }
+
+            if ([IO.Path]::IsPathRooted($include.Target)) {
+                $unsupported.Add([pscustomobject]@{
+                    Source = $relativeSource
+                    Line = $lineNumber
+                    Target = $include.Target
+                    Reason = 'Absolute include paths are machine-specific; use a repository-relative path.'
+                })
+                continue
+            }
+
+            $target = Resolve-IncludeTarget $file $include.Target
+            if (Test-Path -LiteralPath $target -PathType Container) {
+                $unsupported.Add([pscustomobject]@{
+                    Source = $relativeSource
+                    Line = $lineNumber
+                    Target = ConvertTo-RepoPath $resolvedRoot $target
+                    Reason = 'Include-directory directives change path resolution; use file-relative include paths.'
+                })
                 continue
             }
 
             if (-not (Test-Path -LiteralPath $target -PathType Leaf)) {
+                if ($include.Optional) {
+                    continue
+                }
                 $missing.Add([pscustomobject]@{
                     Source = $relativeSource
                     Line = $lineNumber
@@ -120,7 +169,12 @@ function Get-IncludeGraph {
         }
     }
 
-    return [pscustomobject]@{ Root = $resolvedRoot; Graph = $graph; Missing = $missing }
+    return [pscustomobject]@{
+        Root = $resolvedRoot
+        Graph = $graph
+        Missing = $missing
+        Unsupported = $unsupported
+    }
 }
 
 function Get-IncludeCycles {
@@ -194,6 +248,22 @@ function Get-BoundaryViolations {
                     Target = $relativeTarget
                 })
             }
+            $isCompatibilityFacade = $relativeSource.Equals('Lib/Core.ahk', [StringComparison]::OrdinalIgnoreCase)
+            $importsApplicationConfiguration =
+                $relativeTarget.StartsWith('Apps Integrated/', [StringComparison]::OrdinalIgnoreCase) -or
+                $relativeTarget.StartsWith('Apps Standalone/', [StringComparison]::OrdinalIgnoreCase) -or
+                $relativeTarget.StartsWith('Dashboards/', [StringComparison]::OrdinalIgnoreCase) -or
+                $relativeTarget.StartsWith('Profiles/', [StringComparison]::OrdinalIgnoreCase) -or
+                $relativeTarget.StartsWith('Secrets/', [StringComparison]::OrdinalIgnoreCase)
+            if (-not $isCompatibilityFacade -and
+                $relativeSource.StartsWith('Lib/', [StringComparison]::OrdinalIgnoreCase) -and
+                $importsApplicationConfiguration) {
+                $violations.Add([pscustomobject]@{
+                    Rule = 'Reusable Lib files must not import applications, dashboards, profiles, or secrets.'
+                    Source = $relativeSource
+                    Target = $relativeTarget
+                })
+            }
             if (-not $relativeSource.StartsWith('Startup/', [StringComparison]::OrdinalIgnoreCase) -and
                 $relativeTarget.StartsWith('Startup/', [StringComparison]::OrdinalIgnoreCase)) {
                 $violations.Add([pscustomobject]@{
@@ -221,9 +291,31 @@ function Invoke-IncludeArchitectureSelfTest {
     try {
         Set-Content -LiteralPath (Join-Path $fixtureRoot 'Main.ahk') -Value '#Include Lib\Valid.ahk'
         Set-Content -LiteralPath (Join-Path $fixtureRoot 'Lib\Valid.ahk') -Value 'Valid() => true'
+        Set-Content -LiteralPath (Join-Path $fixtureRoot 'Lib\Quoted Valid.ahk') -Value 'QuotedValid() => true'
+        Add-Content -LiteralPath (Join-Path $fixtureRoot 'Main.ahk') -Value '#Include "Lib\Quoted Valid.ahk"'
         $valid = Get-IncludeGraph $fixtureRoot
         Assert-Check ($valid.Missing.Count -eq 0) 'valid graph reported a missing include'
+        Assert-Check ($valid.Unsupported.Count -eq 0) 'valid graph reported an unsupported include'
+        Assert-Check ($valid.Graph[(Join-Path $fixtureRoot 'Main.ahk')].Count -eq 2) 'quoted include was not resolved'
         Assert-Check ((Get-IncludeCycles $valid.Graph).Count -eq 0) 'valid graph reported a cycle'
+
+        Set-Content -LiteralPath (Join-Path $fixtureRoot 'Dynamic.ahk') -Value '#Include "%A_ScriptDir%\Lib\Valid.ahk"'
+        $dynamic = Get-IncludeGraph $fixtureRoot
+        Assert-Check ($dynamic.Unsupported.Count -eq 1) 'dynamic include was silently skipped'
+        Remove-Item -LiteralPath (Join-Path $fixtureRoot 'Dynamic.ahk')
+
+        Set-Content -LiteralPath (Join-Path $fixtureRoot 'Optional.ahk') -Value '#Include "*i DoesNotExist.ahk"'
+        Set-Content -LiteralPath (Join-Path $fixtureRoot 'External.ahk') -Value '#Include <ExternalLib>'
+        Set-Content -LiteralPath (Join-Path $fixtureRoot 'LocalLibrary.ahk') -Value '#Include <Valid>'
+        $nonRepository = Get-IncludeGraph $fixtureRoot
+        Assert-Check ($nonRepository.Missing.Count -eq 0) 'optional or external include was treated as a missing repository file'
+        Assert-Check ($nonRepository.Graph[(Join-Path $fixtureRoot 'LocalLibrary.ahk')].Count -eq 1) 'matching repository library include was not modeled'
+        Remove-Item -LiteralPath (Join-Path $fixtureRoot 'Optional.ahk'), (Join-Path $fixtureRoot 'External.ahk'), (Join-Path $fixtureRoot 'LocalLibrary.ahk')
+
+        Set-Content -LiteralPath (Join-Path $fixtureRoot 'Absolute.ahk') -Value '#Include C:\machine-specific\Dependency.ahk'
+        $absolute = Get-IncludeGraph $fixtureRoot
+        Assert-Check ($absolute.Unsupported.Count -eq 1) 'absolute include was not rejected'
+        Remove-Item -LiteralPath (Join-Path $fixtureRoot 'Absolute.ahk')
 
         Set-Content -LiteralPath (Join-Path $fixtureRoot 'Missing.ahk') -Value '#Include DoesNotExist.ahk'
         $missing = Get-IncludeGraph $fixtureRoot
@@ -240,6 +332,12 @@ function Invoke-IncludeArchitectureSelfTest {
         Set-Content -LiteralPath (Join-Path $fixtureRoot 'Lib\Forbidden.ahk') -Value '#Include Core.ahk'
         $forbidden = Get-IncludeGraph $fixtureRoot
         Assert-Check (@(Get-BoundaryViolations $fixtureRoot $forbidden.Graph).Count -eq 1) 'Lib-to-Core boundary violation was not detected'
+
+        New-Item -ItemType Directory -Path (Join-Path $fixtureRoot 'Secrets') -Force | Out-Null
+        Set-Content -LiteralPath (Join-Path $fixtureRoot 'Secrets\Config.ahk') -Value 'Config() => true'
+        Set-Content -LiteralPath (Join-Path $fixtureRoot 'Lib\Configured.ahk') -Value '#Include ..\Secrets\Config.ahk'
+        $configured = Get-IncludeGraph $fixtureRoot
+        Assert-Check (@(Get-BoundaryViolations $fixtureRoot $configured.Graph | Where-Object { $_.Source -eq 'Lib/Configured.ahk' }).Count -eq 1) 'Lib-to-configuration boundary violation was not detected'
     } finally {
         Remove-Item -LiteralPath $fixtureRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
@@ -258,6 +356,12 @@ $hasFailures = $false
 foreach ($item in $result.Missing) {
     $hasFailures = $true
     Write-Host "MISSING: $($item.Source):$($item.Line) -> $($item.Target)"
+}
+
+foreach ($item in $result.Unsupported) {
+    $hasFailures = $true
+    Write-Host "UNSUPPORTED: $($item.Source):$($item.Line) -> $($item.Target)"
+    Write-Host "             $($item.Reason)"
 }
 
 foreach ($component in $cycles) {

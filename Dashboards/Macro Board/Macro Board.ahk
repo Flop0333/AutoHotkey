@@ -25,6 +25,7 @@
 #Include "..\..\Apps Integrated\Command Storer\Command Storer.ahk"
 #Include ..\..\Apps Integrated\Spell Checker.ahk
 #Include ..\..\Apps Integrated\Fake Working Mode.ahk
+#Include "..\..\Apps Integrated\Notion Pages.ahk"
 #Include ..\..\Lib\Apps\Spotify.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
@@ -34,6 +35,7 @@
 ; === ACTIONS REGISTRATION ==================================================
 ; ===========================================================================
 InstallGlobalErrorHandler()
+Browser.ConfigureDefaultBrowser(ProfileManager.Is(Profiles.work, Profiles.devbox) ? Edge : Brave)
 SpellChecker.Enable()
 InitializeFakeWorkModeForProfile()
 
