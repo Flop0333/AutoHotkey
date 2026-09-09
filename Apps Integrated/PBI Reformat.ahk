@@ -82,7 +82,6 @@ Class PBIReformat {
             Sleep(count -= 0.25)
             this.reformatGui["MyProgress"].Value -= 1
         }
-        ExitApp
     }
 
     static ExitAppWhenClosingGui(*) {
