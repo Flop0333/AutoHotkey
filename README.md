@@ -9,7 +9,7 @@ A personal, modular automation suite built for AutoHotkey v2 on Windows. It comb
 1. Install [AutoHotkey v2](https://www.autohotkey.com/).
 2. Clone this repository on Windows.
 3. Run `Startup/Startup.ahk`.
-4. Select or configure a profile when prompted.
+4. Confirm the detected profile in the tray menu and customize it if needed.
 
 See the [installation guide](INSTALLATION.md) for prerequisites, local configuration, and Windows auto-start.
 
