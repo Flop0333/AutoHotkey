@@ -133,7 +133,7 @@ Test_RealHostsAndCrossProcessBehavior() {
 		ShowLogDashboard()
 		dashboardPid := WinGetPID("ahk_id " FindLogDashboardWindow())
 		Assert.NotEqual(loggerPid, dashboardPid, "Logger and dashboard must have separate host processes")
-		Assert.True(IsVisible(FindLogDashboardWindow()), "Client API should show shared dashboard")
+		Assert.True(WaitUntil(() => IsVisible(FindLogDashboardWindow())), "Client API should show shared dashboard")
 		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Opening dashboard should hide logger; read=" GetReadLogEntryCount() ", total=" GetLogEntryCount() DumpEntries())
 		Assert.Equal(0, GetUnreadLogEntries().Length, "Opening dashboard should mark all logs read")
 		HideLogDashboard()
