@@ -58,6 +58,7 @@ The suite is intentionally code-first: editing a clear script can be faster—an
 - [Apps and scripts](docs/APPS.md) — every maintained user-facing tool and entry point
 - [Testing](docs/TESTING.md) — local tests, CI, and the Test Dashboard
 - [Automation](docs/AUTOMATION.md) — GitHub workflows, board connections, and scheduled agents
+- [Contributing](CONTRIBUTING.md) — ticket-to-PR workflow and definition of done
 - [AI agent guide](AGENTS.md) — focused instructions for coding agents
 
 Feel free to explore, adapt the ideas, report a bug, or share feedback. I hope something here inspires your own Windows workflow. 💭

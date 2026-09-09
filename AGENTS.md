@@ -10,6 +10,7 @@ This is an AutoHotkey v2 productivity suite for Windows. Keep changes scoped, pr
 - [docs/APPS.md](docs/APPS.md) — user-facing entry points and invocation.
 - [docs/AUTOMATION.md](docs/AUTOMATION.md) — GitHub workflows, Project board, credentials, and schedules.
 - [docs/TESTING.md](docs/TESTING.md) — test architecture and commands.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — ticket, branch, pull-request, and definition-of-done workflow.
 
 ## Architecture
 
@@ -37,12 +38,19 @@ Do not add real email addresses, credentials, private URLs, or secret contents t
 ## Change rules
 
 - Target AutoHotkey v2.
+- Inspect the working tree before editing and preserve unrelated or user-owned changes.
 - Preserve the CapsLock startup dependency: `Capslock Service.ahk` starts before scripts that call `CapsLock.Hotkey(...)`.
 - Derive repository paths through `Lib/Core/Paths.ahk`; do not add a fixed checkout location.
 - Keep reusable behavior in shared classes/functions and entry points focused on wiring, hotkeys, and startup.
 - Treat `Startup/Startup.ahk`, test discovery code, workflow YAML, and `.github/labels.yml` as authoritative over prose.
 - Update the relevant focused document when changing an app entry point, default hotkey, startup set, test command, workflow trigger, credential, or external connection.
 - The repository normalizes AutoHotkey, Markdown, INI, and JSON files to CRLF on checkout through `.gitattributes`.
+
+## Working agreement
+
+For tracked changes, follow [CONTRIBUTING.md](CONTRIBUTING.md): work from an issue and focused branch, keep the Project status current, open a pull request, and review the complete diff. Do not merge a pull request unless the maintainer explicitly requests it.
+
+A change is ready for review when its acceptance criteria are met, relevant validation passes or is reported, affected documentation is updated, and the diff contains no unrelated changes, personal data, secrets, or generated runtime files.
 
 ## Validation
 
