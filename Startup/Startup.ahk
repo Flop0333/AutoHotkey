@@ -21,39 +21,39 @@
 
 RunStartup(profile?) {
     steps := [
-        { name: "Start new log session", action: () => StartNewLogSession() },
-        { name: "Set startup tray icon", action: () => TraySetIcon(Paths.autoHotkeyIcon) },
-        { name: "Show startup message", action: () => StartupMessage() },
-        { name: "Configure startup tray menu", action: () => StartupMenuTray() },
-        { name: "Initialize secrets", action: () => SecretsFileManager.Initialize() },
-        { name: "Select active profile", action: () => IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetByComputerName() },
+        () => StartNewLogSession(),
+        () => TraySetIcon(Paths.autoHotkeyIcon),
+        () => StartupMessage(),
+        () => StartupMenuTray(),
+        () => SecretsFileManager.Initialize(),
+        () => IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetByComputerName(),
 
         ; Run this before scripts that set a CapsLock hotkey.
-        { name: "Start Capslock Service", action: () => Run(Paths.appsStandalone "\Capslock Service.ahk") },
-        { name: "Start Age of Efficiency", action: () => Run(Paths.dashboards "\Age of Efficiency\Age of Efficiency.ahk") },
-        { name: "Start Macro Board", action: () => Run(Paths.dashboards "\Macro Board\Macro Board.ahk") },
+        () => Run(Paths.appsStandalone "\Capslock Service.ahk"),
+        () => Run(Paths.dashboards "\Age of Efficiency\Age of Efficiency.ahk"),
+        () => Run(Paths.dashboards "\Macro Board\Macro Board.ahk"),
 
-        { name: "Start Desktops Manager", action: () => Run(Paths.appsStandalone "\Desktops Manager\Desktops Manager.ahk") },
-        { name: "Start Emoji Sender", action: () => Run(Paths.appsStandalone "\Emoji Sender\Emoji Sender.ahk") },
-        { name: "Start Mouse Gestures", action: () => Run(Paths.appsStandalone "\Mouse Gestures\Mouse Gestures.ahk") },
-        { name: "Start Screen Snipper", action: () => Run(Paths.appsStandalone "\Screen Snipper\Screen Snipper.ahk") },
-        { name: "Start Key Bindings", action: () => Run(Paths.appsStandalone "\Key Bindings.ahk") },
-        { name: "Start Text Speaker", action: () => Run(Paths.appsStandalone "\Text Speaker\Text Speaker.ahk") },
-        { name: "Start Window Manager", action: () => Run(Paths.appsStandalone "\Window Manager.ahk") },
+        () => Run(Paths.appsStandalone "\Desktops Manager\Desktops Manager.ahk"),
+        () => Run(Paths.appsStandalone "\Emoji Sender\Emoji Sender.ahk"),
+        () => Run(Paths.appsStandalone "\Mouse Gestures\Mouse Gestures.ahk"),
+        () => Run(Paths.appsStandalone "\Screen Snipper\Screen Snipper.ahk"),
+        () => Run(Paths.appsStandalone "\Key Bindings.ahk"),
+        () => Run(Paths.appsStandalone "\Text Speaker\Text Speaker.ahk"),
+        () => Run(Paths.appsStandalone "\Window Manager.ahk"),
 
-        { name: "Start Command Storer", action: () => Run(Paths.appsIntegrated "\Command Storer\Command Storer.ahk") },
-        { name: "Start App Hotkeys", action: () => Run(Paths.appsIntegrated "\App Hotkeys.ahk") },
-        { name: "Start Hotkeys", action: () => Run(Paths.appsIntegrated "\Hotkeys.ahk") },
-        { name: "Start Mouse Toys", action: () => Run(Paths.appsIntegrated "\Mouse Toys.ahk") },
-        { name: "Initialize logger", action: () => InitializeLogging() },
+        () => Run(Paths.appsIntegrated "\Command Storer\Command Storer.ahk"),
+        () => Run(Paths.appsIntegrated "\App Hotkeys.ahk"),
+        () => Run(Paths.appsIntegrated "\Hotkeys.ahk"),
+        () => Run(Paths.appsIntegrated "\Mouse Toys.ahk"),
+        () => InitializeLogging(),
     ]
 
     failures := []
     for step in steps {
         try
-            step.action.Call()
+            step.Call()
         catch as startupError {
-            failureMessage := step.name " failed: " startupError.Message
+            failureMessage := "Startup step failed: " startupError.Message
             failures.Push(failureMessage)
 
             ; Logging is best-effort here: a broken log path or lock must not
@@ -74,5 +74,4 @@ RunStartup(profile?) {
 ; Auto-run only when in Startup folder or run as standalone (not when #Include'd)
 if (StrSplit(A_ScriptDir, "\").Pop() = StrSplit(A_Startup, "\").Pop())
     RunStartup()
-
 
