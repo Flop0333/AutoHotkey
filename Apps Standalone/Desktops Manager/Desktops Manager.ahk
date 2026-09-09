@@ -36,8 +36,6 @@
 #Include ..\..\Lib\Apps\WhatsApp.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
 
-Browser.ConfigureDefaultBrowser(ProfileManager.Is(Profiles.work, Profiles.devbox) ? Edge : Brave)
-
 GetDesktopsForProfile() {
     desktopCounter := 0 ; Start at 0, increment for each desktop added
     config := Map()

@@ -15,7 +15,7 @@ entry point / composition root
 ```
 
 - Reusable files include their immediate dependencies rather than `Lib/Core.ahk`.
-- Reusable files under `Lib/` do not import applications, dashboards, profiles, or secrets. Executable composition roots supply that configuration.
+- Reusable files under `Lib/` do not import applications, dashboards, or secrets. Profile-aware utilities may read the current profile directly when that keeps their default behavior simple.
 - Files outside `Startup/` do not include startup bootstrap files.
 - An application may expose one focused feature root, but broad catch-all barrels are avoided.
 - Vendored examples and the WebView setup template are not application dependencies and are excluded explicitly from the maintained graph check.
@@ -48,7 +48,7 @@ The Age of Efficiency composition root selects JSON repositories:
 AppsState.Initialize(AppsDatabaseService(), LogAndNotifyInfo)
 ```
 
-Tests can pass an in-memory repository with the same `Load()` and `Store(items)` methods. Effectful functions use the same pattern; `Browser.ConfigureRunFunction(fakeRun)` lets a test observe a launch without starting a process.
+Tests can pass an in-memory repository with the same `Load()` and `Store(items)` methods. Use similar seams for other effects only when the testing benefit outweighs the extra indirection in production code.
 
 Prefer injection when a dependency performs I/O, starts a process, displays UI, reads machine-specific state, or needs a fake in a unit test. Pure helpers can be called directly.
 

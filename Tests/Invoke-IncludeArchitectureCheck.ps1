@@ -253,13 +253,12 @@ function Get-BoundaryViolations {
                 $relativeTarget.StartsWith('Apps Integrated/', [StringComparison]::OrdinalIgnoreCase) -or
                 $relativeTarget.StartsWith('Apps Standalone/', [StringComparison]::OrdinalIgnoreCase) -or
                 $relativeTarget.StartsWith('Dashboards/', [StringComparison]::OrdinalIgnoreCase) -or
-                $relativeTarget.StartsWith('Profiles/', [StringComparison]::OrdinalIgnoreCase) -or
                 $relativeTarget.StartsWith('Secrets/', [StringComparison]::OrdinalIgnoreCase)
             if (-not $isCompatibilityFacade -and
                 $relativeSource.StartsWith('Lib/', [StringComparison]::OrdinalIgnoreCase) -and
                 $importsApplicationConfiguration) {
                 $violations.Add([pscustomobject]@{
-                    Rule = 'Reusable Lib files must not import applications, dashboards, profiles, or secrets.'
+                    Rule = 'Reusable Lib files must not import applications, dashboards, or secrets.'
                     Source = $relativeSource
                     Target = $relativeTarget
                 })
