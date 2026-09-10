@@ -56,5 +56,6 @@ AI coding agents should begin with [AGENTS.md](../AGENTS.md), which summarizes t
 | [Agent guide](../AGENTS.md) | Fast repository orientation for AI agents and contributors |
 | [Resources](RESOURCES.md) | Optional AutoHotkey libraries and development resources to explore |
 | [Daily ticket agent design record](decisions/daily-ticket-agent.md) | Historical decisions retained from the implemented automation proposal |
+| [Control Dashboard design record](decisions/control-dashboard.md) | Proposed rework of the Log Dashboard into a suite control dashboard |
 
 This project favors code-first configuration and small, composable AutoHotkey scripts.
