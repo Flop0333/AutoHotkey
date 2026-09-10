@@ -17,6 +17,7 @@
 #Include ..\..\..\Lib\Apps\Notion.ahk
 #Include ..\..\..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
 #Include ..\..\..\Lib\Helpers\System.ahk
+#Include ..\..\..\Apps Integrated\Suite Control\Suite Control.ahk
 
 StartPBIReformat() => PBIReformat.Start()
 
@@ -26,7 +27,7 @@ StartFakeWorkMode() => FakeWorkMode.Start()
 
 ShutPcDown() => System.PowerDown()
 
-RerunStartup() => System.KillAndReload(false)
+RerunStartup() => SuiteControl.ReloadSuite(false)
 
 ShowStatusMeme(meme) => StatusMeme(meme)
 

@@ -16,7 +16,6 @@
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Paths.ahk
 #Include ..\..\Lib\Helpers\Capslock.ahk
-#Include ..\..\Lib\Helpers\System.ahk
 #Include ..\..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
 #Include ..\..\Lib\Tools\Info.ahk
 #Include ..\..\Profiles\Profile Manager.ahk
@@ -24,6 +23,7 @@
 #Include Controller.ahk
 #Include "..\..\Apps Integrated\Command Storer\Command Storer.ahk"
 #Include ..\..\Apps Integrated\Spell Checker.ahk
+#Include ..\..\Apps Integrated\Suite Control\Suite Control.ahk
 #Include ..\..\Apps Integrated\Fake Working Mode.ahk
 #Include "..\..\Apps Integrated\Notion Pages.ahk"
 #Include ..\..\Lib\Apps\Spotify.ahk
@@ -39,13 +39,13 @@ InitializeFakeWorkModeForProfile()
 
 ToggleSpellChecker() => SpellChecker.Toggle()
 GetSpellCheckerState() => SpellChecker.Enabled
-KillAllAHkProcesses() => System.KillAllAHkProcesses()
+KillAllAHkProcesses() => SuiteControl.ExitSuite()
 ToggleFakeWorkMode() => FakeWorkMode.Toggle()
 GetFakeWorkModeState() => FakeWorkMode.Enabled
 PullAllWindowsToCurrentDesktop() => DesktopsDDL.PullAllWindowsToCurrentDesktop()
 OpenNotionShitFixen() => Notion.OpenPage(NotionPages.shitFixen)
 CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
-KillAndReloadAllAHkProcesses() => System.KillAndReload()
+KillAndReloadAllAHkProcesses() => SuiteControl.ReloadSuite()
 
 ; ============================================================================
 ; === BUTTONS REGISTRATION ======================---==========================

@@ -42,7 +42,7 @@ Dashboards/Control Dashboard/Dashboard.ahk   (host process, composition root)
         -> Profiles/Profile Manager.ahk      (profile list and requested profile)
 ```
 
-The dashboard runs in its own process, so control actions are cross-process by nature. That is already how `System.KillAndReload()` works: it kills every other AutoHotkey process, starts `Startup/Startup.ahk`, and exits itself. The service formalizes the rest:
+The dashboard runs in its own process, so control actions are cross-process by nature. That is how the suite reload works: it kills every other AutoHotkey process, starts `Startup/Startup.ahk`, and exits itself. The service formalizes the rest:
 
 - **Inventory** — enumerate AutoHotkey processes and read each one's script path from its (hidden) main window title, rather than guessing from the startup list.
 - **Restart one script** — stop the process owning a script path and run it again, without touching the rest of the suite.

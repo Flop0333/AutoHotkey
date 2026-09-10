@@ -17,7 +17,8 @@
 ;   - All profile changes are persisted to current_profile.ini
 ; ============================================================================
 
-#Include ..\Lib\Helpers\System.ahk
+#Include ..\Apps Integrated\Suite Control\Suite Control.ahk
+
 class StartupMenuTray {
     __New() {
         ; Logging.ahk includes Core.ahk, whose #NoTrayIcon directive is correct
@@ -25,11 +26,11 @@ class StartupMenuTray {
         ; Explicitly publish the startup owner's tray icon before building it.
         A_IconHidden := false
         A_TrayMenu.Delete()
-        A_TrayMenu.Add("Reload", (*) => System.KillAndReload())
+        A_TrayMenu.Add("Reload", (*) => SuiteControl.ReloadSuite())
         this._AddProfilesToTrayMenu()
         A_TrayMenu.Add("Log Dashboard", (*) => ShowLogDashboard())
         A_TrayMenu.Add("Test Dashboard", (*) => RunTests())
-        A_TrayMenu.Add("Exit", (*) => System.KillAllAHkProcesses())
+        A_TrayMenu.Add("Exit", (*) => SuiteControl.ExitSuite())
     }
 
     _AddProfilesToTrayMenu() {
