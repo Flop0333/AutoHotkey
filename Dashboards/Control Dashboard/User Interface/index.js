@@ -47,6 +47,10 @@ class ControlDashboardShell {
 
 	_attachKeyboardShortcuts() {
 		document.addEventListener('keydown', (event) => {
+			// A confirmation owns the keyboard while it waits for an answer:
+			// switching section behind it would leave the question stranded.
+			// Escape still reaches the dialog, which listens for it itself.
+			if (this.confirmDialog.isOpen) return;
 			const typing = event.target.matches('input, select, textarea, [contenteditable="true"]');
 			if (typing) return;
 			const sections = ['overview', 'processes', 'logs', 'tests', 'profiles', 'health'];
@@ -220,6 +224,10 @@ class ConfirmDialog {
 			if (!this.element.hidden && event.key === 'Escape')
 				this._close(false);
 		});
+	}
+
+	get isOpen() {
+		return !this.element.hidden;
 	}
 
 	ask({ title, message, confirmLabel = 'Confirm', danger = true }) {
