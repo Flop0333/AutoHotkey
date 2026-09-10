@@ -9,7 +9,7 @@
 <body>
   <div class="title-bar">
     <div class="drag-region" onmousedown="ahk.DragWindow()">
-      <span class="title-text">Control Dashboard</span>
+      <span class="title-text">AutoHotkey Control Dashboard</span>
       <span id="git-status" class="git-status"></span>
     </div>
     <div class="title-btn-container">
@@ -18,31 +18,137 @@
       <span class="title-btn title-btn-close" onclick="ahk.Close()">r</span>
     </div>
   </div>
-  <div class="toolbar">
-    <select id="severity-filter"><option value="">All severities</option></select>
-    <select id="script-filter"><option value="">All scripts</option></select>
-    <button id="sort-time">Time ↓</button>
-	<button id="open-archive" title="Open archived logs from earlier sessions">Earlier sessions</button>
-    <span id="entry-count"></span>
-    <span class="test-buttons">
-      <button class="test-btn" data-severity="info" title="Log and notify a test info entry">Test Info</button>
-      <button class="test-btn" data-severity="warning" title="Log and notify a test warning entry">Test Warning</button>
-      <button class="test-btn" data-severity="error" title="Log and notify a test error entry">Test Error</button>
-    </span>
-  </div>
-  <div class="layout">
-    <table id="log-table">
-      <thead>
-        <tr><th>Time</th><th>Severity</th><th>Script</th><th>Message</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <div id="detail-panel">
-      <p class="empty-state">Select a log entry to see details.</p>
+
+  <!-- Visible from every section: the four numbers worth knowing at a glance. -->
+  <div class="status-strip">
+    <div class="status-item">
+      <span class="status-label">Profile</span>
+      <span class="status-value" id="status-profile">…</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Session</span>
+      <span class="status-value" id="status-uptime">…</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Unread</span>
+      <span class="status-value pill-row" id="status-unread"></span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Tests</span>
+      <span class="status-value pill-row" id="status-tests"></span>
     </div>
   </div>
+
+  <div class="shell">
+    <nav class="rail" id="rail">
+      <button type="button" class="rail-item" data-section="overview"><span class="rail-icon">◉</span><span class="rail-label">Overview</span></button>
+      <button type="button" class="rail-item" data-section="processes"><span class="rail-icon">▦</span><span class="rail-label">Processes</span></button>
+      <button type="button" class="rail-item" data-section="logs"><span class="rail-icon">☰</span><span class="rail-label">Logs</span></button>
+      <button type="button" class="rail-item" data-section="tests"><span class="rail-icon">✔</span><span class="rail-label">Tests</span></button>
+      <button type="button" class="rail-item" data-section="profiles"><span class="rail-icon">◧</span><span class="rail-label">Profiles</span></button>
+      <button type="button" class="rail-item" data-section="health"><span class="rail-icon">✚</span><span class="rail-label">Health</span></button>
+    </nav>
+
+    <main class="content">
+      <section class="section" id="section-overview" hidden>
+        <header class="section-header">
+          <h1>Overview</h1>
+          <p class="section-subtitle">Suite state at a glance, with the actions worth one click.</p>
+        </header>
+        <div class="card placeholder">
+          <p class="placeholder-title">Not built yet</p>
+          <p class="placeholder-body">Profile, uptime, running scripts, unread log counts, and the reload, exit, and test-notification actions land here. Until then the strip above carries the state, and the tray menu carries the actions.</p>
+        </div>
+      </section>
+
+      <section class="section" id="section-processes" hidden>
+        <header class="section-header">
+          <h1>Processes</h1>
+          <p class="section-subtitle">The AutoHotkey scripts that make up the running suite.</p>
+        </header>
+        <div class="card placeholder">
+          <p class="placeholder-title">Not built yet</p>
+          <p class="placeholder-body">An inventory of the running scripts with their uptime, plus restart and stop per script, lands here. The service behind it already exists; only this view is missing.</p>
+        </div>
+      </section>
+
+      <section class="section section-fill" id="section-logs" hidden>
+        <div class="toolbar">
+          <select id="severity-filter" title="Filter by severity"><option value="">All severities</option></select>
+          <select id="script-filter" title="Filter by script"><option value="">All scripts</option></select>
+          <button type="button" id="sort-time">Time ↓</button>
+          <button type="button" id="open-archive" title="Open archived logs from earlier sessions">Earlier sessions</button>
+          <span id="entry-count" class="muted-text"></span>
+          <span class="test-buttons">
+            <button type="button" class="test-btn" data-severity="info" title="Log and notify a test info entry">Test Info</button>
+            <button type="button" class="test-btn" data-severity="warning" title="Log and notify a test warning entry">Test Warning</button>
+            <button type="button" class="test-btn" data-severity="error" title="Log and notify a test error entry">Test Error</button>
+          </span>
+        </div>
+        <div class="layout">
+          <div class="table-wrap">
+            <table id="log-table" class="data-table">
+              <thead>
+                <tr><th>Time</th><th>Severity</th><th>Script</th><th>Message</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div id="detail-panel">
+            <p class="empty-state">Select a log entry to see details.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="section-tests" hidden>
+        <header class="section-header">
+          <h1>Tests</h1>
+          <p class="section-subtitle">Run the suites and read the last run.</p>
+        </header>
+        <div class="card placeholder">
+          <p class="placeholder-title">Not built yet</p>
+          <p class="placeholder-body">Running the suites, live run status, and the per-suite results of the last run land here. Until then use the Test Dashboard from the tray menu.</p>
+        </div>
+      </section>
+
+      <section class="section" id="section-profiles" hidden>
+        <header class="section-header">
+          <h1>Profiles</h1>
+          <p class="section-subtitle">Which profile is active, and switching to another one.</p>
+        </header>
+        <div class="card placeholder">
+          <p class="placeholder-title">Not built yet</p>
+          <p class="placeholder-body">The profile list and switch-and-restart land here. The handoff that makes a switch survive the restart already exists; until this view ships, switch from the tray menu.</p>
+        </div>
+      </section>
+
+      <section class="section" id="section-health" hidden>
+        <header class="section-header">
+          <h1>Health</h1>
+          <p class="section-subtitle">Whether this machine is set up the way the suite expects.</p>
+        </header>
+        <div class="card placeholder">
+          <p class="placeholder-title">Not built yet</p>
+          <p class="placeholder-body">AutoHotkey and WebView2 versions, resolved paths, the log session, and the secrets sync state land here.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="confirm-modal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h2 class="modal-title" id="confirm-title"></h2>
+      <p class="modal-message" id="confirm-message"></p>
+      <div class="modal-actions">
+        <button type="button" class="button" id="confirm-cancel">Cancel</button>
+        <button type="button" class="button button-danger" id="confirm-accept">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast"></div>
-  <script src="index.js"></script>
+
   <script src="AhkDataService.js"></script>
+  <script src="index.js"></script>
 </body>
 </html>

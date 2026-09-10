@@ -7,6 +7,8 @@ Class ControlDashboard extends WebViewToo {
 	static WIN_TITLE := "AutoHotkey Control Dashboard"
 	static INITIALIZING_TITLE := "AutoHotkey Control Dashboard - Initializing"
 	static SHOW_OPTIONS := Format("w{} h{}", Round(A_ScreenWidth * 0.85), Round(A_ScreenHeight * 0.75))
+	; Written by Tests\Invoke-AllTests.ps1; the Tests section will run it from here.
+	static TEST_STATUS_FILE := Paths.autohotkey "\Logs\test-run-status.json"
 
 	__New() {
 		super.__New()
@@ -14,6 +16,7 @@ Class ControlDashboard extends WebViewToo {
 		this.Gui.OnEvent("Close", (*) => this.Hide())
 		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Control Dashboard\User Interface", 0) ; block cors error, allow loading local files
 		this.Load("http://app.local/index.html")
+		this.AddCallbackToScript("GetSuiteStatus", (*) => this.GetSuiteStatusForWeb())
 		this.AddCallbackToScript("GetLogEntries", (*) => this.GetLogEntriesForWeb())
 		this.AddCallbackToScript("SetClipboard", (webview, text) => A_Clipboard := text)
 		this.AddCallbackToScript("LogTestMessage", (webview, severity) => this.LogTestMessage(severity))
@@ -37,6 +40,42 @@ Class ControlDashboard extends WebViewToo {
 	}
 
 	Close() => this.Hide()
+
+	; Everything the status strip shows, in one read: the log file is opened once
+	; under the shared logging lock instead of once per value.
+	GetSuiteStatusForWeb() {
+		logState := ReadLogState()
+		return JSON.Dump(Map(
+			"profile", this.CurrentProfileName(),
+			"uptimeSeconds", this.SessionUptimeSeconds(logState["sessionId"]),
+			"entryCount", logState["entries"].Length,
+			"unread", GetUnreadLogCounts(logState["entries"], logState["readEntryCount"]),
+			"tests", this.LastTestRun()
+		))
+	}
+
+	; The display name only. Reading it from the profile ini keeps this viewer
+	; process out of the secrets stack that Profile Manager needs for device
+	; matching; the Profiles section adds the full list when it needs one.
+	CurrentProfileName() {
+		try return Trim(IniRead(Paths.profileIniFile, "Profile", "Current", ""))
+		return ""
+	}
+
+	; The log session starts with the suite, so its id doubles as the suite's
+	; start time: "yyyyMMdd-HHmmss-<pid>-<tick>-<sequence>".
+	SessionUptimeSeconds(sessionId) {
+		if !RegExMatch(sessionId, "^(\d{8})-(\d{6})", &sessionStart)
+			return ""
+		return DateDiff(A_Now, sessionStart[1] sessionStart[2], "Seconds")
+	}
+
+	LastTestRun() {
+		if !FileExist(ControlDashboard.TEST_STATUS_FILE)
+			return Map("status", "unknown")
+		try return JSON.parse(FileRead(ControlDashboard.TEST_STATUS_FILE, "UTF-8"))
+		return Map("status", "unknown")
+	}
 
 	GetLogEntriesForWeb() {
 		return JSON.Dump(ReadLogEntries())

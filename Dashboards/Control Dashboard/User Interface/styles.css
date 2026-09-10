@@ -1,23 +1,70 @@
+/* ==========================================================================
+   Control Dashboard - design tokens
+   Every color in this file is defined here. Component and section rules below
+   use var(...) only, so the whole window can be retoned from one block.
+   ========================================================================== */
+:root {
+	--bg: #1b1b1d;
+	--surface: #232326;
+	--surface-raised: #2b2b2f;
+	--surface-sunken: #17171a;
+	--border: #34343a;
+	--border-strong: #45454d;
+	--text: #e3e3e7;
+	--muted: #90909a;
+	--accent: #3794ff;
+	--accent-contrast: #ffffff;
+	--selection: #0b4b78;
+	--hover: #2a2a2e;
+
+	--info: #3794ff;
+	--warning: #ffa03f;
+	--error: #f1585a;
+	--success: #86d08c;
+	--neutral: #90909a;
+
+	--shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+	--overlay: rgba(0, 0, 0, 0.55);
+	--tint: rgba(255, 255, 255, 0.06);
+	--close: #e81123;
+
+	--radius: 8px;
+	--radius-small: 5px;
+	--gap: 12px;
+	--font: "Segoe UI", sans-serif;
+	--mono: Consolas, "Cascadia Mono", monospace;
+}
+
 * {
 	box-sizing: border-box;
 }
 
+/* Sections and the dialog are toggled through the hidden attribute, and several
+   of them set display themselves - which would otherwise win. */
+[hidden] {
+	display: none !important;
+}
+
 body {
 	margin: 0;
-	font-family: Segoe UI, sans-serif;
-	background: #1e1e1e;
-	color: #ddd;
+	font-family: var(--font);
+	font-size: 13px;
+	background: var(--bg);
+	color: var(--text);
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
+	overflow: hidden;
 }
 
+/* === Title bar =========================================================== */
 .title-bar {
 	display: flex;
 	align-items: stretch;
 	height: 32px;
-	background: #2d2d2d;
-	border-bottom: 1px solid #333;
+	flex: 0 0 auto;
+	background: var(--surface);
+	border-bottom: 1px solid var(--border);
 	-webkit-user-select: none;
 	user-select: none;
 }
@@ -26,24 +73,30 @@ body {
 	flex: 1;
 	display: flex;
 	align-items: center;
+	gap: 10px;
 	padding-left: 12px;
+	min-width: 0;
 	cursor: default;
 }
 
 .title-text {
 	font-size: 12px;
-	color: #ccc;
+	color: var(--text);
+	white-space: nowrap;
 }
 
 .git-status {
 	font-size: 11px;
-	color: #888;
-	margin-left: 10px;
-	font-family: Consolas, monospace;
+	color: var(--muted);
+	font-family: var(--mono);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .title-btn-container {
 	display: flex;
+	flex: 0 0 auto;
 }
 
 .title-btn {
@@ -54,110 +107,322 @@ body {
 	justify-content: center;
 	width: 40px;
 	cursor: pointer;
-	color: #ccc;
+	color: var(--muted);
 }
 
 .title-btn:hover {
-	background: #3d3d3d;
+	background: var(--surface-raised);
+	color: var(--text);
 }
 
 .title-btn-close:hover {
-	background: #e81123;
-	color: #fff;
+	background: var(--close);
+	color: var(--accent-contrast);
 }
 
-.toolbar {
+/* === Status strip ======================================================== */
+.status-strip {
+	display: flex;
+	flex: 0 0 auto;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px var(--gap);
+	padding: 8px 12px;
+	background: var(--surface-sunken);
+	border-bottom: 1px solid var(--border);
+}
+
+.status-item {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+}
+
+.status-label {
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.status-value {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	color: var(--text);
+	white-space: nowrap;
+}
+
+.pill-row {
+	flex-wrap: wrap;
+}
+
+/* === Shell: rail + content =============================================== */
+.shell {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+}
+
+.rail {
+	display: flex;
+	flex-direction: column;
+	flex: 0 0 172px;
+	gap: 2px;
+	padding: 10px 8px;
+	background: var(--surface);
+	border-right: 1px solid var(--border);
+	overflow-y: auto;
+}
+
+.rail-item {
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	padding: 10px;
-	background: #252526;
-	border-bottom: 1px solid #333;
+	padding: 8px 10px;
+	border: 1px solid transparent;
+	border-radius: var(--radius-small);
+	background: none;
+	color: var(--muted);
+	font-family: inherit;
+	font-size: 13px;
+	text-align: left;
+	cursor: pointer;
+	transition: background 120ms ease, color 120ms ease;
 }
 
-.toolbar select, .toolbar button {
-	background: #333;
-	color: #ddd;
-	border: 1px solid #444;
-	border-radius: 4px;
-	padding: 4px 8px;
+.rail-item:hover {
+	background: var(--hover);
+	color: var(--text);
 }
 
-#entry-count {
-	color: #888;
+.rail-item.active {
+	background: var(--surface-raised);
+	border-color: var(--border-strong);
+	color: var(--text);
+}
+
+.rail-icon {
+	width: 16px;
+	text-align: center;
 	font-size: 12px;
 }
 
+.rail-item.active .rail-icon {
+	color: var(--accent);
+}
+
+.content {
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.section {
+	flex: 1;
+	min-height: 0;
+	padding: 18px 20px;
+	overflow-y: auto;
+}
+
+/* Sections that own their own scrolling regions (the log table and its detail
+   panel) fill the frame instead of scrolling as one page. */
+.section-fill {
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+	overflow: hidden;
+}
+
+.section-header h1 {
+	margin: 0;
+	font-size: 17px;
+	font-weight: 600;
+}
+
+.section-subtitle {
+	margin: 4px 0 16px;
+	color: var(--muted);
+}
+
+/* === Components ========================================================== */
+.card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	padding: 16px;
+}
+
+.placeholder {
+	max-width: 760px;
+}
+
+.placeholder-title {
+	margin: 0 0 6px;
+	font-weight: 600;
+	color: var(--text);
+}
+
+.placeholder-body {
+	margin: 0;
+	color: var(--muted);
+	max-width: 68ch;
+	line-height: 1.5;
+}
+
+.pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 2px 8px;
+	border: 1px solid var(--border-strong);
+	border-radius: 999px;
+	background: var(--surface-raised);
+	color: var(--muted);
+	font-size: 11px;
+	white-space: nowrap;
+}
+
+.pill-info { color: var(--info); }
+.pill-warning { color: var(--warning); }
+.pill-error { color: var(--error); }
+.pill-success { color: var(--success); }
+.pill-neutral { color: var(--neutral); }
+
+.button {
+	background: var(--surface-raised);
+	color: var(--text);
+	border: 1px solid var(--border-strong);
+	border-radius: var(--radius-small);
+	padding: 5px 12px;
+	font-family: inherit;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.button:hover {
+	background: var(--hover);
+}
+
+.button-danger {
+	border-color: var(--error);
+	color: var(--error);
+}
+
+.muted-text {
+	color: var(--muted);
+	font-size: 12px;
+}
+
+.empty-state {
+	color: var(--muted);
+	text-align: center;
+	padding: 20px;
+}
+
+/* === Toolbar (Logs) ====================================================== */
+.toolbar {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 10px 12px;
+	flex: 0 0 auto;
+	background: var(--surface);
+	border-bottom: 1px solid var(--border);
+}
+
+.toolbar select,
+.toolbar button {
+	background: var(--surface-raised);
+	color: var(--text);
+	border: 1px solid var(--border-strong);
+	border-radius: var(--radius-small);
+	padding: 4px 8px;
+	font-family: inherit;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.toolbar select:hover,
+.toolbar button:hover {
+	background: var(--hover);
+}
+
 .test-buttons {
+	display: flex;
+	gap: 4px;
 	margin-left: auto;
 }
 
+.test-btn {
+	font-size: 11px;
+}
+
+/* === Data table ========================================================== */
 .layout {
 	display: flex;
 	flex: 1;
 	min-height: 0;
 }
 
-#log-table {
+.table-wrap {
 	flex: 3;
-	border-collapse: collapse;
-	overflow-y: auto;
-	display: block;
-	font-size: 13px;
+	min-width: 0;
+	overflow: auto;
 }
 
-#log-table thead, #log-table tbody {
-	display: table;
+.data-table {
 	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
 	table-layout: fixed;
 }
 
-#log-table th, #log-table td {
+.data-table th,
+.data-table td {
 	text-align: left;
 	padding: 6px 10px;
-	border-bottom: 1px solid #2d2d2d;
+	border-bottom: 1px solid var(--border);
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
-#log-table th {
-	background: #252526;
+.data-table th {
+	background: var(--surface);
 	position: sticky;
 	top: 0;
+	z-index: 1;
+	font-weight: 600;
 }
 
-#log-table th:nth-child(1), #log-table td:nth-child(1) { width: 20%; } /* Time */
-#log-table th:nth-child(2), #log-table td:nth-child(2) { width: 10%; } /* Severity */
-#log-table th:nth-child(3), #log-table td:nth-child(3) { width: 20%; } /* Script */
-#log-table th:nth-child(4), #log-table td:nth-child(4) { width: 50%; } /* Message */
-
-#log-table tbody tr:hover {
-	background: #2a2d2e;
+.data-table tbody tr:hover {
+	background: var(--hover);
 	cursor: pointer;
 }
 
-#log-table tbody tr.selected {
-	background: #094771;
+.data-table tbody tr.selected {
+	background: var(--selection);
 }
 
-.severity-error { color: #f14c4c; }
-.severity-warning { color: #ff9800; }
-.severity-info { color: #3794ff; }
-.severity-success { color: #89d185; }
+/* Fixed widths for the columns whose content has a known length, so the
+   timestamp never truncates and the message keeps whatever is left. */
+#log-table th:nth-child(1), #log-table td:nth-child(1) { width: 165px; } /* Time */
+#log-table th:nth-child(2), #log-table td:nth-child(2) { width: 100px; } /* Severity */
+#log-table th:nth-child(3), #log-table td:nth-child(3) { width: 22%; } /* Script */
 
-.test-buttons {
-	display: flex;
-	gap: 4px;
-}
+.severity-error { color: var(--error); }
+.severity-warning { color: var(--warning); }
+.severity-info { color: var(--info); }
+.severity-success { color: var(--success); }
 
-.test-btn {
-	font-size: 11px;
-	opacity: 0.8;
-}
-
-.test-btn:hover {
-	opacity: 1;
+.copy-btn {
+	flex-shrink: 0;
 }
 
 .message-cell {
@@ -168,12 +433,14 @@ body {
 	text-decoration: underline dotted;
 }
 
+/* === Detail panel ======================================================== */
 #detail-panel {
 	flex: 2;
+	min-width: 260px;
 	padding: 16px;
 	overflow-y: auto;
-	border-left: 1px solid #333;
-	background: #1e1e1e;
+	border-left: 1px solid var(--border);
+	background: var(--bg);
 }
 
 .detail-header {
@@ -185,46 +452,68 @@ body {
 
 #detail-panel h2 {
 	font-size: 15px;
+	margin: 0 0 8px;
 	word-break: break-word;
-}
-
-.copy-btn {
-	flex-shrink: 0;
-	background: #333;
-	color: #ddd;
-	border: 1px solid #444;
-	border-radius: 4px;
-	padding: 4px 8px;
-	cursor: pointer;
-	font-size: 12px;
-}
-
-.copy-btn:hover {
-	background: #3d3d3d;
 }
 
 #detail-panel pre {
 	white-space: pre-wrap;
 	word-break: break-word;
-	background: #252526;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-small);
 	padding: 10px;
-	border-radius: 4px;
+	font-family: var(--mono);
 }
 
-.empty-state {
-	color: #888;
-	text-align: center;
-	padding: 20px;
+/* === Confirmation dialog ================================================= */
+.modal {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--overlay);
+	z-index: 900;
 }
 
+.modal-box {
+	width: min(420px, calc(100% - 40px));
+	background: var(--surface);
+	border: 1px solid var(--border-strong);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
+	padding: 18px;
+}
+
+.modal-title {
+	margin: 0 0 8px;
+	font-size: 15px;
+}
+
+.modal-message {
+	margin: 0 0 18px;
+	color: var(--muted);
+	line-height: 1.5;
+}
+
+.modal-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+/* === Toast =============================================================== */
 #toast {
 	position: fixed;
 	bottom: 20px;
 	right: 20px;
-	background: #094771;
-	color: #fff;
+	max-width: calc(100% - 40px);
+	background: var(--selection);
+	color: var(--accent-contrast);
 	padding: 10px 16px;
-	border-radius: 6px;
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
 	font-size: 13px;
 	opacity: 0;
 	pointer-events: none;
@@ -240,4 +529,41 @@ body {
 	10% { opacity: 1; transform: translateY(0); }
 	85% { opacity: 1; transform: translateY(0); }
 	100% { opacity: 0; transform: translateY(10px); }
+}
+
+/* === Narrow windows ====================================================== */
+/* The rail becomes a horizontal tab row, and the log detail panel stacks under
+   the table, so nothing clips and the shell never scrolls sideways. */
+@media (max-width: 860px) {
+	.shell {
+		flex-direction: column;
+	}
+
+	.rail {
+		flex: 0 0 auto;
+		flex-direction: row;
+		overflow-x: auto;
+		border-right: none;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.rail-label {
+		display: none;
+	}
+
+	.rail-item {
+		justify-content: center;
+	}
+
+	.layout {
+		flex-direction: column;
+	}
+
+	#detail-panel {
+		flex: 0 0 auto;
+		max-height: 45%;
+		min-width: 0;
+		border-left: none;
+		border-top: 1px solid var(--border);
+	}
 }

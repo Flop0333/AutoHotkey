@@ -34,7 +34,7 @@ Class Profiles {
 Class ProfileManager {
     static current := Profiles.default
     static allProfiles := []
-    static iniFile := Paths.profiles "\current_profile.ini"
+    static iniFile := Paths.profileIniFile
     
     static __New() {
         this._InitAllProfiles()
