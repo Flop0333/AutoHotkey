@@ -18,14 +18,28 @@
 #Include Profile Request.ahk
 
 Class Profile {
+    ; deviceName may be a single name, an array of names, or a function that
+    ; resolves one. Resolving lazily keeps merely defining the profiles free of
+    ; side effects: the work profile's device names come from a secret, and
+    ; reading a secret at load time makes every process that includes this file
+    ; touch the secrets file - and log a warning when the value is not set
+    ; locally, which is why the logging integration test has to wait out those
+    ; notices before it can trust the log.
     __New(displayName, deviceName) {
         this.displayName := displayName
-        this.deviceName := deviceName is Array ? deviceName : [deviceName]
+        this._deviceName := deviceName
+    }
+
+    deviceName {
+        get {
+            resolved := this._deviceName is Func ? this._deviceName.Call() : this._deviceName
+            return resolved is Array ? resolved : [resolved]
+        }
     }
 }
 
 Class Profiles {
-    static work := Profile("Work", Secrets.WorkDeviceNames.Get())
+    static work := Profile("Work", () => Secrets.WorkDeviceNames.Get())
     static devbox := Profile("Dev Box", ["DESKTOP-2NC1KCL", "CPC-fbrem-HLWU3"]) ; [VM, Dev Box]
     static woonkamerLaptops := Profile("Woonkamer Laptops", ["FLOPLAPTOP", "LAPTOP-LNTJIJKB"]) ; [Amyrion, Magneet]
     static default := Profile("Default", "")
