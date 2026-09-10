@@ -9,13 +9,20 @@ history, which is expected - documented in the ticket as acceptable v1
 behavior rather than something to special-case away.
 
 Only writes CHANGELOG.md - does not commit or push. The workflow handles
-git add/commit/push, since that's a workflow-level concern (committer
-identity, no-op detection via `git diff --cached`) rather than something
-this script needs to know about.
+git add/commit/push and the changelog pull request, since those are
+workflow-level concerns (committer identity, no-op detection via
+`git diff --cached`, PR create-vs-reuse) rather than something this
+script needs to know about.
+
+Excludes merged PRs from $ChangelogBranch itself, since main's ruleset
+means every changelog update now lands via a bot-owned pull request from
+that branch - without the exclusion, each merged changelog PR would add
+an entry for itself the next time this script runs.
 #>
 param(
     [Parameter(Mandatory)] [string]$Repo,   # e.g. "Flop0333/AutoHotkey"
-    [string]$ChangelogPath = "CHANGELOG.md"
+    [string]$ChangelogPath = "CHANGELOG.md",
+    [string]$ChangelogBranch = "automation/update-changelog"
 )
 
 $ErrorActionPreference = "Stop"
@@ -33,9 +40,9 @@ if (Test-Path $ChangelogPath) {
     $existingBody = $content -replace ('(?s)^.*?' + [regex]::Escape($MarkerPrefix) + '\d+\s*-->\s*\r?\n?'), ''
 }
 
-$lines = gh pr list --repo $Repo --state merged --json number,title,mergedAt,labels,url --limit 200
+$lines = gh pr list --repo $Repo --state merged --json number,title,mergedAt,labels,url,headRefName --limit 200
 $parsed = ($lines -join "`n") | ConvertFrom-Json
-$allMerged = @($parsed)
+$allMerged = @($parsed | Where-Object { $_.headRefName -ne $ChangelogBranch })
 $newPrs = @($allMerged | Where-Object { $_.number -gt $lastPr } | Sort-Object number)
 
 if ($newPrs.Count -eq 0) {
