@@ -18,6 +18,7 @@ Class ControlDashboard extends WebViewToo {
 	; Written by Tests\Invoke-AllTests.ps1; the Tests section will read more of it.
 	static TEST_STATUS_FILE := Paths.autohotkey "\Logs\test-run-status.json"
 	static TEST_RUNNER_SCRIPT := Paths.autohotkey "\Tests\Invoke-AllTests.ps1"
+	static TEST_HISTORY_FILE := Paths.autohotkey "\Logs\test-run-history.log"
 	static SECRETS_FILE := Paths.autohotkey "\Secrets\My Secrets.json"
 	; Evergreen WebView2 runtime, as registered by its installer.
 	static WEBVIEW2_VERSION_KEYS := [
@@ -48,6 +49,7 @@ Class ControlDashboard extends WebViewToo {
 		this.AddCallbackToScript("ReloadSuite", (*) => this.ReloadSuite())
 		this.AddCallbackToScript("ExitSuite", (*) => this.ExitSuite())
 		this.AddCallbackToScript("RunAllTests", (*) => this.RunAllTests())
+		this.AddCallbackToScript("GetTestRuns", (*) => this.GetTestRunsForWeb())
 		this.AddCallbackToScript("GetHealth", (*) => this.GetHealthForWeb())
 		this.AddCallbackToScript("GetProcesses", (*) => this.GetProcessesForWeb())
 		this.AddCallbackToScript("GetProfiles", (*) => this.GetProfilesForWeb())
@@ -350,7 +352,24 @@ Class ControlDashboard extends WebViewToo {
 
 	RunAllTests() {
 		testRunner := 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' ControlDashboard.TEST_RUNNER_SCRIPT '"'
-		return this.ReportOutcome(() => Run(testRunner, , "Hide"))
+		return this.ReportOutcome(() => this.StartTestRun(testRunner))
+	}
+
+	; One runner at a time: a second run would race the first for the status and
+	; history files it writes.
+	StartTestRun(testRunner) {
+		if (this.LastTestRun("").Get("status", "") = "running")
+			throw Error("A test run is already in progress")
+		Run(testRunner, , "Hide")
+	}
+
+	; Status and history in one read, both scoped to this suite session.
+	GetTestRunsForWeb() {
+		sessionStartedAt := this.SessionStartedAt(GetLogSessionId())
+		return JSON.Dump(Map(
+			"status", this.LastTestRun(sessionStartedAt),
+			"runs", TestRunStatus.ReadRuns(ControlDashboard.TEST_HISTORY_FILE, sessionStartedAt)
+		))
 	}
 
 	; An action running in a hidden process must not fail silently: report the

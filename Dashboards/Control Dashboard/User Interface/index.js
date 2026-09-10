@@ -27,7 +27,7 @@ class ControlDashboardShell {
 		this._register(new OverviewSection(this));
 		this._register(new ProcessesSection(this));
 		this._register(new LogsSection(this));
-		this._register(new PlaceholderSection('tests'));
+		this._register(new TestsSection(this));
 		this._register(new ProfilesSection(this));
 		this._register(new HealthSection(this));
 
@@ -532,6 +532,178 @@ class LogsSection {
 			const details = `${entry.severity.toUpperCase()}: ${entry.message}\nScript: ${entry.script}\nTime: ${entry.timestamp}\n\n${entry.stack || '(no stack trace)'}`;
 			this._copyToClipboard(details, 'Error details copied to clipboard');
 		});
+	}
+}
+
+// Running the suites and reading what happened. Runs are scoped to the current
+// suite session, matching the status strip: what ran before the suite started
+// is not this session's result.
+class TestsSection {
+
+	constructor(shell) {
+		this.id = 'tests';
+		this.shell = shell;
+		this.element = document.querySelector('#section-tests');
+		this.runButton = this.element.querySelector('#action-run-suites');
+		this.status = this.element.querySelector('#tests-status');
+		this.statusNote = this.element.querySelector('#tests-status-note');
+		this.tableBody = this.element.querySelector('#test-run-table tbody');
+		this.detail = this.element.querySelector('#test-detail');
+		this.runs = [];
+		this.selectedTimestamp = null;
+		this.wasRunning = false;
+		this.wired = false;
+	}
+
+	activate() {
+		if (!this.wired) {
+			this.runButton.addEventListener('click', () => this._run());
+			this.wired = true;
+		}
+		this.refresh();
+	}
+
+	refresh() {
+		const state = AhkDataService.GetTestRuns();
+		const running = state.status && state.status.status === 'running';
+
+		this._renderStatus(state.status || {}, running);
+		this.runButton.disabled = running;
+		this.runButton.textContent = running ? 'Running…' : 'Run all tests';
+
+		const changed = TestsSection.Fingerprint(this.runs) !== TestsSection.Fingerprint(state.runs || []);
+		this.runs = state.runs || [];
+		if (changed)
+			this._renderRows();
+
+		// A run that just finished is the one worth reading.
+		if (this.wasRunning && !running)
+			this._selectLatestRun();
+		this.wasRunning = running;
+	}
+
+	static Fingerprint(runs) {
+		return runs.map(run => run.timestamp).join(',');
+	}
+
+	_renderStatus(status, running) {
+		if (running) {
+			this.status.replaceChildren(Pill('running…', 'info'));
+			this.statusNote.textContent = status.currentSuite ? `Currently: ${status.currentSuite}` : '';
+			return;
+		}
+		if (!status.lastRunStatus) {
+			this.status.replaceChildren(Pill('not run yet', 'neutral'));
+			this.statusNote.textContent = 'Nothing has run since the suite started.';
+			return;
+		}
+		const passed = status.lastRunStatus === 'PASS';
+		this.status.replaceChildren(Pill(passed ? 'passed' : 'failed', passed ? 'success' : 'error'));
+		this.statusNote.textContent = status.lastRunDurationSeconds
+			? `Last run took ${TestsSection.FormatDuration(status.lastRunDurationSeconds)}`
+			: '';
+	}
+
+	static FormatDuration(seconds) {
+		const total = Number(seconds);
+		if (!Number.isFinite(total))
+			return '';
+		if (total < 60)
+			return `${total.toFixed(1)}s`;
+		return `${Math.floor(total / 60)}m ${Math.round(total % 60)}s`;
+	}
+
+	static FormatTime(timestamp) {
+		const time = new Date(timestamp);
+		return isNaN(time) ? timestamp : time.toLocaleTimeString();
+	}
+
+	// Oldest first, so a session reads top to bottom in the order it happened.
+	_renderRows() {
+		this.tableBody.innerHTML = '';
+		if (!this.runs.length) {
+			this.tableBody.innerHTML = '<tr><td colspan="3" class="empty-state">No runs since the suite started.</td></tr>';
+			return;
+		}
+
+		this.runs.forEach(run => {
+			const row = document.createElement('tr');
+			row.dataset.timestamp = run.timestamp;
+			const passed = run.overallStatus === 'PASS';
+			row.innerHTML = `
+				<td>${escapeHtml(TestsSection.FormatTime(run.timestamp))}</td>
+				<td class="severity severity-${passed ? 'success' : 'error'}">${escapeHtml(run.overallStatus)}</td>
+				<td>${escapeHtml(TestsSection.FormatDuration(run.durationSeconds))}</td>
+			`;
+			row.addEventListener('click', () => this._showDetail(run));
+			if (run.timestamp === this.selectedTimestamp)
+				row.classList.add('selected');
+			this.tableBody.appendChild(row);
+		});
+	}
+
+	_selectLatestRun() {
+		const latest = this.runs[this.runs.length - 1];
+		if (latest)
+			this._showDetail(latest);
+	}
+
+	_showDetail(run) {
+		this.selectedTimestamp = run.timestamp;
+		this.tableBody.querySelectorAll('tr').forEach(row =>
+			row.classList.toggle('selected', row.dataset.timestamp === run.timestamp));
+
+		this.detail.replaceChildren();
+		const heading = document.createElement('h2');
+		heading.className = 'modal-title';
+		heading.textContent = `${TestsSection.FormatTime(run.timestamp)} · ${TestsSection.FormatDuration(run.durationSeconds)}`;
+		this.detail.appendChild(heading);
+
+		(run.suites || []).forEach(suite => this.detail.appendChild(this._suite(suite)));
+	}
+
+	_suite(suite) {
+		const passed = suite.status === 'PASS';
+		const element = document.createElement('div');
+		element.className = 'suite';
+
+		const name = document.createElement('span');
+		name.className = 'suite-name';
+		name.textContent = suite.name;
+		element.append(name, Pill(passed ? 'passed' : suite.status.toLowerCase(), passed ? 'success' : 'error'));
+
+		const duration = document.createElement('span');
+		duration.className = 'muted-text';
+		duration.textContent = TestsSection.FormatDuration(suite.durationSeconds);
+		element.appendChild(duration);
+
+		if (!passed && suite.output) {
+			const copy = document.createElement('button');
+			copy.type = 'button';
+			copy.className = 'button';
+			copy.textContent = '📋 Copy output';
+			copy.addEventListener('click', () => {
+				AhkDataService.SetClipboard(`${suite.name}\n\n${suite.output}`);
+				this.shell.showToast(`${suite.name} output copied to clipboard`);
+			});
+			element.appendChild(copy);
+
+			const output = document.createElement('pre');
+			output.className = 'suite-output';
+			output.textContent = suite.output;
+			element.appendChild(output);
+		}
+		return element;
+	}
+
+	_run() {
+		const result = AhkDataService.RunAllTests();
+		if (!result.ok) {
+			this.shell.showToast(`Could not start the tests: ${result.error}`);
+			return;
+		}
+		this.shell.showToast('Test run started');
+		this.refresh();
 	}
 }
 

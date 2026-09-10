@@ -290,6 +290,62 @@ body {
 	text-overflow: ellipsis;
 }
 
+/* === Tests =============================================================== */
+.tests-toolbar {
+	align-items: center;
+	margin-bottom: var(--gap);
+	flex: 0 0 auto;
+}
+
+.tests-layout {
+	display: flex;
+	gap: var(--gap);
+	flex: 1;
+	min-height: 0;
+}
+
+.tests-layout .table-wrap {
+	flex: 2;
+}
+
+#test-detail {
+	flex: 3;
+	min-width: 0;
+	overflow-y: auto;
+}
+
+.suite {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	flex-wrap: wrap;
+	padding: 8px 0;
+	border-bottom: 1px solid var(--border);
+}
+
+.suite:last-of-type {
+	border-bottom: none;
+}
+
+.suite-name {
+	font-weight: 600;
+}
+
+.suite-output {
+	white-space: pre-wrap;
+	word-break: break-word;
+	background: var(--surface-sunken);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-small);
+	padding: 10px;
+	margin: 6px 0 0;
+	max-height: 320px;
+	overflow: auto;
+	font-family: var(--mono);
+	font-size: 12px;
+	width: 100%;
+}
+
 /* === Components ========================================================== */
 .card {
 	background: var(--surface);

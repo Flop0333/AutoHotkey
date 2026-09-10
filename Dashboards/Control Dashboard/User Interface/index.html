@@ -145,14 +145,28 @@
         </div>
       </section>
 
-      <section class="section" id="section-tests" hidden>
+      <section class="section section-scroll" id="section-tests" hidden>
         <header class="section-header">
           <h1>Tests</h1>
           <p class="section-subtitle">Run the suites and read the last run.</p>
         </header>
-        <div class="card placeholder">
-          <p class="placeholder-title">Not built yet</p>
-          <p class="placeholder-body">Running the suites, live run status, and the per-suite results of the last run land here. Until then use the Test Dashboard from the tray menu.</p>
+        <div class="action-row tests-toolbar">
+          <button type="button" class="button" id="action-run-suites">Run all tests</button>
+          <span class="pill-row" id="tests-status"></span>
+          <span class="muted-text" id="tests-status-note"></span>
+        </div>
+        <div class="tests-layout">
+          <div class="table-wrap table-wrap-inset">
+            <table id="test-run-table" class="data-table">
+              <thead>
+                <tr><th>Started</th><th>Result</th><th>Duration</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="card" id="test-detail">
+            <p class="empty-state">Select a run to see how each suite did.</p>
+          </div>
         </div>
       </section>
 

@@ -59,10 +59,12 @@ Targets are discovered from the `Run(...)` calls in `Startup/Startup.ahk`, plus 
 
 Double-click `Tests/Run-Tests.ahk`, choose **Test Dashboard** from the startup tray, or run the `Test` command in Age of Efficiency. The launcher opens the dashboard and runs `Invoke-AllTests.ps1` in a hidden PowerShell process.
 
+The Control Dashboard's **Tests** section runs the same suites and reads the same two files. It scopes both the status and the run list to the current suite session, so a result from an earlier session never reads as this session's, and it refuses to start a second run while one is in progress.
+
 The combined runner executes all five suites and writes git-ignored runtime data:
 
-- `Logs/test-run-status.json` — current state and most recent result, polled by the dashboard;
-- `Logs/test-run-history.log` — one compact JSON object per completed run, oldest first.
+- `Logs/test-run-status.json` — current state, the suite currently running, and the most recent result with its duration, polled by the dashboards;
+- `Logs/test-run-history.log` — one compact JSON object per completed run, oldest first, each with the run's duration and a per-suite result, duration, and captured output.
 
 Direct individual-suite runs print results to the terminal but do not update dashboard history. Delete the two result files only when intentionally resetting the local dashboard history.
 

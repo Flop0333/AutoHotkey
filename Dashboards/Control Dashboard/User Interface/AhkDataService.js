@@ -17,6 +17,8 @@ class AhkDataService {
 
   static RunAllTests = () => JSON.parse(ahk.sync.RunAllTests());
 
+  static GetTestRuns = () => JSON.parse(ahk.sync.GetTestRuns());
+
   static GetGitStatus = () => ahk.GetGitStatus().then(JSON.parse);
 
   static GetHealth = () => JSON.parse(ahk.sync.GetHealth());
