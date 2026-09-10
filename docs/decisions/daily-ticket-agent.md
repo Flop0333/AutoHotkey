@@ -1,6 +1,6 @@
 # Daily ticket agent: design record
 
-This is a short historical record for [issue #47](https://github.com/Flop0333/AutoHotkey/issues/47). The proposal has been implemented. Current behavior is documented in [docs/AUTOMATION.md](docs/AUTOMATION.md) and defined by `.github/workflows/daily-agent.yml` plus `.github/scripts/Select-AgentIssue.ps1`.
+This is a short historical record for [issue #47](https://github.com/Flop0333/AutoHotkey/issues/47). The proposal has been implemented. Current behavior is documented in [repository automation](../AUTOMATION.md) and defined by `.github/workflows/daily-agent.yml` plus `.github/scripts/Select-AgentIssue.ps1`.
 
 ## Decisions retained from the proposal
 

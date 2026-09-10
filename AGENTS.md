@@ -6,7 +6,7 @@ This is an AutoHotkey v2 productivity suite for Windows. Keep changes scoped, pr
 
 - [README.md](README.md) — visitor-facing feature showcase and documentation map.
 - [docs/PROJECT-GUIDE.md](docs/PROJECT-GUIDE.md) — project structure, startup, and development overview.
-- [INSTALLATION.md](INSTALLATION.md) — profiles, secrets, dependencies, and local startup.
+- [INSTALLATION.md](docs/INSTALLATION.md) — profiles, secrets, dependencies, and local startup.
 - [docs/APPS.md](docs/APPS.md) — user-facing entry points and invocation.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — include direction, activation, composition roots, and dependency injection.
 - [docs/AUTOMATION.md](docs/AUTOMATION.md) — GitHub workflows, Project board, credentials, and schedules.

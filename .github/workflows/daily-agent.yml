@@ -1,7 +1,7 @@
 name: Daily ticket agent
 
-# Design: agent-plan.md (proposal reviewed and approved on issue #47 before
-# this was written).
+# Design: docs/decisions/daily-ticket-agent.md (proposal reviewed and approved
+# on issue #47 before this was written).
 #
 # Requires one new one-time setup step, otherwise the "Run Claude Code" step
 # below will fail loudly rather than silently doing nothing:

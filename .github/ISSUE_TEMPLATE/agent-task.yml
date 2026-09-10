@@ -37,7 +37,7 @@ body:
     id: risk
     attributes:
       label: Risk level
-      description: Choose the matching risk label to apply after submission; definitions are summarized in agent-plan.md.
+      description: Choose the matching risk label to apply after submission; definitions are summarized in docs/decisions/daily-ticket-agent.md.
       options:
         - read (no state change)
         - reversible (easy-to-undo local change)
@@ -63,4 +63,4 @@ body:
     id: context
     attributes:
       label: Additional context
-      description: Links to related issues, agent-plan.md, ROAD MAP.md, or prior discussion.
+      description: Links to related issues, docs/decisions/daily-ticket-agent.md, or prior discussion.

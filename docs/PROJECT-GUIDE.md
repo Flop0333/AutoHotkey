@@ -11,7 +11,7 @@ Return to the [project welcome page](../README.md) for the feature showcase.
 3. Run `Startup/Startup.ahk`.
 4. Confirm the detected profile in the tray menu and customize it if needed.
 
-See the [installation guide](../INSTALLATION.md) for prerequisites, local configuration, and Windows auto-start.
+See the [installation guide](INSTALLATION.md) for prerequisites, local configuration, and Windows auto-start.
 
 ## What is included
 
@@ -48,12 +48,13 @@ AI coding agents should begin with [AGENTS.md](../AGENTS.md), which summarizes t
 | Document | Purpose |
 |---|---|
 | [Welcome](../README.md) | Feature showcase and entry point for new visitors |
-| [Installation](../INSTALLATION.md) | Prerequisites, profiles, secrets, startup, and troubleshooting |
+| [Installation](INSTALLATION.md) | Prerequisites, profiles, secrets, startup, and troubleshooting |
 | [Apps and scripts](APPS.md) | Catalog of runnable tools, dashboards, and supporting areas |
 | [Architecture](ARCHITECTURE.md) | Include direction, activation, composition roots, and dependency injection |
 | [Automation](AUTOMATION.md) | Windows auto-run and all GitHub connections and workflows |
 | [Testing](TESTING.md) | Local test suites, dashboard, CI, and test authoring |
 | [Agent guide](../AGENTS.md) | Fast repository orientation for AI agents and contributors |
-| [Road map](../ROAD%20MAP.md) | Future ideas and resources under consideration |
+| [Resources](RESOURCES.md) | Optional AutoHotkey libraries and development resources to explore |
+| [Daily ticket agent design record](decisions/daily-ticket-agent.md) | Historical decisions retained from the implemented automation proposal |
 
 This project favors code-first configuration and small, composable AutoHotkey scripts.

@@ -29,7 +29,7 @@ Profiles let one checkout behave differently on work machines, personal laptops,
 
 `Secrets/Secrets Catalog.ahk` is the tracked catalog of supported keys and descriptions. Personal values belong in `Secrets/My Secrets.json`, which is created and synchronized on startup and ignored by Git.
 
-- Store values as one JSON object containing string keys and string values.
+- Store values as one JSON object whose values are strings or arrays of strings.
 - New catalog keys can be added to the local file with an empty value.
 - Values whose catalog entry was removed are preserved locally in `Secrets/Removed Secrets.json`.
 - Invalid JSON stops synchronization and leaves the original file untouched.
@@ -49,7 +49,7 @@ Most features tolerate empty values until that specific action is used.
 6. Start the configured standalone apps.
 7. Start the configured integrated apps.
 
-The exact current list is documented in the [app catalog](docs/APPS.md) and expressed by the `Run(...)` calls inside `RunStartup()`.
+The exact current list is documented in the [app catalog](APPS.md) and expressed by the `Run(...)` calls inside `RunStartup()`.
 
 Logging initialization deletes the active `Logs/errors.log` and `Logs/errors.read` files. The Log Dashboard therefore shows the current suite session; earlier error sessions are not archived.
 
@@ -69,6 +69,6 @@ Shared path resolution normally derives the repository root from `Lib/Core/Paths
 
 - **A dashboard does not open:** install or repair Microsoft Edge WebView2 Runtime, then inspect the Log Dashboard.
 - **The wrong profile is active:** select one from the tray menu and verify its device names in `Profiles/Profile Manager.ahk`.
-- **A secret-backed action does nothing:** check that the matching key in `Secrets/My Secrets.json` contains a string value.
+- **A secret-backed action does nothing:** check that the matching key in `Secrets/My Secrets.json` contains the expected string or array of strings.
 - **The suite behaves inconsistently after edits:** choose **Reload** from the tray menu.
-- **Before reporting a code problem:** run `./Tests/Invoke-AllTests.ps1`; see the [testing guide](docs/TESTING.md).
+- **Before reporting a code problem:** run `./Tests/Invoke-AllTests.ps1`; see the [testing guide](TESTING.md).

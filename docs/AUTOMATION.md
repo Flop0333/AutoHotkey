@@ -2,7 +2,7 @@
 
 This repository has two independent automation layers:
 
-- **Windows startup** launches the local AutoHotkey suite. See [Installation and startup](../INSTALLATION.md) and `Startup/Startup.ahk`.
+- **Windows startup** launches the local AutoHotkey suite. See [Installation and startup](INSTALLATION.md) and `Startup/Startup.ahk`.
 - **GitHub automation** connects the repository, issues, Project 8, pull requests, CI, GitHub Pages, and scheduled agent work.
 
 The GitHub repository is [Flop0333/AutoHotkey](https://github.com/Flop0333/AutoHotkey). Workflow YAML and the scripts it calls are the source of truth; this page is the operational overview.
@@ -38,7 +38,7 @@ All cron expressions use UTC. Amsterdam local time is UTC+1 in winter and UTC+2 
 | [Stale decision nudges](../.github/workflows/stale-nudges.yml) | Monday 09:00 or manual | Comments on open `needs-human-decision` issues after 14 quiet days. Any issue activity resets the clock. |
 | [Sync board status on reopen](../.github/workflows/sync-board-status.yml) | Issue reopened | Moves the corresponding Project item back to Todo using the Projects token. |
 | [Sync labels](../.github/workflows/sync-labels.yml) | Relevant label/workflow change on `main`, or manual | Creates or updates labels from `.github/labels.yml`; `skip-delete` preserves unrelated labels. |
-| [Update changelog](../.github/workflows/update-changelog.yml) | Push to `main` or manual | Adds merged PRs to `CHANGELOG.md` and commits directly to `main` as `github-actions[bot]`. A commit-message guard prevents recursion. |
+| [Update changelog](../.github/workflows/update-changelog.yml) | Push to `main` or manual | Regenerates `CHANGELOG.md` on the reusable `automation/update-changelog` branch and opens or updates one bot-owned PR for human review. It never auto-merges. |
 
 ## Issue and Project lifecycle
 
@@ -96,4 +96,4 @@ The complete allowlist required by these workflows is: `actions/checkout`, `acti
 - Use manual dispatch for a controlled validation, then inspect the Actions run and resulting GitHub state.
 - Run the local suite described in [Testing](TESTING.md) when a change affects scripts used by CI.
 
-The original daily-agent design decisions are summarized in [agent-plan.md](../agent-plan.md). Implemented workflow files always take precedence over that historical note.
+The original daily-agent design decisions are summarized in the [daily ticket agent design record](decisions/daily-ticket-agent.md). Implemented workflow files always take precedence over that historical note.

@@ -21,4 +21,4 @@ body:
     id: related
     attributes:
       label: Related ideas or docs
-      description: Links to other issues, ROAD MAP.md, or Dashboards/Macro Board/New Features Ideas.md for Macro Board concepts.
+      description: Links to related issues, docs/RESOURCES.md, or Dashboards/Macro Board/New Features Ideas.md for Macro Board concepts.

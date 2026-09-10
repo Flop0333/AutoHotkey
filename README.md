@@ -56,7 +56,7 @@ The suite is intentionally code-first: editing a clear script can be faster—an
 
 - [Project guide](docs/PROJECT-GUIDE.md) — structure, startup, development, and documentation map
 - [Architecture](docs/ARCHITECTURE.md) — include direction, activation, composition, and testability
-- [Installation](INSTALLATION.md) — requirements, profiles, secrets, and Windows auto-start
+- [Installation](docs/INSTALLATION.md) — requirements, profiles, secrets, and Windows auto-start
 - [Apps and scripts](docs/APPS.md) — every maintained user-facing tool and entry point
 - [Testing](docs/TESTING.md) — local tests, CI, and the Test Dashboard
 - [Automation](docs/AUTOMATION.md) — GitHub workflows, board connections, and scheduled agents

@@ -76,4 +76,4 @@ These files support the entry points above and are not intended to run independe
 - `Lib/Tools/Gdip/`, `Lib/Tools/OCR/`, and `Lib/Tools/UIA-v2/` include third-party libraries, examples, and their own upstream-oriented READMEs. Examples are references, not part of suite startup or the repo test set.
 - `Lib/Tools/WebView/` contains the WebView2 wrapper, loader DLLs, and a setup template used by HTML/CSS/JS interfaces.
 
-For startup configuration and prerequisites, see [Installation](../INSTALLATION.md). For the exact validation scope, see [Testing](TESTING.md).
+For startup configuration and prerequisites, see [Installation](INSTALLATION.md). For the exact validation scope, see [Testing](TESTING.md).
