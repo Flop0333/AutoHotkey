@@ -17,6 +17,39 @@ WaitUntil(predicate, timeoutMs := 4000) {
 	return false
 }
 
+; Opens a lasting handle to a just-started process (SYNCHRONIZE + query
+; rights). Must be called immediately after Run() returns the pid, not
+; later: these writer processes are fast enough to fully exit - and be
+; torn down by Windows, since nothing was keeping a handle open - before
+; a later loop gets around to inspecting them, which is exactly what
+; happened the first time this was tried (OpenProcess failing on an
+; already-gone pid, misreported as "exited with no code" instead of
+; actually observing the writer's real, successful exit). Holding the
+; handle from the start also avoids relying on ProcessExist(pid) polling,
+; since Windows can reuse a PID once a process exits.
+OpenProcessHandle(pid) {
+	PROCESS_QUERY_LIMITED_INFORMATION := 0x1000
+	SYNCHRONIZE := 0x100000
+	return DllCall("OpenProcess", "UInt", PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, "Int", false, "UInt", pid, "Ptr")
+}
+
+; Waits on a handle from OpenProcessHandle() and reports the real exit
+; code, so a writer that hits a mutex timeout or other exception and
+; exits early (see LoggingWriter.ahk's catch block) having written only
+; part of its share is named directly instead of only showing up as an
+; unexplained short entry count.
+WaitForProcessExit(handle, timeoutMs := 30000) {
+	try {
+		waitResult := DllCall("WaitForSingleObject", "Ptr", handle, "UInt", timeoutMs, "UInt")
+		if waitResult != 0
+			return Map("exited", false, "exitCode", "")
+		exitCode := 0
+		DllCall("GetExitCodeProcess", "Ptr", handle, "UInt*", &exitCode)
+		return Map("exited", true, "exitCode", exitCode)
+	} finally
+		DllCall("CloseHandle", "Ptr", handle)
+}
+
 ; Waits for GetLogEntryCount() to stop changing for quietMs, instead of
 ; assuming any single checkpoint (a fixed sleep, or "is the popup hidden
 ; right now") is late enough to have seen everything. Confirmed necessary,
@@ -133,7 +166,14 @@ Test_RealHostsAndCrossProcessBehavior() {
 		ShowLogDashboard()
 		dashboardPid := WinGetPID("ahk_id " FindLogDashboardWindow())
 		Assert.NotEqual(loggerPid, dashboardPid, "Logger and dashboard must have separate host processes")
-		Assert.True(WaitUntil(() => IsVisible(FindLogDashboardWindow())), "Client API should show shared dashboard")
+		; A CI-only intermittent failure here (window found - dashboardPid
+		; above succeeded - but not yet visible) means the window handle
+		; already existed; only the WS_VISIBLE flip from ShowLogDashboard's
+		; WinShow call was still catching up. Widened from the previous
+		; 4000ms default (an arbitrary local-machine budget with no
+		; documented basis) to match this file's other generous, evidence-
+		; based waits rather than guess at a root cause a third time.
+		Assert.True(WaitUntil(() => IsVisible(FindLogDashboardWindow()), 8000), "Client API should show shared dashboard")
 		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Opening dashboard should hide logger; read=" GetReadLogEntryCount() ", total=" GetLogEntryCount() DumpEntries())
 		Assert.Equal(0, GetUnreadLogEntries().Length, "Opening dashboard should mark all logs read")
 		HideLogDashboard()
@@ -158,15 +198,26 @@ Test_ConcurrentWritersPreserveEveryEntry() {
 	ClearErrorLog()
 	writerCount := 4
 	entriesPerWriter := 10
-	pids := []
+	pidsAndHandles := []
 	writerScript := A_ScriptDir "\..\Support\LoggingWriter.ahk"
 
 	loop writerCount {
 		Run('"' A_AhkPath '" /ErrorStdOut "' writerScript '" "writer-' A_Index '" "' entriesPerWriter '"',,, &pid)
-		pids.Push(pid)
+		; Open the handle right here, before this fast-exiting writer can
+		; fully vanish - see OpenProcessHandle's comment.
+		pidsAndHandles.Push(Map("pid", pid, "handle", OpenProcessHandle(pid)))
 	}
-	for pid in pids
-		Assert.True(WaitUntil(() => !ProcessExist(pid), 30000), "Concurrent log writer did not exit")
+	; Checking the real exit code (not just "it stopped existing") is what
+	; actually distinguishes "every writer really wrote all its entries"
+	; from "some writer silently failed partway" - the previous version of
+	; this test could not tell those apart, so a partial-entry failure
+	; below showed only a confusing short count with no explanation.
+	for entry in pidsAndHandles {
+		Assert.True(entry["handle"], "Could not open a handle to concurrent log writer (pid " entry["pid"] ") before it exited")
+		result := WaitForProcessExit(entry["handle"], 30000)
+		Assert.True(result["exited"], "Concurrent log writer (pid " entry["pid"] ") did not exit within 30s")
+		Assert.Equal(0, result["exitCode"], "Concurrent log writer (pid " entry["pid"] ") exited with code " result["exitCode"] " instead of writing all its entries - see its stderr for the AppendLogEntry failure")
+	}
 
 	entries := ReadLogEntries()
 	Assert.Equal(writerCount * entriesPerWriter, entries.Length, "Every concurrent append must produce one valid entry")
