@@ -34,6 +34,8 @@ class AhkDataService {
   // Scripts are addressed by process id, so no path crosses the bridge.
   static RestartScript = (processId) => JSON.parse(ahk.sync.RestartScript(processId));
 
+  static StartExpectedScript = (scriptName) => JSON.parse(ahk.sync.StartExpectedScript(scriptName));
+
   static StopScript = (processId) => JSON.parse(ahk.sync.StopScript(processId));
 
   // Opening a folder can fail (a missing path, a blocked shell), so these

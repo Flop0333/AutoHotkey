@@ -1,6 +1,6 @@
 # AutoHotkey Control Dashboard: design record
 
-This is the design record for reworking the Log Dashboard into an **AutoHotkey Control Dashboard**: one WebView2 cockpit for the running suite. It is being implemented in phases, tracked by the tickets linked from the Control Dashboard epic on [Project 8](https://github.com/users/Flop0333/projects/8); the shipped code, `Startup/Startup.ahk`, and the focused documents are authoritative for anything already delivered.
+This records the decisions used to ship the **AutoHotkey Control Dashboard**: one WebView2 cockpit for the running suite. The shipped code, `Startup/Startup.ahk`, and the focused documents are authoritative.
 
 ## Goal
 
@@ -93,8 +93,8 @@ Beyond the usual suites, the change touches startup, includes, and logging, so `
 - The logging integration test keeps covering the renamed dashboard host, including its lazy start.
 - `Invoke-SyntaxCheck.ps1` targets the renamed host, and the Test Dashboard target is removed only in the phase that retires it.
 
-## Open questions
+## Decisions made
 
-- Should the tray menu keep separate items after the rename, or collapse to a single **Control Dashboard** entry plus Reload and Exit?
-- Should the expected startup set become a declarative list consumed by both `RunStartup()` and the dashboard, or should the dashboard simply report what is running?
-- Should per-suite test runs be offered from the dashboard, or only the combined run that CI and the current dashboard use?
+- The tray keeps one **Control Dashboard** item alongside Reload and Exit.
+- A declarative startup list is consumed by both `RunStartup()` and the Processes section, which flags expected-but-missing scripts.
+- The Tests section runs the combined `Invoke-AllTests.ps1` workflow so local and CI behaviour stay aligned.

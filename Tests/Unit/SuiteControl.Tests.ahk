@@ -68,6 +68,12 @@ TestKit.Run("WMI creation date keeps its timestamp prefix", Test_ParseWmiDateTim
 TestKit.Run("WMI creation date without a fraction is accepted", Test_ParseWmiDateTime_AcceptsATimestampWithoutAFraction)
 TestKit.Run("An unexpected WMI creation date yields no timestamp", Test_ParseWmiDateTime_RejectsAnUnexpectedValue)
 
+TestKit.Run("Missing startup scripts are compared case-insensitively", (*) => (
+    running := [{path: "C:\\Suite\\One.ahk"}],
+    missing := SuiteControl.FindMissingScripts(running, ["c:\\suite\\ONE.ahk", "C:\\Suite\\Two.ahk"]),
+    Assert.ArrayEqual(["C:\\Suite\\Two.ahk"], missing)
+))
+
 Test_Confirmed_SkipsThePromptWhenConfirmIsFalse() {
     Assert.True(SuiteControl._Confirmed(false, "message", "title"))
 }

@@ -47,7 +47,6 @@ $targets.Add($startupFile)
 $targets.Add((Join-Path $repoRoot "Dashboards\Logger\Logger Host.ahk"))
 $targets.Add((Join-Path $repoRoot "Dashboards\Control Dashboard\Dashboard.ahk"))
 $targets.Add((Join-Path $repoRoot "Dashboards\Logger\Logging.ahk"))
-$targets.Add((Join-Path $repoRoot "Dashboards\Test Dashboard\Dashboard.ahk"))
 $targets.Add((Join-Path $repoRoot "Tests\Run-Tests.ahk"))
 
 $runCalls = [regex]::Matches($startupContent, 'Run\(Paths\.(\w+)\s*"([^"]+)"\)')

@@ -177,6 +177,19 @@ body {
 	overflow-y: auto;
 }
 
+.shortcut-help {
+	position: fixed;
+	left: 10px;
+	bottom: 8px;
+	width: 152px;
+	color: var(--muted);
+	font-size: 10px;
+	line-height: 1.5;
+	z-index: 2;
+}
+
+.process-missing { background: var(--tint); color: var(--muted); }
+
 .rail-item {
 	display: flex;
 	align-items: center;
@@ -699,6 +712,7 @@ body {
 /* The rail becomes a horizontal tab row, and the log detail panel stacks under
    the table, so nothing clips and the shell never scrolls sideways. */
 @media (max-width: 860px) {
+	.shortcut-help { display: none; }
 	.shell {
 		flex-direction: column;
 	}

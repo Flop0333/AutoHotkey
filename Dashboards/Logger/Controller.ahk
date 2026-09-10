@@ -89,7 +89,7 @@ Class LoggerPopup {
 
 	OpenDashboard() {
 		this.Dismiss()
-		ShowControlDashboard()
+		ShowControlDashboard("logs")
 	}
 
 	_Seed() {

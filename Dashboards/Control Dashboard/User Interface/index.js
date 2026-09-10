@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-	new ControlDashboardShell().start();
+	window.controlDashboardShell = new ControlDashboardShell();
+	window.controlDashboardShell.start();
 });
 
 // The frame every section plugs into: rail navigation, the always-visible
@@ -38,9 +39,29 @@ class ControlDashboardShell {
 		});
 
 		this.show(ControlDashboardShell.DEFAULT_SECTION);
+		this._attachKeyboardShortcuts();
 		this._refreshStatus();
 		this.refreshGitStatus();
 		setInterval(() => this._tick(), ControlDashboardShell.POLL_INTERVAL_MS);
+	}
+
+	_attachKeyboardShortcuts() {
+		document.addEventListener('keydown', (event) => {
+			const typing = event.target.matches('input, select, textarea, [contenteditable="true"]');
+			if (typing) return;
+			const sections = ['overview', 'processes', 'logs', 'tests', 'profiles', 'health'];
+			if (/^[1-6]$/.test(event.key)) this.show(sections[Number(event.key) - 1]);
+			else if (event.key.toLowerCase() === 'r') {
+				this.show('tests');
+				this.sections.get('tests')._run();
+			} else if (event.key === '/') {
+				event.preventDefault();
+				this.show('logs');
+				document.querySelector('#script-filter').focus();
+			} else if (event.key === 'Escape' && this.activeSectionId === 'logs') {
+				this.sections.get('logs')._renderEmptyDetail();
+			}
+		});
 	}
 
 	show(sectionId) {
@@ -817,7 +838,7 @@ class ProcessesSection {
 	}
 
 	static Fingerprint(processes) {
-		return processes.map(process => process.processId).sort().join(',');
+		return processes.map(process => `${process.processId}:${process.path}:${process.isMissing || 0}`).sort().join(',');
 	}
 
 	_updateUptimes() {
@@ -847,13 +868,14 @@ class ProcessesSection {
 	_row(process) {
 		const row = document.createElement('tr');
 		row.dataset.processId = process.processId;
+		row.classList.toggle('process-missing', !!process.isMissing);
 		row.innerHTML = `
 			<td>
 				<span class="script-name">${escapeHtml(process.name)}</span>
 				<span class="script-path" title="${escapeHtml(process.path)}">${escapeHtml(process.path)}</span>
 			</td>
-			<td>${escapeHtml(process.processId)}</td>
-			<td>${escapeHtml(StatusStrip.FormatUptime(process.uptimeSeconds))}</td>
+			<td>${process.isMissing ? '—' : escapeHtml(process.processId)}</td>
+			<td>${process.isMissing ? 'missing' : escapeHtml(StatusStrip.FormatUptime(process.uptimeSeconds))}</td>
 			<td class="row-actions"></td>
 		`;
 
@@ -861,12 +883,24 @@ class ProcessesSection {
 			row.querySelector('.script-name').appendChild(Pill('outside the repository', 'neutral'));
 		if (process.isDashboard)
 			row.querySelector('.script-name').appendChild(Pill('this dashboard', 'info'));
+		if (process.isMissing)
+			row.querySelector('.script-name').appendChild(Pill('expected · missing', 'warning'));
 
 		const actions = row.querySelector('.row-actions');
+		if (process.isMissing) {
+			actions.appendChild(this._actionButton('Start', () => this._start(process)));
+			return row;
+		}
 		actions.appendChild(this._actionButton('Restart', () => this._restart(process)));
 		if (!process.isDashboard)
 			actions.appendChild(this._actionButton('Stop', () => this._stop(process), true));
 		return row;
+	}
+
+	_start(process) {
+		const result = AhkDataService.StartExpectedScript(process.name);
+		this.shell.showToast(result.ok ? `${process.name} started` : `Could not start ${process.name}: ${result.error}`);
+		this._forceRedrawOnNextRefresh();
 	}
 
 	_actionButton(label, onClick, danger = false) {

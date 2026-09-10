@@ -13,7 +13,7 @@
 3. Check the AutoHotkey tray menu for the detected profile. Use **Profile** in that menu to switch it if necessary.
 4. Fill only the local secret values needed by your chosen features.
 
-The tray menu also provides **Reload**, **Control Dashboard**, **Test Dashboard**, and **Exit**.
+The tray menu also provides **Reload**, **Control Dashboard**, and **Exit**. Profile switching is available both in its Profile submenu and in the dashboard's Profiles section.
 
 ## Profiles
 
@@ -68,7 +68,7 @@ Shared path resolution normally derives the repository root from `Lib/Core/Paths
 
 ## Troubleshooting
 
-- **A dashboard does not open:** install or repair Microsoft Edge WebView2 Runtime, then inspect the Control Dashboard.
+- **The dashboard does not open:** install or repair Microsoft Edge WebView2 Runtime, then reopen the Control Dashboard.
 - **Checking this machine's setup:** the Control Dashboard's **Health** section reports the AutoHotkey and WebView2 versions, the resolved repository and log paths, the current log session, how much of the secrets catalog has a local value, and the processor use of all AutoHotkey processes together.
 - **The wrong profile is active:** select one from the tray menu and verify its device names in `Profiles/Profile Manager.ahk`.
 - **A secret-backed action does nothing:** check that the matching key in `Secrets/My Secrets.json` contains the expected string or array of strings.

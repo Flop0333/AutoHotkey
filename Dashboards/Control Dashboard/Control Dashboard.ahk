@@ -16,7 +16,7 @@
 #Include ..\..\Lib\Core\Paths.ahk
 #Include Controller.ahk
 
-ShowControlDashboard() {
+ShowControlDashboard(section := "overview") {
 	dashboardWindow := FindControlDashboardWindow()
 	if !dashboardWindow {
 		StartControlDashboard()
@@ -26,7 +26,14 @@ ShowControlDashboard() {
 		WinShow("ahk_id " dashboardWindow)
 		WinActivate("ahk_id " dashboardWindow)
 		MarkAllLogsRead()
+		RequestControlDashboardSection(dashboardWindow, section)
 	}
+}
+
+RequestControlDashboardSection(dashboardWindow, section) {
+	sectionIds := Map("overview", 1, "processes", 2, "logs", 3, "tests", 4, "profiles", 5, "health", 6)
+	if sectionIds.Has(section)
+		PostMessage(0x8001, sectionIds[section], 0, , "ahk_id " dashboardWindow)
 }
 
 HideControlDashboard() {

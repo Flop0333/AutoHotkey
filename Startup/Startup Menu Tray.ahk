@@ -29,7 +29,6 @@ class StartupMenuTray {
         A_TrayMenu.Add("Reload", (*) => SuiteControl.ReloadSuite())
         this._AddProfilesToTrayMenu()
         A_TrayMenu.Add("Control Dashboard", (*) => ShowControlDashboard())
-        A_TrayMenu.Add("Test Dashboard", (*) => RunTests())
         A_TrayMenu.Add("Exit", (*) => SuiteControl.ExitSuite())
     }
 

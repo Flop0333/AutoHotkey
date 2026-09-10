@@ -3,6 +3,7 @@
 #Include ..\..\Lib\Extensions\Json.ahk
 #Include ..\..\Lib\Core\WebView.ahk
 #Include ..\..\Apps Integrated\Suite Control\Suite Control.ahk
+#Include ..\..\Apps Integrated\Suite Control\Startup Scripts.ahk
 #Include ..\..\Profiles\Profile Manager.ahk
 ; The catalog is what the Health section counts against, but a Secret's own
 ; methods reach for the file manager and the prompt UI, so the whole facade has
@@ -57,6 +58,7 @@ Class ControlDashboard extends WebViewToo {
 		; Scripts are addressed by process id, never by path: the page names a
 		; process, and this side decides which script that is.
 		this.AddCallbackToScript("RestartScript", (webview, processId) => this.RestartScript(processId))
+		this.AddCallbackToScript("StartExpectedScript", (webview, scriptName) => this.StartExpectedScript(scriptName))
 		this.AddCallbackToScript("StopScript", (webview, processId) => this.StopScript(processId))
 		this.AddCallbackToScript("OpenLogArchive", (*) => this.OpenLogArchive())
 		this.AddCallbackToScript("OpenLogFolder", (*) => this.OpenLogFolder())
@@ -195,7 +197,8 @@ Class ControlDashboard extends WebViewToo {
 	GetProcessesForWeb() {
 		processes := []
 		startTimes := Map()
-		for script in SuiteControl.ListRunningScripts(false) {
+		runningScripts := SuiteControl.ListRunningScripts(false)
+		for script in runningScripts {
 			if this._startTimes.Has(script.processId)
 				startedAt := this._startTimes[script.processId]
 			else
@@ -212,9 +215,21 @@ Class ControlDashboard extends WebViewToo {
 				"isLoggingHost", this.IsLoggingHost(script.path) ? 1 : 0
 			))
 		}
+		for scriptPath in SuiteControl.FindMissingScripts(runningScripts, SuiteStartupScripts()) {
+			SplitPath(scriptPath, &scriptName)
+			processes.Push(Map("name", scriptName, "path", scriptPath, "processId", 0,
+				"uptimeSeconds", "", "belongsToSuite", 1, "isDashboard", 0,
+				"isLoggingHost", 0, "isMissing", 1))
+		}
 		; Drop the processes that are gone rather than growing the map forever.
 		this._startTimes := startTimes
 		return JSON.Dump(processes)
+	}
+
+	ShowSection(sectionName) {
+		allowed := Map("overview", 1, "processes", 1, "logs", 1, "tests", 1, "profiles", 1, "health", 1)
+		if allowed.Has(sectionName)
+			this.ExecuteScript("window.controlDashboardShell && window.controlDashboardShell.show(" JSON.Dump(sectionName) ")")
 	}
 
 	; The Logger popup is the suite's notification surface; stopping it leaves
@@ -238,6 +253,21 @@ Class ControlDashboard extends WebViewToo {
 			return
 		}
 		throw Error("That script is no longer running")
+	}
+
+	StartExpectedScript(scriptName) {
+		return this.ReportOutcome(() => this.StartExpectedScriptByName(scriptName))
+	}
+
+	StartExpectedScriptByName(scriptName) {
+		for scriptPath in SuiteStartupScripts() {
+			SplitPath(scriptPath, &expectedName)
+			if (expectedName = scriptName) {
+				Run('"' A_AhkPath '" "' scriptPath '"')
+				return
+			}
+		}
+		throw Error("That script is not in the suite startup list")
 	}
 
 	StopScript(processId) {

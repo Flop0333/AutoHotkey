@@ -114,6 +114,19 @@ class SuiteControl {
 		return RegExMatch(windowTitle, "i)^(.+\.ahk) - AutoHotkey v\d", &titleMatch) ? titleMatch[1] : ""
 	}
 
+	; Pure comparison used by the dashboard and unit tests. Paths are compared
+	; case-insensitively because Windows paths are case-insensitive.
+	static FindMissingScripts(runningScripts, expectedPaths) {
+		runningPaths := Map()
+		for script in runningScripts
+			runningPaths[StrLower(script.path)] := true
+		missing := []
+		for scriptPath in expectedPaths
+			if !runningPaths.Has(StrLower(scriptPath))
+				missing.Push(scriptPath)
+		return missing
+	}
+
 	; Local process start time as an AutoHotkey timestamp, or "" when WMI is
 	; unavailable or the process is already gone.
 	static GetProcessStartTime(processId) {

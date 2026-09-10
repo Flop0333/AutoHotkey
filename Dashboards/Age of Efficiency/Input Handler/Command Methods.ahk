@@ -12,7 +12,6 @@
 #Include ..\..\..\Apps Integrated\Timer.ahk
 #Include ..\..\..\Apps Integrated\Status Memes\Status Meme.ahk
 #Include ..\..\..\Apps Integrated\Picture In Picture.ahk
-#Include ..\..\Test Dashboard\Test Dashboard.ahk
 #Include ..\..\Control Dashboard\Control Dashboard.ahk
 #Include ..\..\..\Lib\Apps\Notion.ahk
 #Include ..\..\..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
@@ -42,3 +41,5 @@ StartPictureInPicture() => PictureInPicture()
 CloseOnAllDesktops() => DesktopsDDL.CloseOnAllDesktops()
 
 OpenAutoHotkeyDashboard() => ShowControlDashboard()
+
+RunTests() => ShowControlDashboard("tests")

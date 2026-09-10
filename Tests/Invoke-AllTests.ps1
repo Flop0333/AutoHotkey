@@ -1,14 +1,14 @@
 <#
 .SYNOPSIS
     Runs documentation, architecture, syntax, unit, and integration checks and
-    logs a structured result for the Test Dashboard to display.
+    logs a structured result for the Control Dashboard to display.
 
 .DESCRIPTION
     Each suite script calls `exit` directly, so each one is launched
     as its own child process rather than dot-sourced or called in-process.
 
     Writes Logs\test-run-status.json (current run state, polled by the Test
-    Dashboard while a run is in progress) and appends one JSON line per run to
+    Dashboard Tests section while a run is in progress) and appends one JSON line per run to
     Logs\test-run-history.log (newest run last, same line-delimited-JSON
     convention as Logs\errors.log). Both files live under Logs\, which is
     already git-ignored.
