@@ -20,6 +20,7 @@
 ; - Configure hotkey and sensitivity in Gesture Detector.ahk
 ; ============================================================================
 
+#NoTrayIcon
 #Include ..\..\Lib\Core\OnError.ahk
 #Include Gesture Detector.ahk
 

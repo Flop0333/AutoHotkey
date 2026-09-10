@@ -2,6 +2,7 @@
 ; === Mouse Toys - Custom mouse button and wheel actions =====================
 ; ============================================================================
 
+#NoTrayIcon
 #Include ..\Lib\Core\OnError.ahk
 #Include ..\Profiles\Profile Manager.ahk
 

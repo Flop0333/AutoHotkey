@@ -18,6 +18,7 @@
 ; Note: Requires Capslock Service to be running
 ; ============================================================================
 
+#NoTrayIcon
 #Include ..\Lib\Core\OnError.ahk
 #Include ..\Lib\Helpers\Capslock.ahk
 #Include ..\Lib\Extensions\Win.ahk

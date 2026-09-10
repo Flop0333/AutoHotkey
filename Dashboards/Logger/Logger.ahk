@@ -12,6 +12,7 @@
 ;     until the next log entry
 ; ============================================================================
 
+#NoTrayIcon
 #Include ..\..\Lib\Core\Paths.ahk
 #Include Controller.ahk
 

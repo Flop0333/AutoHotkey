@@ -19,9 +19,9 @@
 ;   Generic: Ctrl+Wheel to zoom in VS Code
 ;   Profile: LButton+N opens Notion on home laptops only
 ; ============================================================================
-
-#Include ..\Lib\Helpers\Capslock.ahk
+#NoTrayIcon
 #Include ..\Lib\Core\OnError.ahk
+#Include ..\Lib\Helpers\Capslock.ahk
 #Include ..\Profiles\Profile Manager.ahk
 #Include ..\Lib\Apps\Notion.ahk
 #Include ..\Lib\Apps\Spotify.ahk

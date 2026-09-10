@@ -1,3 +1,4 @@
+#NoTrayIcon
 #Include ..\Lib\Core\OnError.ahk
 #Include ..\Secrets\Secrets Service.ahk
 

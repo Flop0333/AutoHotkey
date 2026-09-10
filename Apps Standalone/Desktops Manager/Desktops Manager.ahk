@@ -23,6 +23,7 @@
 ;   - Multiple RequiredWindow() per desktop supported
 ; ============================================================================
 
+#NoTrayIcon
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Links.ahk
 #Include ..\..\Lib\Helpers\Capslock.ahk

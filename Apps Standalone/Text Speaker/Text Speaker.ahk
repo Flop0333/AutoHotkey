@@ -9,6 +9,7 @@
 ;   - Last-used voice/volume/speed persist across restarts
 ; ============================================================================
 
+#NoTrayIcon
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Paths.ahk
 #Include ..\..\Lib\Extensions\Json.ahk
