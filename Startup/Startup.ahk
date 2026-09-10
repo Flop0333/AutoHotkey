@@ -27,7 +27,7 @@ RunStartup(profile?) {
         () => StartupMessage(),
         () => StartupMenuTray(),
         () => SecretsFileManager.Initialize(),
-        () => IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetByComputerName(),
+        () => IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetForStartup(),
 
         ; Run this before scripts that set a CapsLock hotkey.
         () => Run(Paths.appsStandalone "\Capslock Service.ahk"),

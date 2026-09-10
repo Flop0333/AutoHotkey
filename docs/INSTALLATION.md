@@ -24,6 +24,7 @@ Profiles let one checkout behave differently on work machines, personal laptops,
 - Add or adjust a `Profile` in the `Profiles` class, then use `ProfileManager.Is(...)` where behavior differs.
 - The selected display name is saved in `Profiles/current_profile.ini`. This generated file is ignored by Git.
 - At startup the device name is checked to match a profile. An unmatched machine uses the `Default` profile.
+- A profile chosen just before a restart is recorded as a one-shot request in the same ignored ini file, so it survives the restart instead of being replaced by device detection. The next start auto-detects again.
 
 ## Secrets
 

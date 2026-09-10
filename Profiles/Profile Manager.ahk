@@ -15,6 +15,7 @@
 
 #Include ..\Lib\Core\Paths.ahk
 #Include ..\Secrets\Secrets Service.ahk
+#Include Profile Request.ahk
 
 Class Profile {
     __New(displayName, deviceName) {
@@ -47,6 +48,33 @@ Class ProfileManager {
         return false
     }
 
+    ; Startup entry point: honor a profile requested before the restart, then
+    ; fall back to auto-detection. Callers that already know the profile call
+    ; Set() directly instead.
+    static SetForStartup() {
+        if requestedProfile := this._TakeRequestedProfile() {
+            this.Set(requestedProfile)
+            return
+        }
+        this.SetByComputerName()
+    }
+
+    ; Record the profile the next suite start should use. Combine with a suite
+    ; reload to switch profiles from outside the Startup process.
+    static RequestProfile(newProfile) {
+        return ProfileRequest.Record(this.iniFile, newProfile.displayName)
+    }
+
+    static _TakeRequestedProfile() {
+        requestedDisplayName := ProfileRequest.Take(this.iniFile)
+        if (requestedDisplayName = "")
+            return ""
+        for profile in this.allProfiles
+            if profile.displayName = requestedDisplayName
+                return profile
+        return "" ; A request for a profile that no longer exists is ignored.
+    }
+
     static SetByComputerName() {
         for profile in this.allProfiles
             for device in profile.deviceName
@@ -64,6 +92,8 @@ Class ProfileManager {
             if profile = newProfile || profile.displayName = newProfile.displayName {
                 this.current := profile
                 this._SaveCurrentProfileToFile()
+                ; An explicit choice supersedes anything still pending.
+                ProfileRequest.Clear(this.iniFile)
                 return
             }
         }
