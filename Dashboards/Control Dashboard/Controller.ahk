@@ -4,8 +4,11 @@
 #Include ..\..\Lib\Core\WebView.ahk
 #Include ..\..\Apps Integrated\Suite Control\Suite Control.ahk
 #Include ..\..\Profiles\Profile Manager.ahk
-#Include ..\..\Secrets\Secret.ahk
-#Include ..\..\Secrets\Secrets Catalog.ahk
+; The catalog is what the Health section counts against, but a Secret's own
+; methods reach for the file manager and the prompt UI, so the whole facade has
+; to be present or those references fail at load time - which is exactly what
+; broke the three logging hosts when only the catalog was included here.
+#Include ..\..\Secrets\Secrets Service.ahk
 #Include Test Run Status.ahk
 
 Class ControlDashboard extends WebViewToo {
