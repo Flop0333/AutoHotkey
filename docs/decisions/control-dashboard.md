@@ -1,6 +1,6 @@
 # AutoHotkey Control Dashboard: design record
 
-This is a forward-looking design record for reworking the Log Dashboard into an **AutoHotkey Control Dashboard**: one WebView2 cockpit for the running suite. Nothing here is implemented yet. Implementation is tracked by the tickets linked from the Control Dashboard epic on [Project 8](https://github.com/users/Flop0333/projects/8); the shipped code, `Startup/Startup.ahk`, and the focused documents remain authoritative once work lands.
+This is the design record for reworking the Log Dashboard into an **AutoHotkey Control Dashboard**: one WebView2 cockpit for the running suite. It is being implemented in phases, tracked by the tickets linked from the Control Dashboard epic on [Project 8](https://github.com/users/Flop0333/projects/8); the shipped code, `Startup/Startup.ahk`, and the focused documents are authoritative for anything already delivered.
 
 ## Goal
 

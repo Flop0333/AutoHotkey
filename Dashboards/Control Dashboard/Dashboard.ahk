@@ -5,7 +5,7 @@ Persistent(true)
 
 TraySetIcon(Paths.autoHotkeyIcon)
 
-myLogDashboard := LogDashboard()
-myLogDashboard.InitializeHidden()
+myControlDashboard := ControlDashboard()
+myControlDashboard.InitializeHidden()
 
-#Include Log Dashboard.ahk
+#Include Control Dashboard.ahk

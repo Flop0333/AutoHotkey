@@ -29,7 +29,7 @@
 #Include ..\..\Lib\Apps\Spotify.ahk
 #Include ..\..\Lib\Apps\Notion.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
-#Include ..\Log Dashboard\Log Dashboard.ahk
+#Include ..\Control Dashboard\Control Dashboard.ahk
 
 ; ===========================================================================
 ; === ACTIONS REGISTRATION ==================================================
@@ -52,7 +52,7 @@ KillAndReloadAllAHkProcesses() => SuiteControl.ReloadSuite()
 ; ============================================================================
 
 buttons := [
-    Button(ShowLogDashboard, "Log Dashboard", "log dashboard.gif"),
+    Button(ShowControlDashboard, "Control Dashboard", "log dashboard.gif"),
     Button(KillAndReloadAllAHkProcesses, "Reload AutoHotkey" , "Reload button.gif"),
     Button(KillAllAHkProcesses, "Kill All AHK Processes", "Kill all AHK processes.gif"),
     Button(PullAllWindowsToCurrentDesktop, "Pull All Windows to Current Desktop", "Pull all windows to current desktop.gif"),

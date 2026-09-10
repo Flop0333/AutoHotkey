@@ -8,7 +8,7 @@
 ;   - Shows notifying entries immediately, then hides 5 seconds after the latest
 ;   - Collapsed rows for info/warning/error with running counts; the row for
 ;     the latest not-yet-seen entry expands to show its script + message
-;   - Left-click opens the Log Dashboard; right-click dismisses the popup
+;   - Left-click opens the Control Dashboard; right-click dismisses the popup
 ;     until the next log entry
 ; ============================================================================
 

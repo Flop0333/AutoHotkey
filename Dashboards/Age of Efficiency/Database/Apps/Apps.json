@@ -117,7 +117,7 @@
 		"command": "AL",
 		"icon": "AutoHotkey",
 		"id": 18,
-		"title": "AutoHotkey Log Dashboard"
+		"title": "AutoHotkey Control Dashboard"
 	},
 	{
 		"action": "RunTests",

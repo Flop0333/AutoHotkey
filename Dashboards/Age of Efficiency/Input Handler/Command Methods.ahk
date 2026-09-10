@@ -13,7 +13,7 @@
 #Include ..\..\..\Apps Integrated\Status Memes\Status Meme.ahk
 #Include ..\..\..\Apps Integrated\Picture In Picture.ahk
 #Include ..\..\Test Dashboard\Test Dashboard.ahk
-#Include ..\..\Log Dashboard\Log Dashboard.ahk
+#Include ..\..\Control Dashboard\Control Dashboard.ahk
 #Include ..\..\..\Lib\Apps\Notion.ahk
 #Include ..\..\..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
 #Include ..\..\..\Lib\Helpers\System.ahk
@@ -41,4 +41,4 @@ StartPictureInPicture() => PictureInPicture()
 
 CloseOnAllDesktops() => DesktopsDDL.CloseOnAllDesktops()
 
-OpenAutoHotkeyDashboard() => ShowLogDashboard()
+OpenAutoHotkeyDashboard() => ShowControlDashboard()

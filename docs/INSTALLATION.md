@@ -13,7 +13,7 @@
 3. Check the AutoHotkey tray menu for the detected profile. Use **Profile** in that menu to switch it if necessary.
 4. Fill only the local secret values needed by your chosen features.
 
-The tray menu also provides **Reload**, **Log Dashboard**, **Test Dashboard**, and **Exit**.
+The tray menu also provides **Reload**, **Control Dashboard**, **Test Dashboard**, and **Exit**.
 
 ## Profiles
 
@@ -52,7 +52,7 @@ Most features tolerate empty values until that specific action is used.
 
 The exact current list is documented in the [app catalog](APPS.md) and expressed by the `Run(...)` calls inside `RunStartup()`.
 
-Logging initialization deletes the active `Logs/errors.log` and `Logs/errors.read` files. The Log Dashboard therefore shows the current suite session; earlier error sessions are not archived.
+Logging initialization archives the active `Logs/errors.log` and resets `Logs/errors.read`. The Control Dashboard therefore shows the current suite session; earlier sessions stay available under `Logs/Archive`.
 
 To change auto-run behavior, add, remove, or reorder those calls. Keep the CapsLock service ahead of its consumers.
 
@@ -68,7 +68,7 @@ Shared path resolution normally derives the repository root from `Lib/Core/Paths
 
 ## Troubleshooting
 
-- **A dashboard does not open:** install or repair Microsoft Edge WebView2 Runtime, then inspect the Log Dashboard.
+- **A dashboard does not open:** install or repair Microsoft Edge WebView2 Runtime, then inspect the Control Dashboard.
 - **The wrong profile is active:** select one from the tray menu and verify its device names in `Profiles/Profile Manager.ahk`.
 - **A secret-backed action does nothing:** check that the matching key in `Secrets/My Secrets.json` contains the expected string or array of strings.
 - **The suite behaves inconsistently after edits:** choose **Reload** from the tray menu.

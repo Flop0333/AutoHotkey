@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 class TestDashboardView {
 
-	static POLL_INTERVAL_MS = 1000; // matches Dashboards/Log Dashboard's own polling cadence
+	static POLL_INTERVAL_MS = 1000; // matches Dashboards/Control Dashboard's own polling cadence
 
 	constructor() {
 		this.runs = AhkDataService.GetTestRuns();
@@ -38,7 +38,7 @@ class TestDashboardView {
 		});
 	}
 
-	// Polls run status (same cadence as Log Dashboard's entry polling) so the
+	// Polls run status (same cadence as the Control Dashboard's entry polling) so the
 	// UI reflects a run kicked off from here, from the tray menu, or from
 	// Tests\Run-Tests.ahk directly.
 	_checkStatus() {

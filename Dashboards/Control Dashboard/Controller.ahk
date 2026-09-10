@@ -3,16 +3,16 @@
 #Include ..\..\Lib\Extensions\Json.ahk
 #Include ..\..\Lib\Core\WebView.ahk
 
-Class LogDashboard extends WebViewToo {
-	static WIN_TITLE := "AutoHotkey Error Logger - Log Dashboard"
-	static INITIALIZING_TITLE := "AutoHotkey Log Dashboard - Initializing"
+Class ControlDashboard extends WebViewToo {
+	static WIN_TITLE := "AutoHotkey Control Dashboard"
+	static INITIALIZING_TITLE := "AutoHotkey Control Dashboard - Initializing"
 	static SHOW_OPTIONS := Format("w{} h{}", Round(A_ScreenWidth * 0.85), Round(A_ScreenHeight * 0.75))
 
 	__New() {
 		super.__New()
-		this.Gui.Title := LogDashboard.INITIALIZING_TITLE
+		this.Gui.Title := ControlDashboard.INITIALIZING_TITLE
 		this.Gui.OnEvent("Close", (*) => this.Hide())
-		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Log Dashboard\User Interface", 0) ; block cors error, allow loading local files
+		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Control Dashboard\User Interface", 0) ; block cors error, allow loading local files
 		this.Load("http://app.local/index.html")
 		this.AddCallbackToScript("GetLogEntries", (*) => this.GetLogEntriesForWeb())
 		this.AddCallbackToScript("SetClipboard", (webview, text) => A_Clipboard := text)
@@ -26,14 +26,14 @@ Class LogDashboard extends WebViewToo {
 		Run('explorer.exe "' ErrorLogArchiveDirectory() '"')
 	}
 
-	Show() => super.Show(LogDashboard.SHOW_OPTIONS, LogDashboard.WIN_TITLE)
+	Show() => super.Show(ControlDashboard.SHOW_OPTIONS, ControlDashboard.WIN_TITLE)
 
 	InitializeHidden() {
 		; WIN_TITLE is also the cross-process readiness signal. Publish it only
 		; after the initial Hide has completed so a waiting caller cannot show
 		; this window just before the host hides it again.
-		super.Show("Hide " LogDashboard.SHOW_OPTIONS, LogDashboard.INITIALIZING_TITLE)
-		this.Gui.Title := LogDashboard.WIN_TITLE
+		super.Show("Hide " ControlDashboard.SHOW_OPTIONS, ControlDashboard.INITIALIZING_TITLE)
+		this.Gui.Title := ControlDashboard.WIN_TITLE
 	}
 
 	Close() => this.Hide()
@@ -49,7 +49,7 @@ Class LogDashboard extends WebViewToo {
 	)
 
 	LogTestMessage(severity) {
-		message := LogDashboard.TestMessages.Get(severity, "Test message")
+		message := ControlDashboard.TestMessages.Get(severity, "Test message")
 		switch severity {
 			case "info": LogAndNotifyInfo(message)
 			case "warning": LogAndNotifyWarning(message)

@@ -1,9 +1,9 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-	new LogDashboardView().render();
+	new ControlDashboardView().render();
 });
 
-class LogDashboardView {
+class ControlDashboardView {
 
 	static POLL_INTERVAL_MS = 1000; // matches Dashboards/Logger's own polling cadence
 
@@ -28,7 +28,7 @@ class LogDashboardView {
 		this._attachEvents();
 		this._renderRows();
 		this._loadGitStatus();
-		setInterval(() => this._checkForUpdates(), LogDashboardView.POLL_INTERVAL_MS);
+		setInterval(() => this._checkForUpdates(), ControlDashboardView.POLL_INTERVAL_MS);
 	}
 
 	// Entries are plain objects re-created on every fetch, so object identity

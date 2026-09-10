@@ -23,7 +23,7 @@ Test_ParseScriptPath_ReadsAnAlphaVersionTitle() {
 }
 
 Test_ParseScriptPath_IgnoresAGuiWindowTitle() {
-    Assert.Equal("", SuiteControl.ParseScriptPathFromWindowTitle("AutoHotkey Error Logger - Log Dashboard"))
+    Assert.Equal("", SuiteControl.ParseScriptPathFromWindowTitle("AutoHotkey Control Dashboard"))
 }
 
 Test_ParseScriptPath_IgnoresAnUnrelatedWindowTitle() {
