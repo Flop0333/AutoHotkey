@@ -257,6 +257,68 @@ body {
 	padding: 16px;
 }
 
+/* === Overview ============================================================ */
+.card-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+	gap: var(--gap);
+}
+
+.stat {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+}
+
+.stat-label {
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.stat-value {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+	font-size: 18px;
+	font-weight: 600;
+	word-break: break-word;
+}
+
+/* A branch name is long and not a headline number. */
+.stat-value-compact {
+	font-size: 14px;
+}
+
+.stat-note {
+	font-size: 11px;
+	color: var(--muted);
+}
+
+.group-title {
+	margin: 24px 0 4px;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.group-note {
+	margin: 0 0 10px;
+	color: var(--muted);
+	max-width: 68ch;
+}
+
+.action-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
 .placeholder {
 	max-width: 760px;
 }

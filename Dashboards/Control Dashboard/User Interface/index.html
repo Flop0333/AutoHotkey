@@ -55,9 +55,50 @@
           <h1>Overview</h1>
           <p class="section-subtitle">Suite state at a glance, with the actions worth one click.</p>
         </header>
-        <div class="card placeholder">
-          <p class="placeholder-title">Not built yet</p>
-          <p class="placeholder-body">Profile, uptime, running scripts, unread log counts, and the reload, exit, and test-notification actions land here. Until then the strip above carries the state, and the tray menu carries the actions.</p>
+        <div class="card-grid">
+          <div class="card stat">
+            <span class="stat-label">Profile</span>
+            <span class="stat-value" id="overview-profile">…</span>
+          </div>
+          <div class="card stat">
+            <span class="stat-label">Session</span>
+            <span class="stat-value" id="overview-uptime">…</span>
+            <span class="stat-note">since the suite started</span>
+          </div>
+          <div class="card stat">
+            <span class="stat-label">Running scripts</span>
+            <span class="stat-value" id="overview-scripts">…</span>
+          </div>
+          <div class="card stat">
+            <span class="stat-label">Unread log entries</span>
+            <span class="stat-value pill-row" id="overview-unread"></span>
+            <span class="stat-note" id="overview-entries"></span>
+          </div>
+          <div class="card stat">
+            <span class="stat-label">Last test run</span>
+            <span class="stat-value pill-row" id="overview-tests"></span>
+            <span class="stat-note" id="overview-tests-note"></span>
+          </div>
+          <div class="card stat">
+            <span class="stat-label">Repository</span>
+            <span class="stat-value stat-value-compact" id="overview-branch">…</span>
+            <span class="stat-note" id="overview-branch-note"></span>
+          </div>
+        </div>
+
+        <h2 class="group-title">Suite</h2>
+        <div class="action-row">
+          <button type="button" class="button button-danger" id="action-reload">Reload suite</button>
+          <button type="button" class="button button-danger" id="action-exit">Exit suite</button>
+          <button type="button" class="button" id="action-run-tests">Run all tests</button>
+        </div>
+
+        <h2 class="group-title">Send a test notification</h2>
+        <p class="group-note">Writes a real log entry through the same path the suite uses, so the Logger popup reacts exactly as it would for a real one.</p>
+        <div class="action-row">
+          <button type="button" class="button" data-test-severity="info">Info</button>
+          <button type="button" class="button" data-test-severity="warning">Warning</button>
+          <button type="button" class="button" data-test-severity="error">Error</button>
         </div>
       </section>
 

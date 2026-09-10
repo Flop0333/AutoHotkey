@@ -24,7 +24,7 @@ class ControlDashboardShell {
 	}
 
 	start() {
-		this._register(new PlaceholderSection('overview'));
+		this._register(new OverviewSection(this));
 		this._register(new PlaceholderSection('processes'));
 		this._register(new LogsSection(this));
 		this._register(new PlaceholderSection('tests'));
@@ -39,7 +39,7 @@ class ControlDashboardShell {
 
 		this.show(ControlDashboardShell.DEFAULT_SECTION);
 		this._refreshStatus();
-		this._loadGitStatus();
+		this.refreshGitStatus();
 		setInterval(() => this._tick(), ControlDashboardShell.POLL_INTERVAL_MS);
 	}
 
@@ -77,33 +77,43 @@ class ControlDashboardShell {
 	// Only the visible section is refreshed, so navigation, filters, and an open
 	// detail panel survive every tick.
 	_tick() {
-		this._refreshStatus();
-		const active = this.sections.get(this.activeSectionId);
-		if (active)
-			this._guard(() => active.refresh());
+		this._guard(() => {
+			// One read per tick, shared by the strip and the visible section.
+			const status = AhkDataService.GetSuiteStatus();
+			this.statusStrip.render(status);
+			const active = this.sections.get(this.activeSectionId);
+			if (active)
+				active.refresh(status);
+		});
 	}
 
 	_refreshStatus() {
 		this._guard(() => this.statusStrip.render(AhkDataService.GetSuiteStatus()));
 	}
 
-	async _loadGitStatus() {
+	// Reading git status starts a process, so it is loaded on demand rather than
+	// polled: once at startup, and again whenever a section asks for it.
+	async refreshGitStatus() {
 		const gitStatus = document.querySelector('#git-status');
 		try {
-			const status = await AhkDataService.GetGitStatus();
-			if (!status.branch) {
-				gitStatus.textContent = '';
-				return;
-			}
-			const ahead = Number(status.ahead) || 0;
-			const behind = Number(status.behind) || 0;
-			let text = status.branch;
-			if (ahead) text += ` ↑${ahead}`;
-			if (behind) text += ` ↓${behind}`;
-			gitStatus.textContent = text;
+			this.git = await AhkDataService.GetGitStatus();
+			gitStatus.textContent = ControlDashboardShell.FormatGitStatus(this.git);
 		} catch (error) {
+			this.git = { error: error.message };
 			gitStatus.textContent = 'git-status error: ' + error.message;
 		}
+		return this.git;
+	}
+
+	static FormatGitStatus(status) {
+		if (!status || !status.branch)
+			return '';
+		const ahead = Number(status.ahead) || 0;
+		const behind = Number(status.behind) || 0;
+		let text = status.branch;
+		if (ahead) text += ` ↑${ahead}`;
+		if (behind) text += ` ↓${behind}`;
+		return text;
 	}
 
 	// A failing bridge call must not kill the polling interval.
@@ -221,7 +231,129 @@ class PlaceholderSection {
 
 	activate() {}
 
-	refresh() {}
+	refresh(status) {}
+}
+
+// Suite state at a glance, plus the actions worth one click. Every action
+// confirms in the page when it is destructive, and reports its outcome.
+class OverviewSection {
+
+	constructor(shell) {
+		this.id = 'overview';
+		this.shell = shell;
+		this.element = document.querySelector('#section-overview');
+		this.profile = this.element.querySelector('#overview-profile');
+		this.uptime = this.element.querySelector('#overview-uptime');
+		this.scripts = this.element.querySelector('#overview-scripts');
+		this.unread = this.element.querySelector('#overview-unread');
+		this.entries = this.element.querySelector('#overview-entries');
+		this.tests = this.element.querySelector('#overview-tests');
+		this.testsNote = this.element.querySelector('#overview-tests-note');
+		this.branch = this.element.querySelector('#overview-branch');
+		this.branchNote = this.element.querySelector('#overview-branch-note');
+		this.wired = false;
+	}
+
+	activate() {
+		if (!this.wired) {
+			this._attachEvents();
+			this.wired = true;
+		}
+		this.shell.refreshGitStatus().then(git => this._renderGit(git));
+	}
+
+	refresh(status) {
+		this.profile.textContent = status.profile || 'unknown';
+		this.uptime.textContent = StatusStrip.FormatUptime(status.uptimeSeconds);
+		this.scripts.textContent = Number(status.runningScripts) || 0;
+		this.entries.textContent = `${Number(status.entryCount) || 0} entries this session`;
+		this._renderUnread(status.unread || {});
+		this._renderTests(status.tests || {});
+	}
+
+	_renderUnread(unread) {
+		const severities = ['error', 'warning', 'info'];
+		const present = severities.filter(severity => Number(unread[severity]) > 0);
+		this.unread.replaceChildren(...(present.length
+			? present.map(severity => Pill(`${unread[severity]} ${severity}`, severity))
+			: [Pill('all read', 'neutral')]));
+	}
+
+	_renderTests(tests) {
+		if (tests.status === 'running') {
+			this.tests.replaceChildren(Pill('running…', 'info'));
+			this.testsNote.textContent = '';
+			return;
+		}
+		if (!tests.lastRunStatus) {
+			this.tests.replaceChildren(Pill('no runs yet', 'neutral'));
+			this.testsNote.textContent = 'Nothing has run in this session.';
+			return;
+		}
+		const passed = tests.lastRunStatus === 'PASS';
+		this.tests.replaceChildren(Pill(passed ? 'passed' : 'failed', passed ? 'success' : 'error'));
+		this.testsNote.textContent = tests.lastRunAt ? `Finished ${tests.lastRunAt.replace('T', ' ').slice(0, 19)}` : '';
+	}
+
+	_renderGit(git) {
+		if (git && git.error) {
+			this.branch.textContent = 'unavailable';
+			this.branchNote.textContent = git.error;
+			return;
+		}
+		this.branch.textContent = (git && git.branch) || 'unknown';
+		const ahead = Number(git && git.ahead) || 0;
+		const behind = Number(git && git.behind) || 0;
+		this.branchNote.textContent = ahead || behind
+			? `${ahead} ahead, ${behind} behind`
+			: 'in step with the remote';
+	}
+
+	_attachEvents() {
+		this.element.querySelector('#action-reload').addEventListener('click', () => this._reload());
+		this.element.querySelector('#action-exit').addEventListener('click', () => this._exit());
+		this.element.querySelector('#action-run-tests').addEventListener('click', () => this._runTests());
+		this.element.querySelectorAll('[data-test-severity]').forEach(button =>
+			button.addEventListener('click', () => this._sendTestMessage(button.dataset.testSeverity)));
+	}
+
+	async _reload() {
+		const confirmed = await this.shell.confirm({
+			title: 'Reload the suite?',
+			message: 'Every AutoHotkey script is closed and started again, this dashboard included. It comes back the next time you open it.',
+			confirmLabel: 'Reload'
+		});
+		if (!confirmed)
+			return;
+		this.shell.showToast('Reloading the suite…');
+		AhkDataService.ReloadSuite();
+	}
+
+	async _exit() {
+		const confirmed = await this.shell.confirm({
+			title: 'Exit the suite?',
+			message: 'Every AutoHotkey script is closed, this dashboard included. Nothing comes back until you start the suite again from Startup.ahk.',
+			confirmLabel: 'Exit'
+		});
+		if (!confirmed)
+			return;
+		this.shell.showToast('Closing the suite…');
+		AhkDataService.ExitSuite();
+	}
+
+	_runTests() {
+		const result = AhkDataService.RunAllTests();
+		this.shell.showToast(result.ok
+			? 'Test run started - watch the Tests strip above'
+			: `Could not start the tests: ${result.error}`);
+	}
+
+	_sendTestMessage(severity) {
+		const result = AhkDataService.LogTestMessage(severity);
+		this.shell.showToast(result.ok
+			? `Test ${severity} entry logged`
+			: `Could not log the test entry: ${result.error}`);
+	}
 }
 
 // The structured log view: filter, sort, inspect, and copy entries from
@@ -265,7 +397,7 @@ class LogsSection {
 
 	// Applies new entries without resetting filters, sort, or the open detail
 	// view - unlike a manual _refresh(), which is a deliberate full reset.
-	refresh() {
+	refresh(status) {
 		const fresh = AhkDataService.GetLogEntries();
 		if (fresh.length === this.entries.length)
 			return;
@@ -316,7 +448,9 @@ class LogsSection {
 		this.openArchiveButton.addEventListener('click', () => AhkDataService.OpenLogArchive());
 		this.testButtons.forEach(button => {
 			button.addEventListener('click', () => {
-				AhkDataService.LogTestMessage(button.dataset.severity);
+				const result = AhkDataService.LogTestMessage(button.dataset.severity);
+				if (!result.ok)
+					this.shell.showToast(`Could not log the test entry: ${result.error}`);
 				this._reset();
 			});
 		});

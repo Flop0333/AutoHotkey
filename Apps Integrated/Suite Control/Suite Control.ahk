@@ -72,7 +72,9 @@ class SuiteControl {
 	; Every running AutoHotkey script, newest window order aside, as SuiteScript
 	; objects. GUI windows are skipped: only a script's main window carries the
 	; "<path>.ahk - AutoHotkey v..." title this parses.
-	static ListRunningScripts() {
+	; includeStartTime is opt-out because reading it queries WMI once per process:
+	; a caller that only counts scripts should not pay for that every poll tick.
+	static ListRunningScripts(includeStartTime := true) {
 		scripts := []
 		seenProcessIds := Map()
 		previousDetectHiddenWindows := A_DetectHiddenWindows
@@ -93,7 +95,8 @@ class SuiteControl {
 					continue
 				seenProcessIds[processId] := true
 
-				scripts.Push(SuiteScript(scriptPath, processId, windowHandle, this.GetProcessStartTime(processId)))
+				startedAt := includeStartTime ? this.GetProcessStartTime(processId) : ""
+				scripts.Push(SuiteScript(scriptPath, processId, windowHandle, startedAt))
 			}
 		} finally {
 			SetTitleMatchMode(previousTitleMatchMode)
@@ -135,7 +138,7 @@ class SuiteControl {
 		if (Trim(scriptPath) = "")
 			throw ValueError("A script path is required to restart a script", -1)
 
-		for script in this.ListRunningScripts()
+		for script in this.ListRunningScripts(false)
 			if (script.path = scriptPath)
 				this.StopScript(script.processId)
 
@@ -150,7 +153,7 @@ class SuiteControl {
 		if (processId = this._CurrentProcessId())
 			return false
 
-		for script in this.ListRunningScripts() {
+		for script in this.ListRunningScripts(false) {
 			if (script.processId != processId)
 				continue
 			previousDetectHiddenWindows := A_DetectHiddenWindows
