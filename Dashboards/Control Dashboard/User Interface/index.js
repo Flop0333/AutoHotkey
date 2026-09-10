@@ -25,10 +25,10 @@ class ControlDashboardShell {
 
 	start() {
 		this._register(new OverviewSection(this));
-		this._register(new PlaceholderSection('processes'));
+		this._register(new ProcessesSection(this));
 		this._register(new LogsSection(this));
 		this._register(new PlaceholderSection('tests'));
-		this._register(new PlaceholderSection('profiles'));
+		this._register(new ProfilesSection(this));
 		this._register(new HealthSection(this));
 
 		this.rail.addEventListener('click', (event) => {
@@ -532,6 +532,210 @@ class LogsSection {
 			const details = `${entry.severity.toUpperCase()}: ${entry.message}\nScript: ${entry.script}\nTime: ${entry.timestamp}\n\n${entry.stack || '(no stack trace)'}`;
 			this._copyToClipboard(details, 'Error details copied to clipboard');
 		});
+	}
+}
+
+// Which profile is active, which machine names map to each one, and switching
+// into another - which needs a suite restart to take effect.
+class ProfilesSection {
+
+	constructor(shell) {
+		this.id = 'profiles';
+		this.shell = shell;
+		this.element = document.querySelector('#section-profiles');
+		this.origin = this.element.querySelector('#profile-origin');
+		this.list = this.element.querySelector('#profile-list');
+	}
+
+	activate() {
+		this.refresh();
+	}
+
+	// Profiles only change across a restart, so this reads once per visit
+	// rather than on every tick.
+	refresh() {
+		if (this.list.childElementCount)
+			return;
+		this._render(AhkDataService.GetProfiles());
+	}
+
+	_render(state) {
+		this.origin.textContent = state.origin === 'detected'
+			? `This computer is ${state.computerName}, which matches the ${state.current} profile.`
+			: `This computer is ${state.computerName}. The ${state.current} profile was chosen by hand; it does not match this machine's name.`;
+
+		this.list.replaceChildren(...(state.profiles || []).map(profile => this._card(profile)));
+	}
+
+	_card(profile) {
+		const card = document.createElement('div');
+		card.className = 'card stat';
+		card.innerHTML = `
+			<span class="stat-label">Profile</span>
+			<span class="stat-value stat-value-compact">${escapeHtml(profile.displayName)}</span>
+			<span class="stat-note">${profile.devices.length
+				? escapeHtml(profile.devices.join(', '))
+				: 'no device names; never auto-detected'}</span>
+		`;
+
+		const actions = document.createElement('div');
+		actions.className = 'action-row profile-actions';
+		if (profile.isCurrent) {
+			actions.appendChild(Pill('active', 'success'));
+		} else {
+			const button = document.createElement('button');
+			button.type = 'button';
+			button.className = 'button';
+			button.textContent = 'Switch and reload';
+			button.addEventListener('click', () => this._switch(profile));
+			actions.appendChild(button);
+		}
+		card.appendChild(actions);
+		return card;
+	}
+
+	async _switch(profile) {
+		const confirmed = await this.shell.confirm({
+			title: `Switch to ${profile.displayName}?`,
+			message: 'The suite restarts into that profile, this dashboard included. Anything the current profile started is closed first.',
+			confirmLabel: 'Switch and reload'
+		});
+		if (!confirmed)
+			return;
+
+		const result = AhkDataService.RequestProfile(profile.displayName);
+		if (!result.ok) {
+			this.shell.showToast(`Could not switch profile: ${result.error}`);
+			return;
+		}
+		this.shell.showToast(`Reloading into ${profile.displayName}…`);
+		AhkDataService.ReloadSuite();
+	}
+}
+
+// The AutoHotkey processes that make up the running suite, with restart and
+// stop per script. Rows are keyed by process id so a refresh can redraw
+// without losing the scroll position or what the user is reading.
+class ProcessesSection {
+
+	constructor(shell) {
+		this.id = 'processes';
+		this.shell = shell;
+		this.element = document.querySelector('#section-processes');
+		this.tableBody = this.element.querySelector('#process-table tbody');
+		this.tableWrap = this.element.querySelector('.table-wrap');
+		this.processes = [];
+	}
+
+	activate() {
+		this.refresh();
+	}
+
+	refresh() {
+		const processes = AhkDataService.GetProcesses();
+		const changed = ProcessesSection.Fingerprint(this.processes) !== ProcessesSection.Fingerprint(processes);
+		this.processes = processes;
+		// Uptime ticks every second; redrawing the table for that alone would
+		// fight the user's scrolling, so only a changed set of processes
+		// redraws and the uptime cells are updated in place.
+		if (changed)
+			this._renderRows();
+		else
+			this._updateUptimes();
+	}
+
+	static Fingerprint(processes) {
+		return processes.map(process => process.processId).sort().join(',');
+	}
+
+	_updateUptimes() {
+		for (const process of this.processes) {
+			const row = this.tableBody.querySelector(`tr[data-process-id="${process.processId}"]`);
+			if (row)
+				row.children[2].textContent = StatusStrip.FormatUptime(process.uptimeSeconds);
+		}
+	}
+
+	_renderRows() {
+		const scrollTop = this.tableWrap.scrollTop;
+		this.tableBody.innerHTML = '';
+
+		if (!this.processes.length) {
+			this.tableBody.innerHTML = '<tr><td colspan="4" class="empty-state">No AutoHotkey processes are running.</td></tr>';
+			return;
+		}
+
+		this.processes
+			.slice()
+			.sort((a, b) => a.name.localeCompare(b.name))
+			.forEach(process => this.tableBody.appendChild(this._row(process)));
+		this.tableWrap.scrollTop = scrollTop;
+	}
+
+	_row(process) {
+		const row = document.createElement('tr');
+		row.dataset.processId = process.processId;
+		row.innerHTML = `
+			<td>
+				<span class="script-name">${escapeHtml(process.name)}</span>
+				<span class="script-path" title="${escapeHtml(process.path)}">${escapeHtml(process.path)}</span>
+			</td>
+			<td>${escapeHtml(process.processId)}</td>
+			<td>${escapeHtml(StatusStrip.FormatUptime(process.uptimeSeconds))}</td>
+			<td class="row-actions"></td>
+		`;
+
+		if (!process.belongsToSuite)
+			row.querySelector('.script-name').appendChild(Pill('outside the repository', 'neutral'));
+		if (process.isDashboard)
+			row.querySelector('.script-name').appendChild(Pill('this dashboard', 'info'));
+
+		const actions = row.querySelector('.row-actions');
+		actions.appendChild(this._actionButton('Restart', () => this._restart(process)));
+		if (!process.isDashboard)
+			actions.appendChild(this._actionButton('Stop', () => this._stop(process), true));
+		return row;
+	}
+
+	_actionButton(label, onClick, danger = false) {
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.className = danger ? 'button button-danger' : 'button';
+		button.textContent = label;
+		button.addEventListener('click', onClick);
+		return button;
+	}
+
+	_restart(process) {
+		const result = AhkDataService.RestartScript(process.processId);
+		this.shell.showToast(result.ok
+			? `${process.name} restarted`
+			: `Could not restart ${process.name}: ${result.error}`);
+		this._forceRedrawOnNextRefresh();
+	}
+
+	async _stop(process) {
+		const confirmed = await this.shell.confirm({
+			title: `Stop ${process.name}?`,
+			message: process.isLoggingHost
+				? 'This is the Logger host: stopping it leaves the suite unable to show notifications until the next reload.'
+				: 'The script stops until you restart it or reload the suite. Nothing else is affected.',
+			confirmLabel: 'Stop'
+		});
+		if (!confirmed)
+			return;
+
+		const result = AhkDataService.StopScript(process.processId);
+		this.shell.showToast(result.ok
+			? `${process.name} stopped`
+			: `Could not stop ${process.name}: ${result.error}`);
+		this._forceRedrawOnNextRefresh();
+	}
+
+	// A restarted script keeps its name but changes process id, so the next
+	// refresh must compare against something that cannot match.
+	_forceRedrawOnNextRefresh() {
+		this.processes = [];
 	}
 }
 

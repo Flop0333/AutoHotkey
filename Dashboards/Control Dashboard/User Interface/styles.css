@@ -249,6 +249,47 @@ body {
 	color: var(--muted);
 }
 
+/* A section that scrolls its own table rather than the page. */
+.section-scroll {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.table-wrap-inset {
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--surface);
+}
+
+.actions-column {
+	width: 170px;
+}
+
+.row-actions {
+	display: flex;
+	gap: 6px;
+}
+
+.row-actions .button {
+	padding: 2px 8px;
+	font-size: 11px;
+}
+
+.script-name {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.script-path {
+	display: block;
+	font-size: 11px;
+	color: var(--muted);
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 /* === Components ========================================================== */
 .card {
 	background: var(--surface);
@@ -286,6 +327,10 @@ body {
 	font-size: 18px;
 	font-weight: 600;
 	word-break: break-word;
+}
+
+.profile-actions {
+	margin-top: 4px;
 }
 
 /* A branch name is long and not a headline number. */

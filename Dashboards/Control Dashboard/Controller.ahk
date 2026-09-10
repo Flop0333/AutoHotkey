@@ -3,6 +3,7 @@
 #Include ..\..\Lib\Extensions\Json.ahk
 #Include ..\..\Lib\Core\WebView.ahk
 #Include ..\..\Apps Integrated\Suite Control\Suite Control.ahk
+#Include ..\..\Profiles\Profile Manager.ahk
 #Include ..\..\Secrets\Secret.ahk
 #Include ..\..\Secrets\Secrets Catalog.ahk
 #Include Test Run Status.ahk
@@ -27,6 +28,9 @@ Class ControlDashboard extends WebViewToo {
 		; Processor use is a rate between two samples; these hold the last one.
 		this._cpuTicks := 0
 		this._cpuSampledAt := 0
+		; Process start times come from WMI, so they are read once per process
+		; instead of on every poll of the Processes section.
+		this._startTimes := Map()
 		this.Gui.Title := ControlDashboard.INITIALIZING_TITLE
 		this.Gui.OnEvent("Close", (*) => this.Hide())
 		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Control Dashboard\User Interface", 0) ; block cors error, allow loading local files
@@ -42,6 +46,13 @@ Class ControlDashboard extends WebViewToo {
 		this.AddCallbackToScript("ExitSuite", (*) => this.ExitSuite())
 		this.AddCallbackToScript("RunAllTests", (*) => this.RunAllTests())
 		this.AddCallbackToScript("GetHealth", (*) => this.GetHealthForWeb())
+		this.AddCallbackToScript("GetProcesses", (*) => this.GetProcessesForWeb())
+		this.AddCallbackToScript("GetProfiles", (*) => this.GetProfilesForWeb())
+		this.AddCallbackToScript("RequestProfile", (webview, displayName) => this.RequestProfile(displayName))
+		; Scripts are addressed by process id, never by path: the page names a
+		; process, and this side decides which script that is.
+		this.AddCallbackToScript("RestartScript", (webview, processId) => this.RestartScript(processId))
+		this.AddCallbackToScript("StopScript", (webview, processId) => this.StopScript(processId))
 		this.AddCallbackToScript("OpenLogArchive", (*) => this.OpenLogArchive())
 		this.AddCallbackToScript("OpenLogFolder", (*) => this.OpenLogFolder())
 		this.AddCallbackToScript("OpenRepository", (*) => this.OpenRepository())
@@ -113,6 +124,126 @@ Class ControlDashboard extends WebViewToo {
 	; ran when they have not.
 	LastTestRun(sessionStartedAt) {
 		return TestRunStatus.Read(ControlDashboard.TEST_STATUS_FILE, sessionStartedAt)
+	}
+
+	; --- Profiles -----------------------------------------------------------
+
+	; Device names are read here, on demand, rather than when this process
+	; starts: the work profile's names come from a secret, and a viewer process
+	; should not touch the secrets file just by existing.
+	GetProfilesForWeb() {
+		profiles := []
+		for profile in ProfileManager.allProfiles {
+			profiles.Push(Map(
+				"displayName", profile.displayName,
+				"devices", this.DeviceNames(profile),
+				"isCurrent", profile = ProfileManager.current ? 1 : 0
+			))
+		}
+		return JSON.Dump(Map(
+			"computerName", A_ComputerName,
+			"current", ProfileManager.current.displayName,
+			"origin", this.CurrentProfileOrigin(),
+			"profiles", profiles
+		))
+	}
+
+	DeviceNames(profile) {
+		names := []
+		try {
+			for device in profile.deviceName
+				if (Trim(device) != "")
+					names.Push(device)
+		}
+		return names
+	}
+
+	; Auto-detection matches the computer name against a profile's devices, so
+	; a current profile that this machine's name does not match can only have
+	; been chosen by hand.
+	CurrentProfileOrigin() {
+		for device in this.DeviceNames(ProfileManager.current)
+			if InStr(A_ComputerName, device)
+				return "detected"
+		return "chosen"
+	}
+
+	; Records the profile for the next start. The page reloads the suite after
+	; this succeeds, so a failure to save is reported before anything restarts.
+	RequestProfile(displayName) {
+		return this.ReportOutcome(() => this.RequestProfileByName(displayName))
+	}
+
+	RequestProfileByName(displayName) {
+		for profile in ProfileManager.allProfiles {
+			if (profile.displayName != displayName)
+				continue
+			if !ProfileManager.RequestProfile(profile)
+				throw Error("The profile could not be saved on this machine")
+			return
+		}
+		throw Error("Unknown profile: " displayName)
+	}
+
+	; --- Processes ----------------------------------------------------------
+
+	GetProcessesForWeb() {
+		processes := []
+		startTimes := Map()
+		for script in SuiteControl.ListRunningScripts(false) {
+			if this._startTimes.Has(script.processId)
+				startedAt := this._startTimes[script.processId]
+			else
+				startedAt := SuiteControl.GetProcessStartTime(script.processId)
+			startTimes[script.processId] := startedAt
+
+			processes.Push(Map(
+				"name", script.name,
+				"path", script.path,
+				"processId", script.processId,
+				"uptimeSeconds", startedAt = "" ? "" : DateDiff(A_Now, startedAt, "Seconds"),
+				"belongsToSuite", script.belongsToSuite ? 1 : 0,
+				"isDashboard", script.processId = this.CurrentProcessId() ? 1 : 0,
+				"isLoggingHost", this.IsLoggingHost(script.path) ? 1 : 0
+			))
+		}
+		; Drop the processes that are gone rather than growing the map forever.
+		this._startTimes := startTimes
+		return JSON.Dump(processes)
+	}
+
+	; The Logger popup is the suite's notification surface; stopping it leaves
+	; the suite unable to tell the user anything until the next reload.
+	IsLoggingHost(scriptPath) {
+		SplitPath(scriptPath, &scriptName)
+		return scriptName = "Logger Host.ahk"
+	}
+
+	CurrentProcessId() => DllCall("GetCurrentProcessId", "UInt")
+
+	RestartScript(processId) {
+		return this.ReportOutcome(() => this.RestartScriptByProcessId(Integer(processId)))
+	}
+
+	RestartScriptByProcessId(processId) {
+		for script in SuiteControl.ListRunningScripts(false) {
+			if (script.processId != processId)
+				continue
+			SuiteControl.RestartScript(script.path)
+			return
+		}
+		throw Error("That script is no longer running")
+	}
+
+	StopScript(processId) {
+		return this.ReportOutcome(() => this.StopScriptByProcessId(Integer(processId)))
+	}
+
+	StopScriptByProcessId(processId) {
+		if (processId = this.CurrentProcessId())
+			throw Error("The dashboard cannot stop its own process - use Exit suite instead")
+		if !SuiteControl.StopScript(processId)
+			throw Error("The script did not stop")
 	}
 
 	; --- Health -------------------------------------------------------------

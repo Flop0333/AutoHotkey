@@ -21,6 +21,19 @@ class AhkDataService {
 
   static GetHealth = () => JSON.parse(ahk.sync.GetHealth());
 
+  static GetProcesses = () => JSON.parse(ahk.sync.GetProcesses());
+
+  static GetProfiles = () => JSON.parse(ahk.sync.GetProfiles());
+
+  // Records the choice; the reload that applies it is a separate call, so a
+  // profile that cannot be saved is reported before the suite restarts.
+  static RequestProfile = (displayName) => JSON.parse(ahk.sync.RequestProfile(displayName));
+
+  // Scripts are addressed by process id, so no path crosses the bridge.
+  static RestartScript = (processId) => JSON.parse(ahk.sync.RestartScript(processId));
+
+  static StopScript = (processId) => JSON.parse(ahk.sync.StopScript(processId));
+
   // Opening a folder can fail (a missing path, a blocked shell), so these
   // report their outcome instead of being fire-and-forget.
   static OpenLogArchive = () => JSON.parse(ahk.sync.OpenLogArchive());
