@@ -296,6 +296,7 @@ body {
 .stat-note {
 	font-size: 11px;
 	color: var(--muted);
+	overflow-wrap: anywhere; /* file paths and session ids have no spaces to break at */
 }
 
 .group-title {

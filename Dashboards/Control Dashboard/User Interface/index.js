@@ -29,7 +29,7 @@ class ControlDashboardShell {
 		this._register(new LogsSection(this));
 		this._register(new PlaceholderSection('tests'));
 		this._register(new PlaceholderSection('profiles'));
-		this._register(new PlaceholderSection('health'));
+		this._register(new HealthSection(this));
 
 		this.rail.addEventListener('click', (event) => {
 			const item = event.target.closest('.rail-item');
@@ -169,7 +169,7 @@ class StatusStrip {
 			return;
 		}
 		if (!tests.lastRunStatus) {
-			this.tests.replaceChildren(Pill('no runs yet', 'neutral'));
+			this.tests.replaceChildren(Pill('not run yet', 'neutral'));
 			return;
 		}
 		const passed = tests.lastRunStatus === 'PASS';
@@ -286,8 +286,8 @@ class OverviewSection {
 			return;
 		}
 		if (!tests.lastRunStatus) {
-			this.tests.replaceChildren(Pill('no runs yet', 'neutral'));
-			this.testsNote.textContent = 'Nothing has run in this session.';
+			this.tests.replaceChildren(Pill('not run yet', 'neutral'));
+			this.testsNote.textContent = 'Nothing has run since the suite started.';
 			return;
 		}
 		const passed = tests.lastRunStatus === 'PASS';
@@ -445,7 +445,11 @@ class LogsSection {
 			this.sortButton.textContent = `Time ${this.sortDescending ? '↓' : '↑'}`;
 			this._renderRows();
 		});
-		this.openArchiveButton.addEventListener('click', () => AhkDataService.OpenLogArchive());
+		this.openArchiveButton.addEventListener('click', () => {
+			const result = AhkDataService.OpenLogArchive();
+			if (!result.ok)
+				this.shell.showToast(`Could not open the archive folder: ${result.error}`);
+		});
 		this.testButtons.forEach(button => {
 			button.addEventListener('click', () => {
 				const result = AhkDataService.LogTestMessage(button.dataset.severity);
@@ -529,6 +533,125 @@ class LogsSection {
 			this._copyToClipboard(details, 'Error details copied to clipboard');
 		});
 	}
+}
+
+// Whether this machine is set up the way the suite expects, and what the
+// suite is costing it. Its data is read only while the section is on screen.
+class HealthSection {
+
+	// Above this share of the machine, something is spinning rather than
+	// waiting - worth flagging without calling it an error.
+	static BUSY_PERCENT = 25;
+
+	constructor(shell) {
+		this.id = 'health';
+		this.shell = shell;
+		this.element = document.querySelector('#section-health');
+		this.cpu = this.element.querySelector('#health-cpu');
+		this.cpuNote = this.element.querySelector('#health-cpu-note');
+		this.ahkVersion = this.element.querySelector('#health-ahk-version');
+		this.ahkPath = this.element.querySelector('#health-ahk-path');
+		this.webView = this.element.querySelector('#health-webview');
+		this.webViewNote = this.element.querySelector('#health-webview-note');
+		this.secrets = this.element.querySelector('#health-secrets');
+		this.secretsNote = this.element.querySelector('#health-secrets-note');
+		this.session = this.element.querySelector('#health-session');
+		this.sessionNote = this.element.querySelector('#health-session-note');
+		this.repository = this.element.querySelector('#health-repository');
+		this.logDirectory = this.element.querySelector('#health-log-directory');
+		this.wired = false;
+	}
+
+	activate() {
+		if (!this.wired) {
+			this._attachEvents();
+			this.wired = true;
+		}
+		this.refresh();
+	}
+
+	refresh() {
+		this._render(AhkDataService.GetHealth());
+	}
+
+	_render(health) {
+		this._renderCpu(health.cpu || {});
+
+		const autoHotkey = health.autoHotkey || {};
+		this.ahkVersion.textContent = autoHotkey.version ? `v${autoHotkey.version}` : 'unknown';
+		this.ahkPath.textContent = autoHotkey.path || '';
+
+		const webView2 = health.webView2 || {};
+		const known = webView2.status === 'ok';
+		this.webView.replaceChildren(Pill(known ? 'installed' : 'version unknown', known ? 'success' : 'warning'));
+		this.webViewNote.textContent = known
+			? webView2.version
+			: 'This window is rendered by WebView2, so it is installed; its version could not be read.';
+
+		this._renderSecrets(health.secrets || {});
+
+		const session = health.session || {};
+		this.session.textContent = session.id || 'unknown';
+		this.sessionNote.textContent = `${Count(Number(session.archivedSessions) || 0, 'archived session', 'archived sessions')}`;
+
+		const paths = health.paths || {};
+		this.repository.textContent = paths.repository || 'unknown';
+		this.logDirectory.textContent = paths.logDirectoryOverride
+			? `Logs redirected to ${paths.logs} by AUTOHOTKEY_LOG_DIR`
+			: `Logs in ${paths.logs}`;
+	}
+
+	// Reported the way Task Manager reports it: a share of the whole machine,
+	// summed over every AutoHotkey process.
+	_renderCpu(cpu) {
+		const processes = Number(cpu.processes) || 0;
+		const cores = Number(cpu.processorCount) || 0;
+		if (cpu.percent === '' || cpu.percent === undefined || cpu.percent === null) {
+			this.cpu.replaceChildren(Pill('sampling…', 'neutral'));
+			this.cpuNote.textContent = `Measuring ${Count(processes, 'process', 'processes')} over the next second.`;
+			return;
+		}
+		const percent = Number(cpu.percent);
+		const busy = percent >= HealthSection.BUSY_PERCENT;
+		this.cpu.replaceChildren(Pill(`${percent.toFixed(1)}%`, busy ? 'warning' : 'success'));
+		this.cpuNote.textContent = `${Count(processes, 'process', 'processes')} across ${Count(cores, 'core', 'cores')}`
+			+ (busy ? ' - something is working hard' : '');
+	}
+
+	_renderSecrets(secrets) {
+		const catalogKeys = Number(secrets.catalogKeys) || 0;
+		const keysWithValue = Number(secrets.keysWithValue) || 0;
+		const tones = { ok: 'success', partial: 'neutral', missing: 'warning', invalid: 'error' };
+		const labels = {
+			ok: 'complete',
+			partial: 'partly filled in',
+			missing: 'no local file',
+			invalid: 'unreadable'
+		};
+		const state = secrets.status || 'missing';
+		this.secrets.replaceChildren(Pill(labels[state] || state, tones[state] || 'neutral'));
+		this.secretsNote.textContent = state === 'missing'
+			? 'Start the suite once to create the local secrets file.'
+			: `${keysWithValue} of ${catalogKeys} catalog keys have a value on this machine.`;
+	}
+
+	_attachEvents() {
+		const open = (work, name) => {
+			const result = work();
+			if (!result.ok)
+				this.shell.showToast(`Could not open the ${name}: ${result.error}`);
+		};
+		this.element.querySelector('#action-open-logs')
+			.addEventListener('click', () => open(AhkDataService.OpenLogFolder, 'logs folder'));
+		this.element.querySelector('#action-open-archive')
+			.addEventListener('click', () => open(AhkDataService.OpenLogArchive, 'archive folder'));
+		this.element.querySelector('#action-open-repository')
+			.addEventListener('click', () => open(AhkDataService.OpenRepository, 'repository'));
+	}
+}
+
+function Count(amount, singular, plural) {
+	return `${amount} ${amount === 1 ? singular : plural}`;
 }
 
 function Pill(text, tone = 'neutral') {

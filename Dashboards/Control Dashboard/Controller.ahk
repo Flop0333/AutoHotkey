@@ -3,6 +3,9 @@
 #Include ..\..\Lib\Extensions\Json.ahk
 #Include ..\..\Lib\Core\WebView.ahk
 #Include ..\..\Apps Integrated\Suite Control\Suite Control.ahk
+#Include ..\..\Secrets\Secret.ahk
+#Include ..\..\Secrets\Secrets Catalog.ahk
+#Include Test Run Status.ahk
 
 Class ControlDashboard extends WebViewToo {
 	static WIN_TITLE := "AutoHotkey Control Dashboard"
@@ -11,9 +14,19 @@ Class ControlDashboard extends WebViewToo {
 	; Written by Tests\Invoke-AllTests.ps1; the Tests section will read more of it.
 	static TEST_STATUS_FILE := Paths.autohotkey "\Logs\test-run-status.json"
 	static TEST_RUNNER_SCRIPT := Paths.autohotkey "\Tests\Invoke-AllTests.ps1"
+	static SECRETS_FILE := Paths.autohotkey "\Secrets\My Secrets.json"
+	; Evergreen WebView2 runtime, as registered by its installer.
+	static WEBVIEW2_VERSION_KEYS := [
+		"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
+		"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
+		"HKEY_CURRENT_USER\SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}"
+	]
 
 	__New() {
 		super.__New()
+		; Processor use is a rate between two samples; these hold the last one.
+		this._cpuTicks := 0
+		this._cpuSampledAt := 0
 		this.Gui.Title := ControlDashboard.INITIALIZING_TITLE
 		this.Gui.OnEvent("Close", (*) => this.Hide())
 		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Control Dashboard\User Interface", 0) ; block cors error, allow loading local files
@@ -28,12 +41,24 @@ Class ControlDashboard extends WebViewToo {
 		this.AddCallbackToScript("ReloadSuite", (*) => this.ReloadSuite())
 		this.AddCallbackToScript("ExitSuite", (*) => this.ExitSuite())
 		this.AddCallbackToScript("RunAllTests", (*) => this.RunAllTests())
+		this.AddCallbackToScript("GetHealth", (*) => this.GetHealthForWeb())
 		this.AddCallbackToScript("OpenLogArchive", (*) => this.OpenLogArchive())
+		this.AddCallbackToScript("OpenLogFolder", (*) => this.OpenLogFolder())
+		this.AddCallbackToScript("OpenRepository", (*) => this.OpenRepository())
 	}
 
 	OpenLogArchive() {
 		DirCreate(ErrorLogArchiveDirectory())
-		Run('explorer.exe "' ErrorLogArchiveDirectory() '"')
+		return this.ReportOutcome(() => Run('explorer.exe "' ErrorLogArchiveDirectory() '"'))
+	}
+
+	OpenLogFolder() {
+		DirCreate(ErrorLogDirectory())
+		return this.ReportOutcome(() => Run('explorer.exe "' ErrorLogDirectory() '"'))
+	}
+
+	OpenRepository() {
+		return this.ReportOutcome(() => Run('explorer.exe "' Paths.autohotkey '"'))
 	}
 
 	Show() => super.Show(ControlDashboard.SHOW_OPTIONS, ControlDashboard.WIN_TITLE)
@@ -58,7 +83,7 @@ Class ControlDashboard extends WebViewToo {
 			"entryCount", logState["entries"].Length,
 			"runningScripts", SuiteControl.ListRunningScripts(false).Length,
 			"unread", GetUnreadLogCounts(logState["entries"], logState["readEntryCount"]),
-			"tests", this.LastTestRun()
+			"tests", this.LastTestRun(this.SessionStartedAt(logState["sessionId"]))
 		))
 	}
 
@@ -73,16 +98,110 @@ Class ControlDashboard extends WebViewToo {
 	; The log session starts with the suite, so its id doubles as the suite's
 	; start time: "yyyyMMdd-HHmmss-<pid>-<tick>-<sequence>".
 	SessionUptimeSeconds(sessionId) {
-		if !RegExMatch(sessionId, "^(\d{8})-(\d{6})", &sessionStart)
-			return ""
-		return DateDiff(A_Now, sessionStart[1] sessionStart[2], "Seconds")
+		sessionStartedAt := this.SessionStartedAt(sessionId)
+		return sessionStartedAt = "" ? "" : DateDiff(A_Now, sessionStartedAt, "Seconds")
 	}
 
-	LastTestRun() {
-		if !FileExist(ControlDashboard.TEST_STATUS_FILE)
-			return Map("status", "unknown")
-		try return JSON.parse(FileRead(ControlDashboard.TEST_STATUS_FILE, "UTF-8"))
-		return Map("status", "unknown")
+	SessionStartedAt(sessionId) {
+		if !RegExMatch(sessionId, "^(\d{8})-(\d{6})", &sessionStart)
+			return ""
+		return sessionStart[1] sessionStart[2]
+	}
+
+	; Scoped to this suite session: a pass or fail from an earlier session is
+	; not this session's result, and reporting it would tell the user the tests
+	; ran when they have not.
+	LastTestRun(sessionStartedAt) {
+		return TestRunStatus.Read(ControlDashboard.TEST_STATUS_FILE, sessionStartedAt)
+	}
+
+	; --- Health -------------------------------------------------------------
+
+	; Everything the Health section reports. Only this section asks for it, so
+	; the processor sample and the registry and secrets lookups happen while it
+	; is on screen rather than on every poll tick.
+	GetHealthForWeb() {
+		scripts := SuiteControl.ListRunningScripts(false)
+		return JSON.Dump(Map(
+			"autoHotkey", Map("version", A_AhkVersion, "path", A_AhkPath),
+			"webView2", this.WebView2Runtime(),
+			"cpu", this.SampleCpu(scripts),
+			"paths", Map(
+				"repository", Paths.autohotkey,
+				"logs", ErrorLogDirectory(),
+				"archive", ErrorLogArchiveDirectory(),
+				"logDirectoryOverride", EnvGet("AUTOHOTKEY_LOG_DIR")
+			),
+			"session", Map(
+				"id", GetLogSessionId(),
+				"archivedSessions", this.ArchivedSessionCount()
+			),
+			"secrets", this.SecretsState()
+		))
+	}
+
+	; Processor time is a rate, so it needs two samples. The first call after
+	; the section opens establishes the baseline and reports no percentage yet.
+	SampleCpu(scripts) {
+		ticks := SuiteControl.TotalCpuTicks(scripts)
+		sampledAt := A_TickCount
+		percent := ""
+		if (this._cpuSampledAt) {
+			percent := SuiteControl.CpuPercentFromTicks(ticks - this._cpuTicks,
+				sampledAt - this._cpuSampledAt, SuiteControl.ProcessorCount())
+		}
+		this._cpuTicks := ticks
+		this._cpuSampledAt := sampledAt
+		return Map(
+			"percent", percent,
+			"processes", scripts.Length,
+			"processorCount", SuiteControl.ProcessorCount()
+		)
+	}
+
+	; The page is rendered by WebView2, so the runtime is present whether or not
+	; its version can be read; only the version is ever in doubt.
+	WebView2Runtime() {
+		for versionKey in ControlDashboard.WEBVIEW2_VERSION_KEYS {
+			try {
+				version := RegRead(versionKey, "pv", "")
+				if (version != "")
+					return Map("status", "ok", "version", version)
+			}
+		}
+		return Map("status", "unknown", "version", "")
+	}
+
+	ArchivedSessionCount() {
+		archived := 0
+		if !DirExist(ErrorLogArchiveDirectory())
+			return archived
+		loop files ErrorLogArchiveDirectory() "\errors-*.log", "F"
+			archived += 1
+		return archived
+	}
+
+	; Counts only. Secret values never reach the page, and neither do the key
+	; names: the catalog is tracked, but what a machine has filled in is not.
+	SecretsState() {
+		catalogKeys := SecretsCatalog.Count
+		if !FileExist(ControlDashboard.SECRETS_FILE)
+			return Map("status", "missing", "catalogKeys", catalogKeys, "keysWithValue", 0)
+		try secrets := JSON.parse(FileRead(ControlDashboard.SECRETS_FILE, "UTF-8"))
+		catch
+			return Map("status", "invalid", "catalogKeys", catalogKeys, "keysWithValue", 0)
+		if !(secrets is Map)
+			return Map("status", "invalid", "catalogKeys", catalogKeys, "keysWithValue", 0)
+
+		keysWithValue := 0
+		for key, value in secrets {
+			if !SecretsCatalog.Has(key)
+				continue
+			if (value is Array ? value.Length > 0 : Trim(String(value)) != "")
+				keysWithValue += 1
+		}
+		status := keysWithValue = catalogKeys ? "ok" : "partial"
+		return Map("status", status, "catalogKeys", catalogKeys, "keysWithValue", keysWithValue)
 	}
 
 	GetLogEntriesForWeb() {

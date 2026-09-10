@@ -111,6 +111,46 @@ TestKit.Run("A declined exit leaves the suite running", Test_ExitSuite_DoesNothi
 TestKit.Run("Stopping the current process is refused", Test_StopScript_RefusesTheCurrentProcess)
 TestKit.Run("Restarting without a script path throws", Test_RestartScript_RequiresAScriptPath)
 
+; Processor use is a rate, so only the arithmetic between two samples is worth
+; testing here - reading the ticks themselves is a DllCall against live processes.
+
+Test_CpuPercent_IsAShareOfTheWholeMachine() {
+    ; One core fully busy for a second is 10,000,000 ticks: 25% of four cores.
+    Assert.Equal(25.0, SuiteControl.CpuPercentFromTicks(10000000, 1000, 4))
+    Assert.Equal(100.0, SuiteControl.CpuPercentFromTicks(10000000, 1000, 1))
+    Assert.Equal(12.5, SuiteControl.CpuPercentFromTicks(10000000, 1000, 8))
+}
+
+Test_CpuPercent_ScalesWithTheSampleInterval() {
+    Assert.Equal(50.0, SuiteControl.CpuPercentFromTicks(10000000, 2000, 1))
+    Assert.Equal(5.0, SuiteControl.CpuPercentFromTicks(1000000, 1000, 2))
+}
+
+Test_CpuPercent_IsZeroWhenNothingRan() {
+    Assert.Equal(0, SuiteControl.CpuPercentFromTicks(0, 1000, 4))
+}
+
+; A process that ended between samples takes its ticks with it.
+Test_CpuPercent_IsZeroForALostProcess() {
+    Assert.Equal(0, SuiteControl.CpuPercentFromTicks(-500000, 1000, 4))
+}
+
+Test_CpuPercent_IsZeroForAnUnusableSample() {
+    Assert.Equal(0, SuiteControl.CpuPercentFromTicks(10000000, 0, 4))
+    Assert.Equal(0, SuiteControl.CpuPercentFromTicks(10000000, 1000, 0))
+}
+
+Test_ProcessorCount_IsAtLeastOne() {
+    Assert.True(SuiteControl.ProcessorCount() >= 1)
+}
+
+TestKit.Run("Processor use is reported as a share of the whole machine", Test_CpuPercent_IsAShareOfTheWholeMachine)
+TestKit.Run("Processor use scales with the sample interval", Test_CpuPercent_ScalesWithTheSampleInterval)
+TestKit.Run("Processor use is zero when nothing ran", Test_CpuPercent_IsZeroWhenNothingRan)
+TestKit.Run("A process lost between samples reports zero, not a negative", Test_CpuPercent_IsZeroForALostProcess)
+TestKit.Run("An unusable sample reports zero", Test_CpuPercent_IsZeroForAnUnusableSample)
+TestKit.Run("The processor count is never zero", Test_ProcessorCount_IsAtLeastOne)
+
 Test_SuiteScript_DescribesTheScript() {
     script := SuiteScript(Paths.autohotkey "\Startup\Startup.ahk", 1234, 0x1000, "")
     Assert.Equal("Startup.ahk", script.name)

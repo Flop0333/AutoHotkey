@@ -130,6 +130,49 @@ class SuiteControl {
 		return RegExMatch(String(wmiDateTime), "^(\d{14})", &dateTimeMatch) ? dateTimeMatch[1] : ""
 	}
 
+	; --- Processor usage ----------------------------------------------------
+
+	; Total processor time consumed by every running AutoHotkey process, in
+	; 100-nanosecond ticks. Only meaningful as a delta between two samples.
+	; Processes this user cannot open (an elevated script) contribute nothing.
+	static TotalCpuTicks(scripts?) {
+		total := 0
+		for script in (IsSet(scripts) ? scripts : this.ListRunningScripts(false))
+			total += this.GetProcessCpuTicks(script.processId)
+		return total
+	}
+
+	static GetProcessCpuTicks(processId) {
+		static PROCESS_QUERY_LIMITED_INFORMATION := 0x1000
+		processHandle := DllCall("OpenProcess", "UInt", PROCESS_QUERY_LIMITED_INFORMATION, "Int", false, "UInt", processId, "Ptr")
+		if !processHandle
+			return 0
+		try {
+			creationTime := Buffer(8, 0), exitTime := Buffer(8, 0), kernelTime := Buffer(8, 0), userTime := Buffer(8, 0)
+			if !DllCall("GetProcessTimes", "Ptr", processHandle, "Ptr", creationTime, "Ptr", exitTime, "Ptr", kernelTime, "Ptr", userTime)
+				return 0
+			return NumGet(kernelTime, 0, "Int64") + NumGet(userTime, 0, "Int64")
+		} finally {
+			DllCall("CloseHandle", "Ptr", processHandle)
+		}
+	}
+
+	; Share of the whole machine's processor capacity, the way Task Manager
+	; reports it: one busy core on an eight-core machine is 12.5%, not 100%.
+	; A tick is 100ns, so one core provides elapsedMs * 10000 ticks.
+	; A negative delta means a process ended between samples; that reads as 0
+	; rather than as a nonsensical negative percentage.
+	static CpuPercentFromTicks(tickDelta, elapsedMs, processorCount) {
+		if (tickDelta <= 0 || elapsedMs <= 0 || processorCount <= 0)
+			return 0
+		return Round(tickDelta / (elapsedMs * 10000 * processorCount) * 100, 1)
+	}
+
+	static ProcessorCount() {
+		reported := EnvGet("NUMBER_OF_PROCESSORS")
+		return IsInteger(reported) && Integer(reported) > 0 ? Integer(reported) : 1
+	}
+
 	; --- Single-script control ----------------------------------------------
 
 	; Stops the process running scriptPath, if any, and starts the script again.

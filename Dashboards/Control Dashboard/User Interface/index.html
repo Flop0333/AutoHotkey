@@ -168,9 +168,44 @@
           <h1>Health</h1>
           <p class="section-subtitle">Whether this machine is set up the way the suite expects.</p>
         </header>
-        <div class="card placeholder">
-          <p class="placeholder-title">Not built yet</p>
-          <p class="placeholder-body">AutoHotkey and WebView2 versions, resolved paths, the log session, and the secrets sync state land here.</p>
+        <div class="card-grid">
+          <div class="card stat">
+            <span class="stat-label">AutoHotkey processor use</span>
+            <span class="stat-value pill-row" id="health-cpu"></span>
+            <span class="stat-note" id="health-cpu-note"></span>
+          </div>
+          <div class="card stat">
+            <span class="stat-label">AutoHotkey</span>
+            <span class="stat-value stat-value-compact" id="health-ahk-version">…</span>
+            <span class="stat-note" id="health-ahk-path"></span>
+          </div>
+          <div class="card stat">
+            <span class="stat-label">WebView2 runtime</span>
+            <span class="stat-value pill-row" id="health-webview"></span>
+            <span class="stat-note" id="health-webview-note"></span>
+          </div>
+          <div class="card stat">
+            <span class="stat-label">Secrets</span>
+            <span class="stat-value pill-row" id="health-secrets"></span>
+            <span class="stat-note" id="health-secrets-note"></span>
+          </div>
+          <div class="card stat">
+            <span class="stat-label">Log session</span>
+            <span class="stat-value stat-value-compact" id="health-session">…</span>
+            <span class="stat-note" id="health-session-note"></span>
+          </div>
+          <div class="card stat">
+            <span class="stat-label">Repository</span>
+            <span class="stat-value stat-value-compact" id="health-repository">…</span>
+            <span class="stat-note" id="health-log-directory"></span>
+          </div>
+        </div>
+
+        <h2 class="group-title">Open</h2>
+        <div class="action-row">
+          <button type="button" class="button" id="action-open-logs">Logs folder</button>
+          <button type="button" class="button" id="action-open-archive">Archived sessions</button>
+          <button type="button" class="button" id="action-open-repository">Repository</button>
         </div>
       </section>
     </main>

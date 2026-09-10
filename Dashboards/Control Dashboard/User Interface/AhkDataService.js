@@ -19,5 +19,13 @@ class AhkDataService {
 
   static GetGitStatus = () => ahk.GetGitStatus().then(JSON.parse);
 
-  static OpenLogArchive = () => ahk.OpenLogArchive();
+  static GetHealth = () => JSON.parse(ahk.sync.GetHealth());
+
+  // Opening a folder can fail (a missing path, a blocked shell), so these
+  // report their outcome instead of being fire-and-forget.
+  static OpenLogArchive = () => JSON.parse(ahk.sync.OpenLogArchive());
+
+  static OpenLogFolder = () => JSON.parse(ahk.sync.OpenLogFolder());
+
+  static OpenRepository = () => JSON.parse(ahk.sync.OpenRepository());
 }
