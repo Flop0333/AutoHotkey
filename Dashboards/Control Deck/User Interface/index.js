@@ -259,7 +259,7 @@ class StatusStrip {
 		this._renderCpu(status.cpu || {});
 		this.profile.textContent = status.profile || 'unknown';
 		this.uptime.textContent = `${Number(status.runningScripts) || 0} Scripts - ${StatusStrip.FormatUptime(status.uptimeSeconds)}`;
-		this.logs.replaceChildren(...LogCountPills(status.logCounts || {}, 'none'));
+		this.logs.replaceChildren(...LogCountPills(status.logCounts || {}, 'none', HEADER_LOG_SEVERITIES));
 		RenderTestState(this.tests, status.tests || {}, () => this.shell.runTests());
 	}
 
@@ -1262,10 +1262,11 @@ function RenderTestState(element, tests, onRun) {
 }
 
 const LOG_SEVERITIES = ['error', 'warning', 'info'];
+const HEADER_LOG_SEVERITIES = ['info', 'warning', 'error'];
 
-// One pill per severity that has entries, most severe first.
-function LogCountPills(counts, emptyLabel) {
-	const present = LOG_SEVERITIES.filter(severity => Number(counts[severity]) > 0);
+// One pill per severity that has entries, most severe first unless an order is given.
+function LogCountPills(counts, emptyLabel, order = LOG_SEVERITIES) {
+	const present = order.filter(severity => Number(counts[severity]) > 0);
 	return present.length
 		? present.map(severity => Pill(`${counts[severity]} ${severity}`, severity))
 		: [Pill(emptyLabel, 'neutral')];
