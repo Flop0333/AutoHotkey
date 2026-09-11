@@ -43,7 +43,7 @@ Optional timeout parameters are available when diagnosing a slow machine:
 
 `Invoke-SyntaxCheck.ps1` parses each active AutoHotkey v2 entry point without running its hotkeys, GUIs, or startup actions. It creates a temporary wrapper that exits before including the target; AutoHotkey still parses the complete include tree first.
 
-Targets are discovered from the suite startup wiring, plus the logging hosts, Control Dashboard host, logging facade, and manual `Tests/Run-Tests.ahk` entry point. A missing file, non-zero exit, or blocked load-error dialog fails the suite. Optional scripts outside that target set are not covered.
+Targets are discovered from the suite startup wiring, plus the logging hosts, Control Deck host, logging facade, and manual `Tests/Run-Tests.ahk` entry point. A missing file, non-zero exit, or blocked load-error dialog fails the suite. Optional scripts outside that target set are not covered.
 
 ### Unit tests
 
@@ -55,9 +55,9 @@ Targets are discovered from the suite startup wiring, plus the logging hosts, Co
 
 `Invoke-IntegrationTests.ps1` runs `Tests/Integration/Logging.Integration.Tests.ahk`. It exercises real logger/dashboard processes and shared logging behavior while redirecting `AUTOHOTKEY_LOG_DIR` to a temporary directory. The runner restores the caller's environment and removes temporary files afterward.
 
-## Control Dashboard and results
+## Control Deck and results
 
-Double-click `Tests/Run-Tests.ahk` or run the `Test` command in Age of Efficiency. The launcher opens the Control Dashboard on **Tests** and runs `Invoke-AllTests.ps1` in a hidden PowerShell process. The section scopes status and history to the current suite session and refuses to start a second run while one is in progress.
+Double-click `Tests/Run-Tests.ahk` or run the `Test` command in Age of Efficiency. The launcher opens the Control Deck on **Tests** and runs `Invoke-AllTests.ps1` in a hidden PowerShell process. Inside the Control Deck, the Tests section's run button, the `R` key, and the **Run tests** button that the status strip and Overview show until the first run of a session all start the same run. The section scopes status and history to the current suite session and refuses to start a second run while one is in progress.
 
 The combined runner executes all five suites and writes git-ignored runtime data:
 

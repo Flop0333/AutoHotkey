@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
     Runs documentation, architecture, syntax, unit, and integration checks and
-    logs a structured result for the Control Dashboard to display.
+    logs a structured result for the Control Deck to display.
 
 .DESCRIPTION
     Each suite script calls `exit` directly, so each one is launched

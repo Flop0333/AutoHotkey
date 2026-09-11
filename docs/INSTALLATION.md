@@ -13,7 +13,7 @@
 3. Check the AutoHotkey tray menu for the detected profile. Use **Profile** in that menu to switch it if necessary.
 4. Fill only the local secret values needed by your chosen features.
 
-The tray menu also provides **Reload**, **Control Dashboard**, and **Exit**. Profile switching is available both in its Profile submenu and in the dashboard's Profiles section.
+The tray menu also provides **Reload**, **Control Deck**, and **Exit**. Profile switching is available both in its Profile submenu and in the dashboard's Profiles section.
 
 ## Profiles
 
@@ -49,10 +49,11 @@ Most features tolerate empty values until that specific action is used.
 5. Start Age of Efficiency and Macro Board.
 6. Start the configured standalone apps.
 7. Start the configured integrated apps.
+8. Start the Control Deck hidden, so opening it later does not wait for WebView2 to load.
 
 The exact current list is documented in the [app catalog](APPS.md) and expressed by the `Run(...)` calls inside `RunStartup()`.
 
-Logging initialization archives the active `Logs/errors.log` and resets `Logs/errors.read`. The Control Dashboard therefore shows the current suite session; earlier sessions stay available under `Logs/Archive`.
+Logging initialization archives the active `Logs/errors.log` and resets `Logs/errors.read`. The Control Deck therefore shows the current suite session; earlier sessions stay available under `Logs/Archive`.
 
 To change auto-run behavior, add, remove, or reorder those calls. Keep the CapsLock service ahead of its consumers.
 
@@ -68,8 +69,8 @@ Shared path resolution normally derives the repository root from `Lib/Core/Paths
 
 ## Troubleshooting
 
-- **The dashboard does not open:** install or repair Microsoft Edge WebView2 Runtime, then reopen the Control Dashboard.
-- **Checking this machine's setup:** the Control Dashboard's **Health** section reports the AutoHotkey and WebView2 versions, the resolved repository and log paths, the current log session, how much of the secrets catalog has a local value, and the processor use of all AutoHotkey processes together.
+- **The dashboard does not open:** install or repair Microsoft Edge WebView2 Runtime, then reopen the Control Deck.
+- **Checking this machine's setup:** the Control Deck's **Health** section reports the AutoHotkey and WebView2 versions, the resolved repository and log paths, the current log session, how much of the secrets catalog has a local value, and the processor use of all AutoHotkey processes together.
 - **The wrong profile is active:** select one from the tray menu and verify its device names in `Profiles/Profile Manager.ahk`.
 - **A secret-backed action does nothing:** check that the matching key in `Secrets/My Secrets.json` contains the expected string or array of strings.
 - **The suite behaves inconsistently after edits:** choose **Reload** from the tray menu.

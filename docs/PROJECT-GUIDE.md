@@ -20,7 +20,7 @@ See the [installation guide](INSTALLATION.md) for prerequisites, local configura
 - **Dashboards** provide WebView2 interfaces for launching commands, running macros, controlling the running suite, and monitoring tests.
 - **Lib** contains shared application wrappers, helpers, extensions, and third-party tools.
 - **Startup, Profiles, and Secrets** coordinate machine-specific configuration and launch the enabled suite.
-- **Tests** contains syntax checks, unit tests, integration tests, and result data displayed by the Control Dashboard.
+- **Tests** contains syntax checks, unit tests, integration tests, and result data displayed by the Control Deck.
 - **.github** connects issues, the Project board, pull requests, CI, GitHub Pages, labels, changelog generation, and scheduled agents.
 
 The complete inventory is in the [app and script catalog](APPS.md).
@@ -56,6 +56,6 @@ AI coding agents should begin with [AGENTS.md](../AGENTS.md), which summarizes t
 | [Agent guide](../AGENTS.md) | Fast repository orientation for AI agents and contributors |
 | [Resources](RESOURCES.md) | Optional AutoHotkey libraries and development resources to explore |
 | [Daily ticket agent design record](decisions/daily-ticket-agent.md) | Historical decisions retained from the implemented automation proposal |
-| [Control Dashboard design record](decisions/control-dashboard.md) | Decisions behind the shipped suite control centre |
+| [Control Deck design record](decisions/control-deck.md) | Decisions behind the shipped suite control centre |
 
 This project favors code-first configuration and small, composable AutoHotkey scripts.

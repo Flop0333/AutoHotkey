@@ -114,10 +114,10 @@
 		"argument": "",
 		"argumentRequired": 0,
 		"category": "PC Management",
-		"command": "AL",
+		"command": "D",
 		"icon": "AutoHotkey",
-		"id": 18,
-		"title": "AutoHotkey Control Dashboard"
+		"id": 20,
+		"title": "Control Deck"
 	},
 	{
 		"action": "RunTests",
