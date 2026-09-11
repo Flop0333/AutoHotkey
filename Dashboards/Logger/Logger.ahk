@@ -3,18 +3,20 @@
 ; ============================================================================
 ;
 ; [FEATURES]
-;   - Uses a lightweight native AHK GUI (no resident WebView2 process)
+;   - Uses a lightweight native layered window (no resident WebView2 process)
+;     painted with the Control Deck's retro artwork
 ;   - Polls Logs\errors.log for new entries (no cross-process messaging needed)
 ;   - Shows notifying entries immediately, then hides 5 seconds after the latest
 ;   - Collapsed rows for info/warning/error with running counts; the row for
 ;     the latest not-yet-seen entry expands to show its script + message
-;   - Left-click opens the Control Deck; right-click dismisses the popup
-;     until the next log entry
+;   - Left-click opens the Control Deck; right-click or the close glyph
+;     dismisses the popup until the next log entry
 ; ============================================================================
 
 #NoTrayIcon
 #Include ..\..\Lib\Core\Paths.ahk
-#Include Controller.ahk
+
+LoggerWindowTitle() => "AutoHotkey Logger"
 
 ShowLogger() {
 	loggerWindow := FindLoggerWindow()
@@ -36,7 +38,7 @@ FindLoggerWindow() {
 	previousTitleMatchMode := A_TitleMatchMode
 	DetectHiddenWindows(true)
 	SetTitleMatchMode(3)
-	loggerWindow := WinExist(LoggerPopup.WIN_TITLE)
+	loggerWindow := WinExist(LoggerWindowTitle())
 	SetTitleMatchMode(previousTitleMatchMode)
 	DetectHiddenWindows(hiddenWindowsWereDetected)
 	return loggerWindow

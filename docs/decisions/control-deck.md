@@ -25,6 +25,8 @@ This is a short historical record for [epic #108](https://github.com/Flop0333/Au
 
 The **Control Deck** theme is an original, offline pixel-art kit in the style of a 1990s maintenance console, catalogued in its [asset manifest](../../Dashboards/Control%20Deck/User%20Interface/assets/control-deck/ASSET-MANIFEST.md). HTML and CSS own every label, layout, focus state, and responsive behavior; artwork is decoration only. Status is shown by shape, label, and colour together, keyboard focus stays visible, and motion respects `prefers-reduced-motion`.
 
+The Logger popup shares the same artwork and palette. It stays a native window so no WebView2 process has to be resident: `Popup Renderer.ahk` paints the panel plate, deck background, and notification icons onto a per-pixel alpha layered window with GDI+.
+
 ## Why this record is intentionally brief
 
 The original proposal described phases, planned files, and validation steps that changed during implementation. Keeping that text made it look authoritative after the Control Deck shipped. The code, startup list, and focused documents are now the single source of truth.
