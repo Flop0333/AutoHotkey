@@ -81,7 +81,8 @@ class ControlDeckShell {
 			if (this.confirmDialog.isOpen) return;
 			const typing = event.target.matches('input, select, textarea, [contenteditable="true"]');
 			if (typing) return;
-			const sections = ['overview', 'processes', 'logs', 'tests', 'profiles', 'health'];
+			// The keys follow the rail, so reordering the rail reorders them too.
+			const sections = [...this.rail.querySelectorAll('.rail-item')].map(item => item.dataset.section);
 			if (/^[1-6]$/.test(event.key)) this.show(sections[Number(event.key) - 1]);
 			else if (event.key.toLowerCase() === 'r') {
 				this.show('tests');

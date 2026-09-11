@@ -156,7 +156,7 @@ img { image-rendering: pixelated; }
 	flex: 0 0 228px;
 	flex-direction: column;
 	gap: 5px;
-	padding: 18px 10px 84px;
+	padding: 18px 10px;
 	background: linear-gradient(90deg, rgba(9, 8, 7, 0.22), transparent 45%, rgba(9, 8, 7, 0.38)), url("assets/control-deck/background-tile.png");
 	background-size: auto, 256px 256px;
 	border-right: 3px double var(--oxblood);
@@ -168,7 +168,7 @@ img { image-rendering: pixelated; }
 .rail-item {
 	position: relative;
 	display: grid;
-	grid-template-columns: 24px 42px 1fr;
+	grid-template-columns: 42px 1fr;
 	align-items: center;
 	min-height: 62px;
 	gap: 7px;
@@ -187,14 +187,10 @@ img { image-rendering: pixelated; }
 .rail-item:hover { border-color: var(--surface-raised); background: rgba(58, 39, 32, 0.58); color: var(--text); transform: translateX(2px); }
 .rail-item.active { border-color: var(--red-highlight); background: linear-gradient(90deg, rgba(142, 44, 49, 0.48), rgba(36, 26, 22, 0.84)); box-shadow: inset 3px 0 0 var(--copper), var(--shadow-hard); color: var(--text); }
 .rail-item.active::after { background: var(--success); box-shadow: 0 0 6px rgba(95, 168, 107, 0.8); }
-.rail-key { color: var(--muted); font-size: 11px; letter-spacing: 0.06em; }
-.rail-item.active .rail-key { color: var(--brass); }
 .rail-icon { display: grid; width: 42px; height: 42px; place-items: center; }
 .rail-icon img { width: 38px; height: 38px; opacity: 0.74; }
 .rail-item:hover .rail-icon img, .rail-item.active .rail-icon img { opacity: 1; }
 .rail-label { font-size: 13px; font-weight: 700; letter-spacing: 0.045em; text-transform: uppercase; }
-.shortcut-help { position: fixed; left: 12px; bottom: 12px; width: 202px; padding: 9px 10px; border: 1px solid var(--surface-raised); background: rgba(9, 8, 7, 0.9); box-shadow: 2px 2px 0 var(--black); color: var(--muted); font-size: 11px; line-height: 1.55; z-index: 4; }
-.shortcut-help::before { display: block; margin-bottom: 3px; color: var(--copper); content: "KEY MAP"; font-weight: 700; letter-spacing: 0.12em; }
 
 .content {
 	position: relative;
@@ -222,8 +218,8 @@ img { image-rendering: pixelated; }
 
 /* === Panels and overview =============================================== */
 .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--gap); }
-/* Four cards read as two rows of two; auto-fit would leave one card alone. */
-#section-overview .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* Overview and Profiles read as rows of two; auto-fit would leave one card alone. */
+.card-grid-pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .card {
 	position: relative;
 	min-width: 0;
@@ -247,6 +243,7 @@ img { image-rendering: pixelated; }
 .group-title::before { width: 18px; height: 3px; background: var(--red-highlight); box-shadow: 0 4px 0 var(--surface-raised); content: ""; }
 .group-note { max-width: 72ch; margin: 0 0 14px; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .action-row { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
+.action-row-centered { justify-content: center; }
 .profile-actions { margin-top: 7px; }
 
 /* === Generated button skins and action icons =========================== */
@@ -450,15 +447,12 @@ th[aria-sort="descending"] .sort-header::after { color: var(--red-highlight); co
 /* === Responsive control deck ========================================== */
 @media (max-width: 1040px) {
 	.rail { width: 196px; flex-basis: 196px; }
-	.rail-item { grid-template-columns: 42px 1fr; }
-	.rail-key { display: none; }
-	.shortcut-help { width: 170px; }
 	.section { padding-right: 22px; padding-left: 22px; }
 }
 
 @media (max-width: 860px) {
 	.status-strip { min-height: 54px; padding-right: 6px; padding-left: 6px; }
-	.status-live-label, .shortcut-help, .rail-heading { display: none; }
+	.status-live-label, .rail-heading { display: none; }
 	.status-live { min-width: 0; }
 	.status-item { min-width: 144px; padding: 0 12px; }
 	.shell { flex-direction: column; }
@@ -480,7 +474,7 @@ th[aria-sort="descending"] .sort-header::after { color: var(--red-highlight); co
 	.title-text { font-size: 13px; }
 	.title-kicker, .git-status { display: none; }
 	.title-btn { width: 40px; }
-	.card-grid, #section-overview .card-grid { grid-template-columns: 1fr; }
+	.card-grid, .card-grid-pairs { grid-template-columns: 1fr; }
 	.toolbar::before, .test-buttons { display: none; }
 	.toolbar select { min-width: 0; flex: 1 1 130px; }
 	.action-row > .button:not(.test-control) { flex: 1 1 100%; }
