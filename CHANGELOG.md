@@ -1,5 +1,12 @@
-<!-- last-pr: 106 -->
+<!-- last-pr: 130 -->
 # Changelog
+
+## 2026-09-11
+
+### Other
+- Rework the Log Dashboard into the AutoHotkey Control Dashboard ([#121](https://github.com/Flop0333/AutoHotkey/pull/121))
+- Control Deck: retro redesign, rename, and instant hidden start ([#130](https://github.com/Flop0333/AutoHotkey/pull/130))
+
 
 ## 2026-09-10
 
