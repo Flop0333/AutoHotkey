@@ -120,6 +120,16 @@
 		"title": "AutoHotkey Control Deck"
 	},
 	{
+		"action": "OpenAutoHotkeyDashboard",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "PC Management",
+		"command": "D",
+		"icon": "AutoHotkey",
+		"id": 20,
+		"title": "Control Deck"
+	},
+	{
 		"action": "RunTests",
 		"argument": "",
 		"argumentRequired": 0,

@@ -11,7 +11,7 @@
 ; [USAGE]
 ;   - ShowControlDeck(section?) / HideControlDeck()
 ;   - Opened from the tray menu's "Control Deck" item, the Macro Board, the
-;     Age of Efficiency command AL, or a Logger notification (on Logs)
+;     Age of Efficiency command D (or AL), or a Logger notification (on Logs)
 ; ============================================================================
 
 #Include ..\..\Lib\Core\OnError.ahk
