@@ -24,6 +24,10 @@ It started as a collection of small scripts and grew into a profile-aware automa
 
 The suite control centre shows what is running, flags missing startup apps, surfaces logs and environment health, runs the complete test suite, and provides safe reload, exit, restart, stop, and profile-switch actions. Open it from the tray or Macro Board; Logger notifications land on Logs, and the Age of Efficiency `Test` command lands on Tests.
 
+Its **AHK Control Deck** interface combines a readable system terminal with original pixel-art navigation, status modules, hardware panels, and action controls.
+
+![AutoHotkey Control Dashboard](Dashboards/Control%20Dashboard/Demo.png)
+
 ### Age of Efficiency
 
 A keyboard-first command launcher for bookmarks, searches, applications, scripts, timers, and other utilities.

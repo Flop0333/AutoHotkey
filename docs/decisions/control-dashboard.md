@@ -66,13 +66,14 @@ Read paths stay synchronous and cheap enough to poll (`ahk.sync.*`, one second, 
 
 ## Visual direction
 
-The current dashboards are functional but plain. The Control Dashboard is the one window that stays open, so it gets a real design pass:
+The Control Dashboard uses an original **AHK Control Deck** theme: a dark 1990s maintenance console rendered with black, brown, oxblood, copper, brass, and semantic status colours. The generated runtime artwork and its source-of-truth palette are catalogued in `Dashboards/Control Dashboard/User Interface/assets/control-deck/ASSET-MANIFEST.md`; HTML and CSS continue to own all labels, layout, focus, and responsive behavior.
 
-- A persistent left rail for section navigation, the custom title bar the other dashboards use, and a status strip (profile, uptime, unread severities, last test result) that is visible from every section.
-- One small design-token layer — background, surface, border, text, muted, accent, and one colour per severity — shared by every section instead of per-view colour literals.
-- Cards for state, pills for status, one table style for logs and processes, and toasts for action results.
-- Motion limited to state changes worth noticing: a run starting, a process disappearing, a new error arriving.
-- Keyboard-first: number keys or arrow navigation between sections, `R` to run tests, `/` to focus the log filter, `Esc` to close the detail panel.
+- The persistent rail is a numbered module selector with a compact horizontal mode for narrow windows. The custom title bar and global status HUD remain visible from every section.
+- Cards, dialogs, buttons, window controls, status symbols, and action icons use the locally bundled pixel-art kit. Nine-slice-style `border-image` treatment preserves panel and button corners as components resize.
+- Logs and test output keep native text and table layouts on dark screen surfaces; decoration never becomes part of the data or blocks pointer input.
+- Status is communicated through shape, label, and colour. Keyboard focus remains visible, selectable rows support Enter and Space, and nonessential motion respects `prefers-reduced-motion`.
+- Motion is limited to short state changes, system messages, and active sampling indicators. There is no continuous CRT flicker or network-loaded visual dependency.
+- Keyboard-first: number keys navigate between sections, `R` runs tests, `/` focuses the log filter, and `Esc` closes the detail panel.
 - The window is resized freely, so layouts are fluid rather than fixed to one screen size.
 
 ## Delivery plan

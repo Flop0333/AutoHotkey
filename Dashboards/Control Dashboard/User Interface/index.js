@@ -82,15 +82,25 @@ class ControlDashboardShell {
 
 		for (const [id, section] of this.sections)
 			section.element.hidden = id !== sectionId;
-		this.rail.querySelectorAll('.rail-item').forEach(item =>
-			item.classList.toggle('active', item.dataset.section === sectionId));
+		this.rail.querySelectorAll('.rail-item').forEach(item => {
+			const active = item.dataset.section === sectionId;
+			item.classList.toggle('active', active);
+			if (active)
+				item.setAttribute('aria-current', 'page');
+			else
+				item.removeAttribute('aria-current');
+		});
 
 		this.activeSectionId = sectionId;
+		document.body.dataset.section = sectionId;
 		this.sections.get(sectionId).activate();
 	}
 
 	showToast(message) {
 		this.toastElement.textContent = message;
+		this.toastElement.dataset.tone = /could not|error|failed/i.test(message)
+			? 'error'
+			: /warning|missing/i.test(message) ? 'warning' : 'info';
 		this.toastElement.classList.remove('show');
 		void this.toastElement.offsetWidth; // restart the animation even if a toast is already showing
 		this.toastElement.classList.add('show');
@@ -198,7 +208,7 @@ class StatusStrip {
 
 	_renderTests(tests) {
 		if (tests.status === 'running') {
-			this.tests.replaceChildren(Pill('running…', 'info'));
+			this.tests.replaceChildren(Pill('running…', 'running'));
 			return;
 		}
 		if (!tests.lastRunStatus) {
@@ -221,6 +231,7 @@ class ConfirmDialog {
 		this.acceptButton = document.querySelector('#confirm-accept');
 		this.cancelButton = document.querySelector('#confirm-cancel');
 		this.resolve = null;
+		this.previouslyFocused = null;
 
 		this.acceptButton.addEventListener('click', () => this._close(true));
 		this.cancelButton.addEventListener('click', () => this._close(false));
@@ -243,7 +254,9 @@ class ConfirmDialog {
 		this.message.textContent = message;
 		this.acceptButton.textContent = confirmLabel;
 		this.acceptButton.classList.toggle('button-danger', danger);
+		this.acceptButton.dataset.icon = 'confirm';
 		this.element.hidden = false;
+		this.previouslyFocused = document.activeElement;
 		this.acceptButton.focus();
 		return new Promise(resolve => this.resolve = resolve);
 	}
@@ -254,6 +267,9 @@ class ConfirmDialog {
 		this.element.hidden = true;
 		const resolve = this.resolve;
 		this.resolve = null;
+		if (this.previouslyFocused instanceof HTMLElement)
+			this.previouslyFocused.focus();
+		this.previouslyFocused = null;
 		resolve(accepted);
 	}
 }
@@ -318,7 +334,7 @@ class OverviewSection {
 
 	_renderTests(tests) {
 		if (tests.status === 'running') {
-			this.tests.replaceChildren(Pill('running…', 'info'));
+			this.tests.replaceChildren(Pill('running…', 'running'));
 			this.testsNote.textContent = '';
 			return;
 		}
@@ -452,8 +468,10 @@ class LogsSection {
 
 		if (this.selectedKey) {
 			const row = [...this.tableBody.querySelectorAll('tr')].find(r => r.dataset.key === this.selectedKey);
-			if (row)
+			if (row) {
 				row.classList.add('selected');
+				row.setAttribute('aria-selected', 'true');
+			}
 		}
 	}
 
@@ -536,6 +554,8 @@ class LogsSection {
 		rows.forEach(entry => {
 			const row = document.createElement('tr');
 			row.dataset.key = this._entryKey(entry);
+			row.tabIndex = 0;
+			row.setAttribute('aria-selected', 'false');
 			row.innerHTML = `
 				<td>${escapeHtml(entry.timestamp)}</td>
 				<td class="severity severity-${escapeHtml(entry.severity)}">${escapeHtml(entry.severity)}</td>
@@ -543,6 +563,12 @@ class LogsSection {
 				<td class="message-cell">${escapeHtml(entry.message)}</td>
 			`;
 			row.addEventListener('click', () => this._showDetail(entry, row));
+			row.addEventListener('keydown', event => {
+				if (event.key === 'Enter' || event.key === ' ') {
+					event.preventDefault();
+					this._showDetail(entry, row);
+				}
+			});
 			row.querySelector('.message-cell').addEventListener('click', (e) => {
 				e.stopPropagation();
 				this._showDetail(entry, row);
@@ -553,13 +579,17 @@ class LogsSection {
 	}
 
 	_showDetail(entry, row) {
-		this.tableBody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+		this.tableBody.querySelectorAll('tr').forEach(r => {
+			r.classList.remove('selected');
+			r.setAttribute('aria-selected', 'false');
+		});
 		row.classList.add('selected');
+		row.setAttribute('aria-selected', 'true');
 		this.selectedKey = this._entryKey(entry);
 		this.detailPanel.innerHTML = `
 			<div class="detail-header">
 				<h2>${escapeHtml(entry.severity.toUpperCase())}: ${escapeHtml(entry.message)}</h2>
-				<button type="button" class="button copy-btn" title="Copy details to clipboard">📋 Copy</button>
+				<button type="button" class="button copy-btn" data-icon="copy" title="Copy details to clipboard">Copy</button>
 			</div>
 			<p><strong>Script:</strong> ${escapeHtml(entry.script)}</p>
 			<p><strong>Time:</strong> ${escapeHtml(entry.timestamp)}</p>
@@ -607,6 +637,11 @@ class TestsSection {
 		this._renderStatus(state.status || {}, running);
 		this.runButton.disabled = running;
 		this.runButton.textContent = running ? 'Running…' : 'Run all tests';
+		const lastRunStatus = state.status && state.status.lastRunStatus;
+		this.runButton.dataset.testState = running
+			? 'running'
+			: !lastRunStatus ? 'run' : lastRunStatus === 'PASS' ? 'passed' : 'failed';
+		this.runButton.setAttribute('aria-label', running ? 'Tests are running' : 'Run all tests');
 
 		const changed = TestsSection.Fingerprint(this.runs) !== TestsSection.Fingerprint(state.runs || []);
 		this.runs = state.runs || [];
@@ -625,7 +660,7 @@ class TestsSection {
 
 	_renderStatus(status, running) {
 		if (running) {
-			this.status.replaceChildren(Pill('running…', 'info'));
+			this.status.replaceChildren(Pill('running…', 'running'));
 			this.statusNote.textContent = status.currentSuite ? `Currently: ${status.currentSuite}` : '';
 			return;
 		}
@@ -666,6 +701,8 @@ class TestsSection {
 		this.runs.forEach(run => {
 			const row = document.createElement('tr');
 			row.dataset.timestamp = run.timestamp;
+			row.tabIndex = 0;
+			row.setAttribute('aria-selected', 'false');
 			const passed = run.overallStatus === 'PASS';
 			row.innerHTML = `
 				<td>${escapeHtml(TestsSection.FormatTime(run.timestamp))}</td>
@@ -673,8 +710,16 @@ class TestsSection {
 				<td>${escapeHtml(TestsSection.FormatDuration(run.durationSeconds))}</td>
 			`;
 			row.addEventListener('click', () => this._showDetail(run));
-			if (run.timestamp === this.selectedTimestamp)
+			row.addEventListener('keydown', event => {
+				if (event.key === 'Enter' || event.key === ' ') {
+					event.preventDefault();
+					this._showDetail(run);
+				}
+			});
+			if (run.timestamp === this.selectedTimestamp) {
 				row.classList.add('selected');
+				row.setAttribute('aria-selected', 'true');
+			}
 			this.tableBody.appendChild(row);
 		});
 	}
@@ -687,8 +732,11 @@ class TestsSection {
 
 	_showDetail(run) {
 		this.selectedTimestamp = run.timestamp;
-		this.tableBody.querySelectorAll('tr').forEach(row =>
-			row.classList.toggle('selected', row.dataset.timestamp === run.timestamp));
+		this.tableBody.querySelectorAll('tr').forEach(row => {
+			const selected = row.dataset.timestamp === run.timestamp;
+			row.classList.toggle('selected', selected);
+			row.setAttribute('aria-selected', String(selected));
+		});
 
 		this.detail.replaceChildren();
 		const heading = document.createElement('h2');
@@ -718,7 +766,8 @@ class TestsSection {
 			const copy = document.createElement('button');
 			copy.type = 'button';
 			copy.className = 'button';
-			copy.textContent = '📋 Copy output';
+			copy.dataset.icon = 'copy';
+			copy.textContent = 'Copy output';
 			copy.addEventListener('click', () => {
 				AhkDataService.SetClipboard(`${suite.name}\n\n${suite.output}`);
 				this.shell.showToast(`${suite.name} output copied to clipboard`);
@@ -779,6 +828,7 @@ class ProfilesSection {
 	_card(profile) {
 		const card = document.createElement('div');
 		card.className = 'card stat';
+		card.classList.toggle('is-active', profile.isCurrent);
 		card.innerHTML = `
 			<span class="stat-label">Profile</span>
 			<span class="stat-value stat-value-compact">${escapeHtml(profile.displayName)}</span>
@@ -795,6 +845,7 @@ class ProfilesSection {
 			const button = document.createElement('button');
 			button.type = 'button';
 			button.className = 'button';
+			button.dataset.icon = 'switch-profile';
 			button.textContent = 'Switch and reload';
 			button.addEventListener('click', () => this._switch(profile));
 			actions.appendChild(button);
@@ -923,6 +974,7 @@ class ProcessesSection {
 		const button = document.createElement('button');
 		button.type = 'button';
 		button.className = danger ? 'button button-danger' : 'button';
+		button.dataset.icon = label.toLowerCase();
 		button.textContent = label;
 		button.addEventListener('click', onClick);
 		return button;
@@ -1033,7 +1085,7 @@ class HealthSection {
 		const processes = Number(cpu.processes) || 0;
 		const cores = Number(cpu.processorCount) || 0;
 		if (cpu.percent === '' || cpu.percent === undefined || cpu.percent === null) {
-			this.cpu.replaceChildren(Pill('sampling…', 'neutral'));
+			this.cpu.replaceChildren(Pill('sampling…', 'running'));
 			this.cpuNote.textContent = `Measuring ${Count(processes, 'process', 'processes')} over the next second.`;
 			return;
 		}

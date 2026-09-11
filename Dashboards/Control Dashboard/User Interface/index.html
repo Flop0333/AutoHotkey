@@ -1,21 +1,23 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
   <title>Control Dashboard</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="title-bar">
     <div class="drag-region" onmousedown="ahk.DragWindow()">
-      <span class="title-text">AutoHotkey Control Dashboard</span>
+      <img class="title-emblem" src="assets/control-deck/app-emblem.png" alt="">
+      <span class="title-text"><span class="title-kicker">AHK //</span> CONTROL DECK</span>
       <span id="git-status" class="git-status"></span>
     </div>
     <div class="title-btn-container">
-      <span class="title-btn" onclick="ahk.Minimize()">0</span>
-      <span class="title-btn title-btn-maximize" onclick="ahk.Maximize()">1</span>
-      <span class="title-btn title-btn-close" onclick="ahk.Close()">r</span>
+      <button type="button" class="title-btn" onclick="ahk.Minimize()" aria-label="Minimize dashboard"><img src="assets/control-deck/window-minimize.png" alt=""></button>
+      <button type="button" class="title-btn title-btn-maximize" onclick="ahk.Maximize()" aria-label="Maximize or restore dashboard"><img src="assets/control-deck/window-maximize.png" alt=""></button>
+      <button type="button" class="title-btn title-btn-close" onclick="ahk.Close()" aria-label="Close dashboard"><img src="assets/control-deck/window-close.png" alt=""></button>
     </div>
   </div>
 
@@ -41,12 +43,13 @@
 
   <div class="shell">
     <nav class="rail" id="rail">
-      <button type="button" class="rail-item" data-section="overview"><span class="rail-icon">◉</span><span class="rail-label">Overview</span></button>
-      <button type="button" class="rail-item" data-section="processes"><span class="rail-icon">▦</span><span class="rail-label">Processes</span></button>
-      <button type="button" class="rail-item" data-section="logs"><span class="rail-icon">☰</span><span class="rail-label">Logs</span></button>
-      <button type="button" class="rail-item" data-section="tests"><span class="rail-icon">✔</span><span class="rail-label">Tests</span></button>
-      <button type="button" class="rail-item" data-section="profiles"><span class="rail-icon">◧</span><span class="rail-label">Profiles</span></button>
-      <button type="button" class="rail-item" data-section="health"><span class="rail-icon">✚</span><span class="rail-label">Health</span></button>
+      <div class="rail-heading" aria-hidden="true">SYSTEM MODULES</div>
+      <button type="button" class="rail-item" data-section="overview"><span class="rail-key">01</span><span class="rail-icon"><img src="assets/control-deck/nav-overview.png" alt=""></span><span class="rail-label">Overview</span></button>
+      <button type="button" class="rail-item" data-section="processes"><span class="rail-key">02</span><span class="rail-icon"><img src="assets/control-deck/nav-processes.png" alt=""></span><span class="rail-label">Processes</span></button>
+      <button type="button" class="rail-item" data-section="logs"><span class="rail-key">03</span><span class="rail-icon"><img src="assets/control-deck/nav-logs.png" alt=""></span><span class="rail-label">Logs</span></button>
+      <button type="button" class="rail-item" data-section="tests"><span class="rail-key">04</span><span class="rail-icon"><img src="assets/control-deck/nav-tests.png" alt=""></span><span class="rail-label">Tests</span></button>
+      <button type="button" class="rail-item" data-section="profiles"><span class="rail-key">05</span><span class="rail-icon"><img src="assets/control-deck/nav-profiles.png" alt=""></span><span class="rail-label">Profiles</span></button>
+      <button type="button" class="rail-item" data-section="health"><span class="rail-key">06</span><span class="rail-icon"><img src="assets/control-deck/nav-health.png" alt=""></span><span class="rail-label">Health</span></button>
     </nav>
 
     <div class="shortcut-help" title="Keyboard shortcuts">1–6 sections · R run tests · / log filter · Esc close details</div>
@@ -90,17 +93,17 @@
 
         <h2 class="group-title">Suite</h2>
         <div class="action-row">
-          <button type="button" class="button button-danger" id="action-reload">Reload suite</button>
-          <button type="button" class="button button-danger" id="action-exit">Exit suite</button>
-          <button type="button" class="button" id="action-run-tests">Run all tests</button>
+          <button type="button" class="button button-danger" id="action-reload" data-icon="reload">Reload suite</button>
+          <button type="button" class="button button-danger" id="action-exit" data-icon="exit">Exit suite</button>
+          <button type="button" class="button" id="action-run-tests" data-icon="run-tests">Run all tests</button>
         </div>
 
         <h2 class="group-title">Send a test notification</h2>
         <p class="group-note">Writes a real log entry through the same path the suite uses, so the Logger popup reacts exactly as it would for a real one.</p>
         <div class="action-row">
-          <button type="button" class="button" data-test-severity="info">Info</button>
-          <button type="button" class="button" data-test-severity="warning">Warning</button>
-          <button type="button" class="button" data-test-severity="error">Error</button>
+          <button type="button" class="button" data-test-severity="info" data-icon="notify-info">Info</button>
+          <button type="button" class="button button-warning" data-test-severity="warning" data-icon="notify-warning">Warning</button>
+          <button type="button" class="button button-danger" data-test-severity="error" data-icon="notify-error">Error</button>
         </div>
       </section>
 
@@ -123,13 +126,13 @@
         <div class="toolbar">
           <select id="severity-filter" title="Filter by severity"><option value="">All severities</option></select>
           <select id="script-filter" title="Filter by script"><option value="">All scripts</option></select>
-          <button type="button" id="sort-time">Time ↓</button>
-          <button type="button" id="open-archive" title="Open archived logs from earlier sessions">Earlier sessions</button>
+          <button type="button" id="sort-time" data-icon="sort">Time ↓</button>
+          <button type="button" id="open-archive" data-icon="archive" title="Open archived logs from earlier sessions">Earlier sessions</button>
           <span id="entry-count" class="muted-text"></span>
           <span class="test-buttons">
-            <button type="button" class="test-btn" data-severity="info" title="Log and notify a test info entry">Test Info</button>
-            <button type="button" class="test-btn" data-severity="warning" title="Log and notify a test warning entry">Test Warning</button>
-            <button type="button" class="test-btn" data-severity="error" title="Log and notify a test error entry">Test Error</button>
+            <button type="button" class="test-btn" data-severity="info" data-icon="notify-info" title="Log and notify a test info entry">Test Info</button>
+            <button type="button" class="test-btn" data-severity="warning" data-icon="notify-warning" title="Log and notify a test warning entry">Test Warning</button>
+            <button type="button" class="test-btn" data-severity="error" data-icon="notify-error" title="Log and notify a test error entry">Test Error</button>
           </span>
         </div>
         <div class="layout">
@@ -153,7 +156,7 @@
           <p class="section-subtitle">Run the suites and read the last run.</p>
         </header>
         <div class="action-row tests-toolbar">
-          <button type="button" class="button" id="action-run-suites">Run all tests</button>
+          <button type="button" class="button test-control" id="action-run-suites" data-test-state="run" aria-label="Run all tests">Run all tests</button>
           <span class="pill-row" id="tests-status"></span>
           <span class="muted-text" id="tests-status-note"></span>
         </div>
@@ -221,9 +224,9 @@
 
         <h2 class="group-title">Open</h2>
         <div class="action-row">
-          <button type="button" class="button" id="action-open-logs">Logs folder</button>
-          <button type="button" class="button" id="action-open-archive">Archived sessions</button>
-          <button type="button" class="button" id="action-open-repository">Repository</button>
+          <button type="button" class="button" id="action-open-logs" data-icon="open-folder">Logs folder</button>
+          <button type="button" class="button" id="action-open-archive" data-icon="archive">Archived sessions</button>
+          <button type="button" class="button" id="action-open-repository" data-icon="open-repository">Repository</button>
         </div>
       </section>
     </main>
@@ -234,13 +237,13 @@
       <h2 class="modal-title" id="confirm-title"></h2>
       <p class="modal-message" id="confirm-message"></p>
       <div class="modal-actions">
-        <button type="button" class="button" id="confirm-cancel">Cancel</button>
-        <button type="button" class="button button-danger" id="confirm-accept">Confirm</button>
+        <button type="button" class="button" id="confirm-cancel" data-icon="cancel">Cancel</button>
+        <button type="button" class="button button-danger" id="confirm-accept" data-icon="confirm">Confirm</button>
       </div>
     </div>
   </div>
 
-  <div id="toast"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
 
   <script src="AhkDataService.js"></script>
   <script src="index.js"></script>
