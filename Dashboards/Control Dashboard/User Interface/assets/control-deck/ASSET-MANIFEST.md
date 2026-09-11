@@ -1,121 +1,78 @@
-# AHK Control Deck V2 asset manifest
+# Control Deck Minimalized Icon Manifest
 
-This second asset kit replaces the first direction with denser, easier-to-read pixel art and a black, brown, and dark-red hardware identity. It contains no mascot or character artwork. The existing dashboard frontend was inspected to cover its actual navigation, status, process, log, test, profile, health, confirmation, and title-bar controls. No dashboard source file was edited.
+This folder contains the icon-only redraw of the Control Deck asset family. Backgrounds, textures, buttons, panels, cursors, illustrations, and mascot artwork are intentionally excluded.
 
-## Palette
+## Visual system
 
-- near-black `#090807`
-- warm black `#15110F`
-- dark brown `#241A16`
-- brown `#3A2720`
-- dark oxblood `#5A191D`
-- red highlight `#8E2C31`
-- copper `#B56A36`
-- brass `#D0A05A`
-- warm ivory `#D8C6A5`
-- muted taupe `#786B5C`
-- success green `#5FA86B`
-- warning amber `#D9A13B`
-- error red `#C94F4F`
+- Main semantic symbol occupies roughly 76–84% of each canvas.
+- Decorative hardware is limited to small, disconnected corner ticks or status pixels.
+- All edges use a hard pixel grid with binary alpha; there are no anti-aliased transparency halos.
+- The 96×96 icons are authored on a shared 48×48 virtual grid and enlarged 2× with nearest-neighbor sampling.
+- The app emblem uses a 64×64 virtual grid; the tray icon uses a simplified 32×32 virtual grid.
 
-Every visible runtime pixel is restricted to this palette. Transparent icons and buttons use hard alpha. `screen-texture.png` intentionally uses low partial alpha.
+## Approved palette
 
-## Branding
-
-| File | Size | Purpose |
-| --- | ---: | --- |
-| `app-emblem.png` | 256×256 | Detailed command-console, keyboard-input, and automation emblem. |
-| `tray-icon.png` | 256×256 | Simplified emblem for 16px and 32px tray use. |
-
-## Navigation
-
-All navigation assets are 96×96 transparent PNGs built on a denser 48×48 virtual grid and intended for display around 32px.
-
-| File | Dashboard destination |
+| Role | Hex |
 | --- | --- |
-| `nav-overview.png` | Overview |
-| `nav-processes.png` | Processes |
-| `nav-logs.png` | Logs |
-| `nav-tests.png` | Tests |
-| `nav-profiles.png` | Profiles |
-| `nav-health.png` | Health |
+| Deep black | `#090807` |
+| Warm black | `#15110F` |
+| Dark brown | `#241A16` |
+| Raised brown | `#3A2720` |
+| Dark red | `#5A191D` |
+| Primary red | `#8E2C31` |
+| Copper | `#B56A36` |
+| Warm amber | `#D0A05A` |
+| Warm ivory | `#D8C6A5` |
+| Muted taupe | `#786B5C` |
+| Success green | `#5FA86B` |
+| Warning amber | `#D9A13B` |
+| Error red | `#C94F4F` |
 
-## Actions and window controls
+## Assets
 
-All action assets are 96×96 transparent PNGs using the same 48×48 grid, frame weight, and lighting.
+| Filename | Dimensions | Purpose | Generation method |
+| --- | ---: | --- | --- |
+| `app-emblem.png` | 256×256 | Primary automation/command emblem | ImageGen redraw, palette snap, 64 px virtual grid |
+| `tray-icon.png` | 256×256 | Simplified small-size application emblem | ImageGen redraw, palette snap, 32 px virtual grid |
+| `nav-overview.png` | 96×96 | Overview navigation | ImageGen icon-first redraw, 48 px virtual grid |
+| `nav-processes.png` | 96×96 | Processes navigation | ImageGen icon-first redraw, 48 px virtual grid |
+| `nav-logs.png` | 96×96 | Logs navigation | ImageGen icon-first redraw, 48 px virtual grid |
+| `nav-tests.png` | 96×96 | Tests navigation | ImageGen icon-first redraw, 48 px virtual grid |
+| `nav-profiles.png` | 96×96 | Profiles navigation | ImageGen icon-first redraw, 48 px virtual grid |
+| `nav-health.png` | 96×96 | Health navigation | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-reload.png` | 96×96 | Reload action | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-exit.png` | 96×96 | Exit/power action | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-run-tests.png` | 96×96 | Run tests action | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-notify-info.png` | 96×96 | Informational notification | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-notify-warning.png` | 96×96 | Warning notification | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-notify-error.png` | 96×96 | Error notification | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-start.png` | 96×96 | Start process | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-restart.png` | 96×96 | Restart process | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-stop.png` | 96×96 | Stop process | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-sort.png` | 96×96 | Sort list | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-archive.png` | 96×96 | Archive item | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-copy.png` | 96×96 | Copy content | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-open-folder.png` | 96×96 | Open folder | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-open-repository.png` | 96×96 | Open repository | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-switch-profile.png` | 96×96 | Switch profile | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-confirm.png` | 96×96 | Confirm action | ImageGen icon-first redraw, 48 px virtual grid |
+| `action-cancel.png` | 96×96 | Cancel action | ImageGen icon-first redraw, 48 px virtual grid |
+| `status-neutral.png` | 96×96 | Neutral/idle status | ImageGen state redraw, 48 px virtual grid |
+| `status-info.png` | 96×96 | Informational status | ImageGen state redraw, 48 px virtual grid |
+| `status-success.png` | 96×96 | Successful/passed status | ImageGen state redraw, 48 px virtual grid |
+| `status-warning.png` | 96×96 | Warning status | ImageGen state redraw, 48 px virtual grid |
+| `status-error.png` | 96×96 | Failed/error status | ImageGen state redraw, 48 px virtual grid |
+| `status-running.png` | 96×96 | Running/testing status | ImageGen state redraw, 48 px virtual grid |
+| `window-minimize.png` | 96×96 | Window minimize control | ImageGen icon-first redraw, 48 px virtual grid |
+| `window-maximize.png` | 96×96 | Window maximize/restore control | ImageGen icon-first redraw, 48 px virtual grid |
+| `window-close.png` | 96×96 | Window close control | ImageGen icon-first redraw, 48 px virtual grid |
+| `preview-contact-sheet.png` | 1500×930 | Review sheet at 72, 32, and 24 px | Programmatic nearest-neighbor composition |
 
-| File | Dashboard use |
-| --- | --- |
-| `action-reload.png` | Reload the suite. |
-| `action-exit.png` | Exit the suite. |
-| `action-run-tests.png` | Run all tests. |
-| `action-notify-info.png` | Send a test information notification. |
-| `action-notify-warning.png` | Send a test warning notification. |
-| `action-notify-error.png` | Send a test error notification. |
-| `action-start.png` | Start a stopped process. |
-| `action-restart.png` | Restart a process. |
-| `action-stop.png` | Stop a process. |
-| `action-sort.png` | Change log sort order. |
-| `action-archive.png` | Open archived sessions. |
-| `action-copy.png` | Copy log or test details. |
-| `action-open-folder.png` | Open logs or archive folders. |
-| `action-open-repository.png` | Open the repository. |
-| `action-switch-profile.png` | Activate a different profile. |
-| `action-confirm.png` | Confirm an operation. |
-| `action-cancel.png` | Cancel or dismiss an operation. |
-| `window-minimize.png` | Minimize the dashboard. |
-| `window-maximize.png` | Maximize or restore the dashboard. |
-| `window-close.png` | Close the dashboard window. |
+## Validation and quality notes
 
-## Semantic states
-
-Each state symbol is a 96×96 transparent PNG. Shape and color both change so meaning does not depend on color alone.
-
-| File | State |
-| --- | --- |
-| `status-neutral.png` | Neutral, unavailable, or not run. |
-| `status-info.png` | Informational. |
-| `status-success.png` | Healthy, active, installed, or passed. |
-| `status-warning.png` | Warning, partial, missing, or busy. |
-| `status-error.png` | Error or failed. |
-| `status-running.png` | Sampling, loading, or tests currently running. |
-
-## Button assets
-
-All buttons are 320×80 transparent PNGs. The generic files contain no text or icon so the dashboard can overlay accessible HTML labels. The four test controls contain exact state text as specifically requested.
-
-| File | State or label |
-| --- | --- |
-| `button-generic-normal.png` | Normal button surface. |
-| `button-generic-hover.png` | Hovered surface. |
-| `button-generic-pressed.png` | Pressed or selected surface. |
-| `button-generic-disabled.png` | Disabled surface. |
-| `button-generic-warning.png` | Warning action surface. |
-| `button-generic-destructive.png` | Destructive action surface. |
-| `button-tests-run.png` | `RUN TESTS` |
-| `button-tests-running.png` | `TESTING...` |
-| `button-tests-passed.png` | `TESTS PASSED` |
-| `button-tests-failed.png` | `TESTS FAILED` |
-
-## Materials and review
-
-| File | Size | Purpose |
-| --- | ---: | --- |
-| `background-tile.png` | 256×256 | Seamless low-contrast machine-casing texture. |
-| `screen-texture.png` | 256×256 | Seamless low-alpha scanline and phosphor overlay. |
-| `panel-plate.png` | 256×256 | Detailed inset plate for cards, dialogs, or detail panes. |
-| `preview-contact-sheet.png` | 1800×1400 | Full kit review at intended interface sizes. Not a runtime asset. |
-
-## Generation and verification
-
-The visual sources were produced with the built-in OpenAI ImageGen tool. Related controls were generated as tightly aligned family atlases to preserve consistent lighting and geometry, then exported as individual files. A deterministic post-process removed generator backdrops, snapped colors to the palette, normalized icons on a 48×48 virtual grid, used nearest-neighbor enlargement, added the exact test-state labels, and enforced final canvases.
-
-Validation completed successfully:
-
-- 48 PNG files present with the expected dimensions;
-- no mascot or character assets present;
-- all runtime pixels belong to the documented palette;
-- hard alpha on icons and buttons;
-- partial alpha limited to the screen overlay;
-- matching opposite edges on both seamless textures;
-- exact test-button text visually reviewed on the contact sheet.
+- 34 canonical icon files are present; all canonical icon-like filenames from `control-deck` are represented.
+- All icons have transparent backgrounds and only fully transparent or fully opaque pixels.
+- All visible icon pixels belong to the approved 13-color palette.
+- The contact sheet confirms semantic legibility at 32×32 and 24×24.
+- The `status-info` beacon intentionally uses ivory, green, and amber rather than blue to remain within the approved palette.
+- These are raster production candidates. A final in-application review is still recommended because browser scaling and display DPI can change the apparent sharpness of pixel art.
