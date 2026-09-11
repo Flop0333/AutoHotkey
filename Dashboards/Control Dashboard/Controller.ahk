@@ -508,7 +508,7 @@ Class ControlDashboard extends WebViewToo {
 		branch := "", ahead := 0, behind := 0
 		try {
 			shell := ComObject("WScript.Shell")
-			exec := shell.Exec(A_ComSpec ' /C cd /d "' Paths.autohotkey '" && git status -sb --porcelain=v1')
+			exec := shell.Exec(A_ComSpec ' /C cd /d "' Paths.autohotkey '" && git status -sb --porcelain=v1', "Hxide")
 			while !exec.Status
 				Sleep(10)
 			firstLine := StrSplit(exec.StdOut.ReadAll(), "`n")[1]
