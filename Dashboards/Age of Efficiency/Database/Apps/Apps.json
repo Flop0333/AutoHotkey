@@ -114,16 +114,6 @@
 		"argument": "",
 		"argumentRequired": 0,
 		"category": "PC Management",
-		"command": "AL",
-		"icon": "AutoHotkey",
-		"id": 18,
-		"title": "AutoHotkey Control Deck"
-	},
-	{
-		"action": "OpenAutoHotkeyDashboard",
-		"argument": "",
-		"argumentRequired": 0,
-		"category": "PC Management",
 		"command": "D",
 		"icon": "AutoHotkey",
 		"id": 20,
