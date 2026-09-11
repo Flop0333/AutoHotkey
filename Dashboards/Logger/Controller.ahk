@@ -17,17 +17,15 @@ Class LoggerPopup {
 	isOpen := false
 	activeSeverities := Map("info", false, "warning", false, "error", false)
 	latestEntries := Map()
-	hideTimerFns := Map()
 	renderedState := ""
 	geometry := {x: 0, y: 0, w: 0, h: 0}
 
 	__New() {
 		this.renderer := LoggerPopupRenderer()
 		this.Gui := Gui("+AlwaysOnTop +ToolWindow -SysMenu -Caption -DPIScale +E0x80000", LoggerWindowTitle())
-		for severity in LoggerPopup.SEVERITIES {
+		for severity in LoggerPopup.SEVERITIES
 			this.latestEntries[severity] := Map("script", "", "message", "")
-			this.hideTimerFns[severity] := this._OnSeverityTimeout.Bind(this, severity)
-		}
+		this.hideTimerFn := this._HideNotification.Bind(this)
 
 		OnMessage(0x0202, this._OnLeftButtonUp.Bind(this))   ; WM_LBUTTONUP
 		OnMessage(0x0205, this._OnRightButtonUp.Bind(this))  ; WM_RBUTTONUP
@@ -53,10 +51,9 @@ Class LoggerPopup {
 
 	Dismiss() {
 		MarkAllLogsRead()
-		for severity in LoggerPopup.SEVERITIES {
-			SetTimer(this.hideTimerFns[severity], 0)
+		SetTimer(this.hideTimerFn, 0)
+		for severity in LoggerPopup.SEVERITIES
 			this.activeSeverities[severity] := false
-		}
 		this.counts := Map("info", 0, "warning", 0, "error", 0)
 		this._Render()
 		this.Hide()
@@ -138,28 +135,17 @@ Class LoggerPopup {
 			"message", Trim(RegExReplace(entry.Get("message", ""), "\s+", " "))
 		)
 		this.Show()
-		SetTimer(this.hideTimerFns[severity], 0)
-		SetTimer(this.hideTimerFns[severity], -LoggerPopup.VISIBLE_DURATION)
+		; One shared timer, restarted by every notification: every expanded row
+		; stays expanded until the latest entry has had its full duration.
+		SetTimer(this.hideTimerFn, -LoggerPopup.VISIBLE_DURATION)
 	}
 
 	_HideNotification() {
-		for severity in LoggerPopup.SEVERITIES {
-			SetTimer(this.hideTimerFns[severity], 0)
+		SetTimer(this.hideTimerFn, 0)
+		for severity in LoggerPopup.SEVERITIES
 			this.activeSeverities[severity] := false
-		}
 		this._Render()
 		this.Hide()
-	}
-
-	_OnSeverityTimeout(severity) {
-		this.activeSeverities[severity] := false
-		for otherSeverity in LoggerPopup.SEVERITIES {
-			if this.activeSeverities[otherSeverity] {
-				this._Render()
-				return
-			}
-		}
-		this._HideNotification()
 	}
 
 	; Repaints only when the visible content changes; the poll runs every second.
