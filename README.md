@@ -72,3 +72,9 @@ The suite is intentionally code-first: editing a clear script can be faster—an
 - [AI agent guide](AGENTS.md) — focused instructions for coding agents
 
 Feel free to explore, adapt the ideas, report a bug, or share feedback. I hope something here inspires your own Windows workflow. 💭
+
+## 🔑 License
+
+Original project code is available under the [MIT License](LICENSE), so it may
+be used, modified, and redistributed, including commercially. Bundled
+third-party libraries retain their own terms
