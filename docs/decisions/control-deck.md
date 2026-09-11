@@ -18,7 +18,7 @@ This is a short historical record for [epic #108](https://github.com/Flop0333/Au
 - The web layer can only call named callbacks. No path, command line, or script text crosses the bridge; scripts are addressed by process id and files by the host.
 - Reload, exit, stop, and profile switching are confirmed in the page before anything happens, never through a message box the hidden host would open behind its own window.
 - Exiting or reloading the suite ends the Control Deck too, and the confirmation says so.
-- Secrets are reported as counts only. Values and key names never reach the page; the Secrets card opens the local file in VS Code rather than displaying it.
+- Secrets are reported as counts only. Values and key names never reach the page; the Secrets cards on the Overview and Health open the local file in VS Code rather than displaying it.
 - Everything is local: files, processes, and the git status of the checkout. External commands run hidden.
 
 ## Visual direction

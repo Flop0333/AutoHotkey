@@ -125,6 +125,26 @@ class ControlDeckShell {
 		this.sections.get(sectionId).activate();
 	}
 
+	openRepositoryInVsCode() {
+		return this._inVsCode(AhkDataService.OpenRepositoryInVsCode, 'Opening the repository in VS Code…');
+	}
+
+	// Shared by the Secrets cards on the Overview and Health.
+	openSecretsInVsCode() {
+		return this._inVsCode(AhkDataService.OpenSecretsInVsCode, 'Opening My Secrets.json in VS Code…');
+	}
+
+	// Starting VS Code can take a moment, so the host answers asynchronously
+	// instead of freezing the page while it waits.
+	async _inVsCode(open, startedMessage) {
+		try {
+			const result = await open();
+			this.showToast(result.ok ? startedMessage : `Could not open VS Code: ${result.error}`);
+		} catch (error) {
+			this.showToast(`Could not open VS Code: ${error.message}`);
+		}
+	}
+
 	// A section requested by another script. The window stays loaded while
 	// hidden, so the section asked for may already be the current one; it is
 	// activated again all the same - a Logger notification reopening Logs
@@ -368,35 +388,9 @@ class OverviewSection {
 	_attachEvents() {
 		this.element.querySelector('#action-reload').addEventListener('click', () => this._reload());
 		this.element.querySelector('#action-exit').addEventListener('click', () => this._exit());
-		this.element.querySelector('#action-open-vscode').addEventListener('click', () => this._openInVsCode());
-
-		const secretsCard = this.element.querySelector('#overview-secrets-card');
-		secretsCard.addEventListener('click', () => this._openSecretsInVsCode());
-		secretsCard.addEventListener('keydown', event => {
-			if (event.key === 'Enter' || event.key === ' ') {
-				event.preventDefault();
-				this._openSecretsInVsCode();
-			}
-		});
-	}
-
-	_openInVsCode() {
-		return this._inVsCode(AhkDataService.OpenRepositoryInVsCode, 'Opening the repository in VS Code…');
-	}
-
-	_openSecretsInVsCode() {
-		return this._inVsCode(AhkDataService.OpenSecretsInVsCode, 'Opening My Secrets.json in VS Code…');
-	}
-
-	// Starting VS Code can take a moment, so the host answers asynchronously
-	// instead of freezing the page while it waits.
-	async _inVsCode(open, startedMessage) {
-		try {
-			const result = await open();
-			this.shell.showToast(result.ok ? startedMessage : `Could not open VS Code: ${result.error}`);
-		} catch (error) {
-			this.shell.showToast(`Could not open VS Code: ${error.message}`);
-		}
+		this.element.querySelector('#action-open-vscode')
+			.addEventListener('click', () => this.shell.openRepositoryInVsCode());
+		OnActivate(this.element.querySelector('#overview-secrets-card'), () => this.shell.openSecretsInVsCode());
 	}
 
 	async _reload() {
@@ -1197,6 +1191,9 @@ class HealthSection {
 			.addEventListener('click', () => open(AhkDataService.OpenLogArchive, 'archive folder'));
 		this.element.querySelector('#action-open-repository')
 			.addEventListener('click', () => open(AhkDataService.OpenRepository, 'repository'));
+		// The cards act on what they describe, like the Overview's Secrets card.
+		OnActivate(this.element.querySelector('#health-secrets-card'), () => this.shell.openSecretsInVsCode());
+		OnActivate(this.element.querySelector('#health-repository-card'), () => open(AhkDataService.OpenRepository, 'repository'));
 	}
 }
 
@@ -1276,6 +1273,17 @@ function LogCountPills(counts, emptyLabel) {
 
 function SeverityTotal(counts) {
 	return LOG_SEVERITIES.reduce((total, severity) => total + (Number(counts[severity]) || 0), 0);
+}
+
+// A card that acts rather than navigates: click, Enter, and Space all run it.
+function OnActivate(element, handler) {
+	element.addEventListener('click', handler);
+	element.addEventListener('keydown', event => {
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			handler();
+		}
+	});
 }
 
 function Count(amount, singular, plural) {
