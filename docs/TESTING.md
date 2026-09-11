@@ -57,7 +57,7 @@ Targets are discovered from the suite startup wiring, plus the logging hosts, Co
 
 ## Control Deck and results
 
-Double-click `Tests/Run-Tests.ahk` or run the `Test` command in Age of Efficiency. The launcher opens the Control Deck on **Tests** and runs `Invoke-AllTests.ps1` in a hidden PowerShell process. The section scopes status and history to the current suite session and refuses to start a second run while one is in progress.
+Double-click `Tests/Run-Tests.ahk` or run the `Test` command in Age of Efficiency. The launcher opens the Control Deck on **Tests** and runs `Invoke-AllTests.ps1` in a hidden PowerShell process. Inside the Control Deck, the Tests section's run button, the `R` key, and the **Run tests** button that the status strip and Overview show until the first run of a session all start the same run. The section scopes status and history to the current suite session and refuses to start a second run while one is in progress.
 
 The combined runner executes all five suites and writes git-ignored runtime data:
 

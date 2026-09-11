@@ -22,9 +22,9 @@ It started as a collection of small scripts and grew into a profile-aware automa
 
 ### AutoHotkey Control Deck
 
-The suite control centre shows what is running, flags missing startup apps, surfaces logs and environment health, runs the complete test suite, and provides safe reload, exit, restart, stop, and profile-switch actions. Open it from the tray or Macro Board; Logger notifications land on Logs, and the Age of Efficiency `Test` command lands on Tests.
+The suite control centre shows what is running, flags missing startup apps, surfaces logs and environment health, runs the complete test suite, and provides safe reload, exit, restart, stop, and profile-switch actions. It starts hidden with the suite, so it opens instantly from the tray or Macro Board; Logger notifications land on Logs, and the Age of Efficiency `Test` command lands on Tests.
 
-Its **AHK Control Deck** interface combines a readable system terminal with original pixel-art navigation, status modules, hardware panels, and action controls.
+Its retro maintenance-console interface combines a readable system terminal with original pixel-art navigation, status modules, hardware panels, and action controls. Every readout in the status strip and on the Overview opens the section behind it.
 
 ![AutoHotkey Control Deck](Dashboards/Control%20Deck/Demo.png)
 

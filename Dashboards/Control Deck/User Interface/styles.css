@@ -222,6 +222,8 @@ img { image-rendering: pixelated; }
 
 /* === Panels and overview =============================================== */
 .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--gap); }
+/* Four cards read as two rows of two; auto-fit would leave one card alone. */
+#section-overview .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .card {
 	position: relative;
 	min-width: 0;
@@ -478,7 +480,7 @@ th[aria-sort="descending"] .sort-header::after { color: var(--red-highlight); co
 	.title-text { font-size: 13px; }
 	.title-kicker, .git-status { display: none; }
 	.title-btn { width: 40px; }
-	.card-grid { grid-template-columns: 1fr; }
+	.card-grid, #section-overview .card-grid { grid-template-columns: 1fr; }
 	.toolbar::before, .test-buttons { display: none; }
 	.toolbar select { min-width: 0; flex: 1 1 130px; }
 	.action-row > .button:not(.test-control) { flex: 1 1 100%; }
