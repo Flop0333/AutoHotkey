@@ -7,7 +7,7 @@ This records the decisions used to ship the **AutoHotkey Control Dashboard**: on
 Today the suite is operated from the tray menu (Reload, Profile, Log Dashboard, Test Dashboard, Exit) and from two separate WebView2 windows that each show one slice of the system. The Control Dashboard replaces that split with a single window that answers three questions and acts on them:
 
 - **What is running?** Profile, uptime, the AutoHotkey processes that belong to the suite, and whether the expected startup set is actually up.
-- **Is anything wrong?** Unread log entries by severity, the last test run, and environment health.
+- **Is anything wrong?** This session's log entries by severity, the last test run, and environment health.
 - **Can I change it from here?** Reload, exit, switch profile, restart a single app, run tests, and emit test notifications.
 
 ## Scope
@@ -21,11 +21,11 @@ Today the suite is operated from the tray menu (Reload, Profile, Log Dashboard, 
 
 ## Sections
 
-1. **Overview** — profile card, suite uptime, running-script count, unread log counts by severity, last test result, git branch/ahead/behind, and the primary actions (Reload suite, Exit suite, Run all tests, Send test notification / warning / error).
-2. **Processes** — the AutoHotkey processes that belong to the suite: script name, path, PID, start time. Per row: restart or stop. Expected-but-missing entries are flagged so a crashed app is visible without reading the log.
-3. **Logs** — the current Log Dashboard view: severity/script filters, time sort, detail panel with message and stack, copy to clipboard, archived sessions.
+1. **Overview** — profile card, secrets file state, the session's log counts by severity (with how many are unread), last test result, and the primary actions (Open in VS Code, Reload suite, Exit suite). The status strip shows the suite's processor use beside its LIVE marker, the running-script count with the session uptime, and the same log counts, whether or not they have been read. The git branch sits in the title bar beside the window controls. Until tests have run this session, the strip and the Overview offer a Run tests button in place of a test result. Each strip readout and Overview card opens the section that explains it; the Secrets card opens `Secrets/My Secrets.json` in VS Code.
+2. **Processes** — the AutoHotkey processes that belong to the suite: script name, path, PID, start time. Per row: restart or stop. Processes running from outside the repository are listed last. Expected-but-missing entries are flagged so a crashed app is visible without reading the log.
+3. **Logs** — the current Log Dashboard view: severity/script filters, sorting by clicking the Time, Severity, Script, or Message column header, detail panel with message and stack, copy to clipboard, archived sessions.
 4. **Tests** — run all suites or one suite, live run status, the last run's per-suite pass/fail and duration, and the run history already written to `Logs/test-run-history.log`.
-5. **Profiles** — every profile from `Profiles/Profile Manager.ahk`, which one is active, which device names map to it, and a switch action that restarts the suite into the chosen profile.
+5. **Profiles** — every profile from `Profiles/Profile Manager.ahk`, the active one first, which device names map to it, and a switch action that restarts the suite into the chosen profile.
 6. **Health** — AutoHotkey version and path, WebView2 runtime presence, resolved `Paths` roots, log session id and directory, secrets file sync state, and shortcuts to open the `Logs` folder or the repository.
 
 ## Architecture

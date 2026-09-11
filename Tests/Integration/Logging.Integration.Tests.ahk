@@ -174,8 +174,10 @@ Test_RealHostsAndCrossProcessBehavior() {
 		; documented basis) to match this file's other generous, evidence-
 		; based waits rather than guess at a root cause a third time.
 		Assert.True(WaitUntil(() => IsVisible(FindControlDashboardWindow()), 8000), "Client API should show shared dashboard")
-		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Opening dashboard should hide logger; read=" GetReadLogEntryCount() ", total=" GetLogEntryCount() DumpEntries())
-		Assert.Equal(0, GetUnreadLogEntries().Length, "Opening dashboard should mark all logs read")
+		Assert.Equal(2, GetUnreadLogEntries().Length, "Overview should preserve unread logs for its counters")
+		ShowControlDashboard("logs")
+		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Opening Logs should hide logger; read=" GetReadLogEntryCount() ", total=" GetLogEntryCount() DumpEntries())
+		Assert.Equal(0, GetUnreadLogEntries().Length, "Opening Logs should mark all logs read")
 		HideControlDashboard()
 		Assert.False(IsVisible(FindControlDashboardWindow()), "Client API should hide shared dashboard")
 

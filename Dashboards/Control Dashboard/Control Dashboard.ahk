@@ -25,7 +25,6 @@ ShowControlDashboard(section := "overview") {
 	if dashboardWindow {
 		WinShow("ahk_id " dashboardWindow)
 		WinActivate("ahk_id " dashboardWindow)
-		MarkAllLogsRead()
 		RequestControlDashboardSection(dashboardWindow, section)
 	}
 }

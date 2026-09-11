@@ -21,6 +21,13 @@ Class ControlDashboard extends WebViewToo {
 	static TEST_RUNNER_SCRIPT := Paths.autohotkey "\Tests\Invoke-AllTests.ps1"
 	static TEST_HISTORY_FILE := Paths.autohotkey "\Logs\test-run-history.log"
 	static SECRETS_FILE := Paths.autohotkey "\Secrets\My Secrets.json"
+	; User and machine-wide installs of VS Code, then Insiders. When none is
+	; present, the `code` command on PATH is the last resort.
+	static VSCODE_EXECUTABLES := [
+		Paths.vsCode,
+		A_ProgramFiles "\Microsoft VS Code\Code.exe",
+		Paths.windows.LocalAppData "\Programs\Microsoft VS Code Insiders\Code - Insiders.exe"
+	]
 	; Evergreen WebView2 runtime, as registered by its installer.
 	static WEBVIEW2_VERSION_KEYS := [
 		"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
@@ -46,6 +53,7 @@ Class ControlDashboard extends WebViewToo {
 		this.AddCallbackToScript("GetPendingSection", (*) => this.TakePendingSection())
 		this.AddCallbackToScript("GetSuiteStatus", (*) => this.GetSuiteStatusForWeb())
 		this.AddCallbackToScript("GetLogEntries", (*) => this.GetLogEntriesForWeb())
+		this.AddCallbackToScript("MarkLogsRead", (*) => MarkAllLogsRead())
 		this.AddCallbackToScript("SetClipboard", (webview, text) => A_Clipboard := text)
 		this.AddCallbackToScript("LogTestMessage", (webview, severity) => this.LogTestMessage(severity))
 		this.AddCallbackToScript("GetGitStatus", (*) => this.GetGitStatusForWeb())
@@ -56,6 +64,7 @@ Class ControlDashboard extends WebViewToo {
 		this.AddCallbackToScript("RunAllTests", (*) => this.RunAllTests())
 		this.AddCallbackToScript("GetTestRuns", (*) => this.GetTestRunsForWeb())
 		this.AddCallbackToScript("GetHealth", (*) => this.GetHealthForWeb())
+		this.AddCallbackToScript("GetSecretsState", (*) => JSON.Dump(this.SecretsState()))
 		this.AddCallbackToScript("GetProcesses", (*) => this.GetProcessesForWeb())
 		this.AddCallbackToScript("GetProfiles", (*) => this.GetProfilesForWeb())
 		this.AddCallbackToScript("RequestProfile", (webview, displayName) => this.RequestProfile(displayName))
@@ -67,6 +76,8 @@ Class ControlDashboard extends WebViewToo {
 		this.AddCallbackToScript("OpenLogArchive", (*) => this.OpenLogArchive())
 		this.AddCallbackToScript("OpenLogFolder", (*) => this.OpenLogFolder())
 		this.AddCallbackToScript("OpenRepository", (*) => this.OpenRepository())
+		this.AddCallbackToScript("OpenRepositoryInVsCode", (*) => this.OpenRepositoryInVsCode())
+		this.AddCallbackToScript("OpenSecretsInVsCode", (*) => this.OpenSecretsInVsCode())
 	}
 
 	OpenLogArchive() {
@@ -83,6 +94,40 @@ Class ControlDashboard extends WebViewToo {
 		return this.ReportOutcome(() => Run('explorer.exe "' Paths.autohotkey '"'))
 	}
 
+	OpenRepositoryInVsCode() {
+		return this.ReportOutcome(() => this.StartVsCode(Paths.autohotkey))
+	}
+
+	; The repository is passed along with the file, so the file opens in the
+	; repository's window rather than in a stray one.
+	OpenSecretsInVsCode() {
+		return this.ReportOutcome(() => this.StartVsCodeOnSecrets())
+	}
+
+	StartVsCodeOnSecrets() {
+		if !FileExist(ControlDashboard.SECRETS_FILE)
+			throw Error("There is no local secrets file yet - start the suite once to create it")
+		this.StartVsCode(Paths.autohotkey, ControlDashboard.SECRETS_FILE)
+	}
+
+	; Not VsCode.OpenFile: that waits for Code.exe to exit, which never happens
+	; when it is the first window, and would hang this host.
+	StartVsCode(targets*) {
+		arguments := ""
+		for target in targets
+			arguments .= ' "' target '"'
+		for executable in ControlDashboard.VSCODE_EXECUTABLES {
+			if FileExist(executable) {
+				Run('"' executable '"' arguments)
+				return
+			}
+		}
+		; `code` is a batch file, so it needs a shell; the shell's exit code is
+		; the only way to tell that it was not found.
+		if RunWait(A_ComSpec ' /C code' arguments, , "Hide")
+			throw Error("VS Code is not installed, or its code command is not on PATH")
+	}
+
 	Show() => super.Show(ControlDashboard.SHOW_OPTIONS, ControlDashboard.WIN_TITLE)
 
 	InitializeHidden() {
@@ -97,13 +142,19 @@ Class ControlDashboard extends WebViewToo {
 
 	; Everything the status strip shows, in one read: the log file is opened once
 	; under the shared logging lock instead of once per value.
+	; Processor use rides along because it is a rate: one sampler, read once per
+	; poll, keeps the interval between samples steady for the strip and Health.
 	GetSuiteStatusForWeb() {
 		logState := ReadLogState()
+		scripts := SuiteControl.ListRunningScripts(false)
 		return JSON.Dump(Map(
 			"profile", this.CurrentProfileName(),
 			"uptimeSeconds", this.SessionUptimeSeconds(logState["sessionId"]),
 			"entryCount", logState["entries"].Length,
-			"runningScripts", SuiteControl.ListRunningScripts(false).Length,
+			"runningScripts", scripts.Length,
+			"cpu", this.SampleCpu(scripts),
+			; Counting from a read cursor of zero counts every entry in the session.
+			"logCounts", GetUnreadLogCounts(logState["entries"], 0),
 			"unread", GetUnreadLogCounts(logState["entries"], logState["readEntryCount"]),
 			"tests", this.LastTestRun(this.SessionStartedAt(logState["sessionId"]))
 		))
@@ -305,15 +356,13 @@ Class ControlDashboard extends WebViewToo {
 
 	; --- Health -------------------------------------------------------------
 
-	; Everything the Health section reports. Only this section asks for it, so
-	; the processor sample and the registry and secrets lookups happen while it
-	; is on screen rather than on every poll tick.
+	; Everything the Health section reports beyond processor use, which comes
+	; with the suite status. Only this section asks for it, so the registry and
+	; secrets lookups happen while it is on screen rather than on every tick.
 	GetHealthForWeb() {
-		scripts := SuiteControl.ListRunningScripts(false)
 		return JSON.Dump(Map(
 			"autoHotkey", Map("version", A_AhkVersion, "path", A_AhkPath),
 			"webView2", this.WebView2Runtime(),
-			"cpu", this.SampleCpu(scripts),
 			"paths", Map(
 				"repository", Paths.autohotkey,
 				"logs", ErrorLogDirectory(),
@@ -328,8 +377,8 @@ Class ControlDashboard extends WebViewToo {
 		))
 	}
 
-	; Processor time is a rate, so it needs two samples. The first call after
-	; the section opens establishes the baseline and reports no percentage yet.
+	; Processor time is a rate, so it needs two samples. The first poll after
+	; the page starts establishes the baseline and reports no percentage yet.
 	SampleCpu(scripts) {
 		ticks := SuiteControl.TotalCpuTicks(scripts)
 		sampledAt := A_TickCount

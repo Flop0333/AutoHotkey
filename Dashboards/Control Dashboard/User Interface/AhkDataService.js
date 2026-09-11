@@ -10,6 +10,8 @@ class AhkDataService {
 
   static GetLogEntries = () => JSON.parse(ahk.sync.GetLogEntries());
 
+  static MarkLogsRead = () => ahk.sync.MarkLogsRead();
+
   static SetClipboard = (text) => ahk.SetClipboard(text);
 
   static LogTestMessage = (severity) => JSON.parse(ahk.sync.LogTestMessage(severity));
@@ -27,7 +29,10 @@ class AhkDataService {
 
   static GetHealth = () => JSON.parse(ahk.sync.GetHealth());
 
-  static GetProcesses = () => JSON.parse(ahk.sync.GetProcesses());
+  // Counts only, like the Health section's copy: no secret names or values.
+  static GetSecretsState = () => JSON.parse(ahk.sync.GetSecretsState());
+
+  static GetProcesses = () => ahk.GetProcesses().then(JSON.parse);
 
   static GetProfiles = () => JSON.parse(ahk.sync.GetProfiles());
 
@@ -49,4 +54,10 @@ class AhkDataService {
   static OpenLogFolder = () => JSON.parse(ahk.sync.OpenLogFolder());
 
   static OpenRepository = () => JSON.parse(ahk.sync.OpenRepository());
+
+  // Waits for VS Code's launcher to answer, so it is asynchronous.
+  static OpenRepositoryInVsCode = () => ahk.OpenRepositoryInVsCode().then(JSON.parse);
+
+  // Opens the local secrets file, whose path the host decides.
+  static OpenSecretsInVsCode = () => ahk.OpenSecretsInVsCode().then(JSON.parse);
 }

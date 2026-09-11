@@ -11,7 +11,8 @@
   <div class="title-bar">
     <div class="drag-region" onmousedown="ahk.DragWindow()">
       <img class="title-emblem" src="assets/control-deck/app-emblem.png" alt="">
-      <span class="title-text"><span class="title-kicker">AHK //</span> CONTROL DECK</span>
+      <span class="title-text"><span class="title-kicker">AutoHotkey</span> CONTROL DECK</span>
+      <!-- Pushed to the right edge, beside the window controls. -->
       <span id="git-status" class="git-status"></span>
     </div>
     <div class="title-btn-container">
@@ -21,21 +22,26 @@
     </div>
   </div>
 
-  <!-- Visible from every section: the four numbers worth knowing at a glance. -->
+  <!-- Visible from every section: the numbers worth knowing at a glance. Each
+       one opens the section that explains it. -->
   <div class="status-strip">
-    <div class="status-item">
+    <div class="status-live" data-open-section="health" role="link" tabindex="0" title="Processor use of every AutoHotkey process, as a share of the whole machine - open Health">
+      <span class="status-live-label">LIVE</span>
+      <span class="status-cpu" id="status-cpu">CPU …</span>
+    </div>
+    <div class="status-item" data-open-section="profiles" role="link" tabindex="0" title="Open Profiles">
       <span class="status-label">Profile</span>
       <span class="status-value" id="status-profile">…</span>
     </div>
-    <div class="status-item">
+    <div class="status-item" data-open-section="processes" role="link" tabindex="0" title="Open Processes">
       <span class="status-label">Session</span>
       <span class="status-value" id="status-uptime">…</span>
     </div>
-    <div class="status-item">
-      <span class="status-label">Unread</span>
-      <span class="status-value pill-row" id="status-unread"></span>
+    <div class="status-item" data-open-section="logs" role="link" tabindex="0" title="Open Logs">
+      <span class="status-label">Logs</span>
+      <span class="status-value pill-row" id="status-logs"></span>
     </div>
-    <div class="status-item">
+    <div class="status-item" data-open-section="tests" role="link" tabindex="0" title="Open Tests">
       <span class="status-label">Tests</span>
       <span class="status-value pill-row" id="status-tests"></span>
     </div>
@@ -61,50 +67,34 @@
           <p class="section-subtitle">Suite state at a glance, with the actions worth one click.</p>
         </header>
         <div class="card-grid">
-          <div class="card stat">
+          <div class="card stat card-link" data-open-section="profiles" role="link" tabindex="0" title="Open Profiles">
             <span class="stat-label">Profile</span>
             <span class="stat-value" id="overview-profile">…</span>
           </div>
-          <div class="card stat">
-            <span class="stat-label">Session</span>
-            <span class="stat-value" id="overview-uptime">…</span>
-            <span class="stat-note">since the suite started</span>
-          </div>
-          <div class="card stat">
-            <span class="stat-label">Running scripts</span>
-            <span class="stat-value" id="overview-scripts">…</span>
-          </div>
-          <div class="card stat">
-            <span class="stat-label">Unread log entries</span>
-            <span class="stat-value pill-row" id="overview-unread"></span>
+          <div class="card stat card-link" data-open-section="logs" role="link" tabindex="0" title="Open Logs">
+            <span class="stat-label">Log entries</span>
+            <span class="stat-value pill-row" id="overview-logs"></span>
             <span class="stat-note" id="overview-entries"></span>
           </div>
-          <div class="card stat">
+          <div class="card stat card-link" data-open-section="tests" role="link" tabindex="0" title="Open Tests">
             <span class="stat-label">Last test run</span>
             <span class="stat-value pill-row" id="overview-tests"></span>
             <span class="stat-note" id="overview-tests-note"></span>
           </div>
-          <div class="card stat">
-            <span class="stat-label">Repository</span>
-            <span class="stat-value stat-value-compact" id="overview-branch">…</span>
-            <span class="stat-note" id="overview-branch-note"></span>
+          <div class="card stat card-link" id="overview-secrets-card" role="button" tabindex="0" title="Open My Secrets.json in VS Code">
+            <span class="stat-label">Secrets</span>
+            <span class="stat-value pill-row" id="overview-secrets"></span>
+            <span class="stat-note" id="overview-secrets-note"></span>
           </div>
         </div>
 
         <h2 class="group-title">Suite</h2>
-        <div class="action-row">
+        <div class="action-row suite-actions">
+          <button type="button" class="button" id="action-open-vscode" data-icon="open-repository" title="Open the AutoHotkey repository in VS Code">Open in VS Code</button>
           <button type="button" class="button button-danger" id="action-reload" data-icon="reload">Reload suite</button>
           <button type="button" class="button button-danger" id="action-exit" data-icon="exit">Exit suite</button>
-          <button type="button" class="button" id="action-run-tests" data-icon="run-tests">Run all tests</button>
         </div>
 
-        <h2 class="group-title">Send a test notification</h2>
-        <p class="group-note">Writes a real log entry through the same path the suite uses, so the Logger popup reacts exactly as it would for a real one.</p>
-        <div class="action-row">
-          <button type="button" class="button" data-test-severity="info" data-icon="notify-info">Info</button>
-          <button type="button" class="button button-warning" data-test-severity="warning" data-icon="notify-warning">Warning</button>
-          <button type="button" class="button button-danger" data-test-severity="error" data-icon="notify-error">Error</button>
-        </div>
       </section>
 
       <section class="section section-scroll" id="section-processes" hidden>
@@ -126,7 +116,6 @@
         <div class="toolbar">
           <select id="severity-filter" title="Filter by severity"><option value="">All severities</option></select>
           <select id="script-filter" title="Filter by script"><option value="">All scripts</option></select>
-          <button type="button" id="sort-time" data-icon="sort">Time ↓</button>
           <button type="button" id="open-archive" data-icon="archive" title="Open archived logs from earlier sessions">Earlier sessions</button>
           <span id="entry-count" class="muted-text"></span>
           <span class="test-buttons">
@@ -139,7 +128,12 @@
           <div class="table-wrap">
             <table id="log-table" class="data-table">
               <thead>
-                <tr><th>Time</th><th>Severity</th><th>Script</th><th>Message</th></tr>
+                <tr>
+                  <th data-sort="timestamp"><button type="button" class="sort-header">Time</button></th>
+                  <th data-sort="severity"><button type="button" class="sort-header">Severity</button></th>
+                  <th data-sort="script"><button type="button" class="sort-header">Script</button></th>
+                  <th data-sort="message"><button type="button" class="sort-header">Message</button></th>
+                </tr>
               </thead>
               <tbody></tbody>
             </table>
@@ -156,7 +150,7 @@
           <p class="section-subtitle">Run the suites and read the last run.</p>
         </header>
         <div class="action-row tests-toolbar">
-          <button type="button" class="button test-control" id="action-run-suites" data-test-state="run" aria-label="Run all tests">Run all tests</button>
+          <button type="button" class="button test-control" id="action-run-suites" data-test-state="run" aria-label="Run all tests"></button>
           <span class="pill-row" id="tests-status"></span>
           <span class="muted-text" id="tests-status-note"></span>
         </div>
