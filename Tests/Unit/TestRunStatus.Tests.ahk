@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2
 #Include ..\Support\Assert.ahk
-#Include ..\..\Dashboards\Control Dashboard\Test Run Status.ahk
+#Include ..\..\Dashboards\Control Deck\Test Run Status.ahk
 
 ; The dashboard must never claim the tests passed - or failed - when the run it
 ; is reporting happened in an earlier suite session.

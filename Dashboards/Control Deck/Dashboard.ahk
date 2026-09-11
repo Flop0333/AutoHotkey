@@ -5,15 +5,15 @@ Persistent(true)
 
 TraySetIcon(Paths.autoHotkeyIcon)
 
-myControlDashboard := ControlDashboard()
-myControlDashboard.InitializeHidden()
+myControlDeck := ControlDeck()
+myControlDeck.InitializeHidden()
 
-OnMessage(0x8001, ShowRequestedControlDashboardSection)
+OnMessage(0x8001, ShowRequestedControlDeckSection)
 
-ShowRequestedControlDashboardSection(sectionId, *) {
+ShowRequestedControlDeckSection(sectionId, *) {
     sections := ["overview", "processes", "logs", "tests", "profiles", "health"]
     if (sectionId >= 1 && sectionId <= sections.Length)
-        myControlDashboard.ShowSection(sections[sectionId])
+        myControlDeck.ShowSection(sections[sectionId])
 }
 
-#Include Control Dashboard.ahk
+#Include Control Deck.ahk

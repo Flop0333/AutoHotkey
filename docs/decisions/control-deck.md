@@ -1,10 +1,10 @@
-# AutoHotkey Control Dashboard: design record
+# AutoHotkey Control Deck: design record
 
-This records the decisions used to ship the **AutoHotkey Control Dashboard**: one WebView2 cockpit for the running suite. The shipped code, `Startup/Startup.ahk`, and the focused documents are authoritative.
+This records the decisions used to ship the **AutoHotkey Control Deck**: one WebView2 cockpit for the running suite. The shipped code, `Startup/Startup.ahk`, and the focused documents are authoritative.
 
 ## Goal
 
-Today the suite is operated from the tray menu (Reload, Profile, Log Dashboard, Test Dashboard, Exit) and from two separate WebView2 windows that each show one slice of the system. The Control Dashboard replaces that split with a single window that answers three questions and acts on them:
+Today the suite is operated from the tray menu (Reload, Profile, Log Dashboard, Test Dashboard, Exit) and from two separate WebView2 windows that each show one slice of the system. The Control Deck replaces that split with a single window that answers three questions and acts on them:
 
 - **What is running?** Profile, uptime, the AutoHotkey processes that belong to the suite, and whether the expected startup set is actually up.
 - **Is anything wrong?** This session's log entries by severity, the last test run, and environment health.
@@ -14,7 +14,7 @@ Today the suite is operated from the tray menu (Reload, Profile, Log Dashboard, 
 
 | In scope | Out of scope |
 |---|---|
-| Rename `Dashboards/Log Dashboard` to `Dashboards/Control Dashboard` and keep the log views as one section. | The Logger popup (`Dashboards/Logger`), which stays the resident notification surface. |
+| Rename `Dashboards/Log Dashboard` to `Dashboards/Control Deck` and keep the log views as one section. | The Logger popup (`Dashboards/Logger`), which stays the resident notification surface. |
 | Absorb the Test Dashboard into a Tests section and retire the standalone dashboard once it is at parity. | Remote or network control of the suite. Everything stays local and in-process-family. |
 | Add suite control: reload, exit, profile switch, per-script restart/stop. | Editing profiles, secrets, or hotkeys from the dashboard. |
 | Add a health/diagnostics section. | Replacing the Macro Board or Age of Efficiency launchers. |
@@ -30,12 +30,12 @@ Today the suite is operated from the tray menu (Reload, Profile, Log Dashboard, 
 
 ## Architecture
 
-The dashboard keeps the established dashboard shape: `Dashboard.ahk` is the composition root and host process, `Controller.ahk` holds the `WebViewToo` subclass and its `AddCallbackToScript` surface, `Control Dashboard.ahk` exposes `ShowControlDashboard()` / `HideControlDashboard()` to other scripts, and `User Interface/` holds HTML, CSS, JS, and `AhkDataService.js`.
+The dashboard keeps the established dashboard shape: `Dashboard.ahk` is the composition root and host process, `Controller.ahk` holds the `WebViewToo` subclass and its `AddCallbackToScript` surface, `Control Deck.ahk` exposes `ShowControlDeck()` / `HideControlDeck()` to other scripts, and `User Interface/` holds HTML, CSS, JS, and `AhkDataService.js`.
 
 Suite control does **not** live in the controller. A reusable service under `Apps Integrated/Suite Control/` owns it, so the same operations are callable from the tray menu, a hotkey, or a unit test:
 
 ```text
-Dashboards/Control Dashboard/Dashboard.ahk   (host process, composition root)
+Dashboards/Control Deck/Dashboard.ahk   (host process, composition root)
     -> Controller.ahk                        (WebView callbacks only)
         -> Apps Integrated/Suite Control/... (reload, exit, inventory, restart)
         -> Lib/Core/OnError.ahk              (log reading and test entries)
@@ -66,7 +66,7 @@ Read paths stay synchronous and cheap enough to poll (`ahk.sync.*`, one second, 
 
 ## Visual direction
 
-The Control Dashboard uses an original **AHK Control Deck** theme: a dark 1990s maintenance console rendered with black, brown, oxblood, copper, brass, and semantic status colours. The generated runtime artwork and its source-of-truth palette are catalogued in `Dashboards/Control Dashboard/User Interface/assets/control-deck/ASSET-MANIFEST.md`; HTML and CSS continue to own all labels, layout, focus, and responsive behavior.
+The Control Deck uses an original **AHK Control Deck** theme: a dark 1990s maintenance console rendered with black, brown, oxblood, copper, brass, and semantic status colours. The generated runtime artwork and its source-of-truth palette are catalogued in `Dashboards/Control Deck/User Interface/assets/control-deck/ASSET-MANIFEST.md`; HTML and CSS continue to own all labels, layout, focus, and responsive behavior.
 
 - The persistent rail is a numbered module selector with a compact horizontal mode for narrow windows. The custom title bar and global status HUD remain visible from every section.
 - Cards, dialogs, buttons, window controls, status symbols, and action icons use the locally bundled pixel-art kit. Nine-slice-style `border-image` treatment preserves panel and button corners as components resize.
@@ -81,7 +81,7 @@ The Control Dashboard uses an original **AHK Control Deck** theme: a dark 1990s 
 Each phase is independently mergeable and leaves the suite working.
 
 1. **Foundations** — the Suite Control service and the requested-profile handoff, with unit coverage. No UI change yet.
-2. **Rename and shell** — `Log Dashboard` becomes `Control Dashboard` across code, tray, Macro Board, Age of Efficiency, the syntax-check target list, integration tests, and documentation; the new shell renders the Logs section as it exists today.
+2. **Rename and shell** — `Log Dashboard` becomes `Control Deck` across code, tray, Macro Board, Age of Efficiency, the syntax-check target list, integration tests, and documentation; the new shell renders the Logs section as it exists today.
 3. **Control sections** — Overview, Processes, and Profiles on top of phase 1.
 4. **Tests section** — the Test Dashboard's behaviour inside the new window, reusing `Logs/test-run-status.json` and `Logs/test-run-history.log`; the standalone dashboard is retired once it is at parity.
 5. **Health and polish** — diagnostics section, keyboard shortcuts, motion, and the README showcase update.
@@ -96,6 +96,6 @@ Beyond the usual suites, the change touches startup, includes, and logging, so `
 
 ## Decisions made
 
-- The tray keeps one **Control Dashboard** item alongside Reload and Exit.
+- The tray keeps one **Control Deck** item alongside Reload and Exit.
 - A declarative startup list is consumed by both `RunStartup()` and the Processes section, which flags expected-but-missing scripts.
 - The Tests section runs the combined `Invoke-AllTests.ps1` workflow so local and CI behaviour stay aligned.

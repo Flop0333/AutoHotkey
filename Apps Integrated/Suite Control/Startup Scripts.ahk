@@ -1,4 +1,4 @@
-; Declarative startup inventory shared by Startup.ahk and the Control Dashboard.
+; Declarative startup inventory shared by Startup.ahk and the Control Deck.
 ; Keep ordering here: CapsLock Service must remain before its consumers.
 #Include ..\..\Lib\Core\Paths.ahk
 
@@ -18,5 +18,5 @@ SuiteStartupScripts() => [
     Paths.appsIntegrated "\Hotkeys.ahk",
     Paths.appsIntegrated "\Mouse Toys.ahk",
     ; Starts hidden, so the first time it is opened it is already loaded.
-    Paths.dashboards "\Control Dashboard\Dashboard.ahk"
+    Paths.dashboards "\Control Deck\Dashboard.ahk"
 ]

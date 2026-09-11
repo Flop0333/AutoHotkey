@@ -13,20 +13,20 @@ It started as a collection of small scripts and grew into a profile-aware automa
 - 🚀 **Age of Efficiency** — search bookmarks, launch apps, and run commands from one WebView2-powered interface.
 - 🎹 **Macro Board** — a customizable Stream Deck-style dashboard for frequently used actions.
 - 📸 **Screen Snipper with OCR** — capture the screen, copy or save an image, and extract text.
-- 🎛️ **Control Dashboard** — inspect processes, logs, tests, profiles, and machine health from one control centre.
+- 🎛️ **Control Deck** — inspect processes, logs, tests, profiles, and machine health from one control centre.
 - 🔊 **Text Speaker** — read selected text or an OCR screen region aloud with Windows speech synthesis.
 - 🖱️ **Mouse gestures and extra-button actions** — control common tasks without reaching for menus.
 - 🧩 **Profiles and local secrets** — adapt one checkout to different computers without committing personal data.
 
 ## 🚀 The dashboards
 
-### AutoHotkey Control Dashboard
+### AutoHotkey Control Deck
 
 The suite control centre shows what is running, flags missing startup apps, surfaces logs and environment health, runs the complete test suite, and provides safe reload, exit, restart, stop, and profile-switch actions. Open it from the tray or Macro Board; Logger notifications land on Logs, and the Age of Efficiency `Test` command lands on Tests.
 
 Its **AHK Control Deck** interface combines a readable system terminal with original pixel-art navigation, status modules, hardware panels, and action controls.
 
-![AutoHotkey Control Dashboard](Dashboards/Control%20Dashboard/Demo.png)
+![AutoHotkey Control Deck](Dashboards/Control%20Deck/Demo.png)
 
 ### Age of Efficiency
 
@@ -67,7 +67,7 @@ The suite is intentionally code-first: editing a clear script can be faster—an
 - [Architecture](docs/ARCHITECTURE.md) — include direction, activation, composition, and testability
 - [Installation](docs/INSTALLATION.md) — requirements, profiles, secrets, and Windows auto-start
 - [Apps and scripts](docs/APPS.md) — every maintained user-facing tool and entry point
-- [Testing](docs/TESTING.md) — local tests, CI, and the Control Dashboard Tests section
+- [Testing](docs/TESTING.md) — local tests, CI, and the Control Deck Tests section
 - [Automation](docs/AUTOMATION.md) — GitHub workflows, board connections, and scheduled agents
 - [AI agent guide](AGENTS.md) — focused instructions for coding agents
 

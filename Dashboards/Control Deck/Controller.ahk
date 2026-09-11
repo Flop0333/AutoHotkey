@@ -12,9 +12,9 @@
 #Include ..\..\Secrets\Secrets Service.ahk
 #Include Test Run Status.ahk
 
-Class ControlDashboard extends WebViewToo {
-	static WIN_TITLE := "AutoHotkey Control Dashboard"
-	static INITIALIZING_TITLE := "AutoHotkey Control Dashboard - Initializing"
+Class ControlDeck extends WebViewToo {
+	static WIN_TITLE := "AutoHotkey Control Deck"
+	static INITIALIZING_TITLE := "AutoHotkey Control Deck - Initializing"
 	static SHOW_OPTIONS := Format("w{} h{}", Round(A_ScreenWidth * 0.85), Round(A_ScreenHeight * 0.75))
 	; Written by Tests\Invoke-AllTests.ps1; the Tests section will read more of it.
 	static TEST_STATUS_FILE := Paths.autohotkey "\Logs\test-run-status.json"
@@ -46,12 +46,12 @@ Class ControlDashboard extends WebViewToo {
 		; Process start times come from WMI, so they are read once per process
 		; instead of on every poll of the Processes section.
 		this._startTimes := Map()
-		this.Gui.Title := ControlDashboard.INITIALIZING_TITLE
+		this.Gui.Title := ControlDeck.INITIALIZING_TITLE
 		this.Gui.OnEvent("Close", (*) => this.Hide())
 		; The window is shown and hidden from other processes as well as this
 		; one, so visibility is followed through the window message itself.
 		OnMessage(0x0018, ObjBindMethod(this, "OnShowWindow")) ; WM_SHOWWINDOW
-		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Control Dashboard\User Interface", 0) ; block cors error, allow loading local files
+		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Control Deck\User Interface", 0) ; block cors error, allow loading local files
 		this.Load("http://app.local/index.html")
 		this.AddCallbackToScript("GetPendingSection", (*) => this.TakePendingSection())
 		this.AddCallbackToScript("GetSuiteStatus", (*) => this.GetSuiteStatusForWeb())
@@ -108,9 +108,9 @@ Class ControlDashboard extends WebViewToo {
 	}
 
 	StartVsCodeOnSecrets() {
-		if !FileExist(ControlDashboard.SECRETS_FILE)
+		if !FileExist(ControlDeck.SECRETS_FILE)
 			throw Error("There is no local secrets file yet - start the suite once to create it")
-		this.StartVsCode(Paths.autohotkey, ControlDashboard.SECRETS_FILE)
+		this.StartVsCode(Paths.autohotkey, ControlDeck.SECRETS_FILE)
 	}
 
 	; Not VsCode.OpenFile: that waits for Code.exe to exit, which never happens
@@ -119,7 +119,7 @@ Class ControlDashboard extends WebViewToo {
 		arguments := ""
 		for target in targets
 			arguments .= ' "' target '"'
-		for executable in ControlDashboard.VSCODE_EXECUTABLES {
+		for executable in ControlDeck.VSCODE_EXECUTABLES {
 			if FileExist(executable) {
 				Run('"' executable '"' arguments)
 				return
@@ -131,17 +131,17 @@ Class ControlDashboard extends WebViewToo {
 			throw Error("VS Code is not installed, or its code command is not on PATH")
 	}
 
-	Show() => super.Show(ControlDashboard.SHOW_OPTIONS, ControlDashboard.WIN_TITLE)
+	Show() => super.Show(ControlDeck.SHOW_OPTIONS, ControlDeck.WIN_TITLE)
 
 	InitializeHidden() {
 		; WIN_TITLE is also the cross-process readiness signal. Publish it only
 		; after the initial Hide has completed so a waiting caller cannot show
 		; this window just before the host hides it again.
-		super.Show("Hide " ControlDashboard.SHOW_OPTIONS, ControlDashboard.INITIALIZING_TITLE)
+		super.Show("Hide " ControlDeck.SHOW_OPTIONS, ControlDeck.INITIALIZING_TITLE)
 		; A window that starts hidden never sends WM_SHOWWINDOW for it, so the
 		; page is told here. It still loads, ready for the first show.
 		this.IsVisible := false
-		this.Gui.Title := ControlDashboard.WIN_TITLE
+		this.Gui.Title := ControlDeck.WIN_TITLE
 	}
 
 	; WebView2 passes this on to the page as document.hidden, which pauses its
@@ -200,7 +200,7 @@ Class ControlDashboard extends WebViewToo {
 	; not this session's result, and reporting it would tell the user the tests
 	; ran when they have not.
 	LastTestRun(sessionStartedAt) {
-		return TestRunStatus.Read(ControlDashboard.TEST_STATUS_FILE, sessionStartedAt)
+		return TestRunStatus.Read(ControlDeck.TEST_STATUS_FILE, sessionStartedAt)
 	}
 
 	; --- Profiles -----------------------------------------------------------
@@ -306,7 +306,7 @@ Class ControlDashboard extends WebViewToo {
 		if !allowed.Has(sectionName)
 			return
 		if this._pageReady
-			this.ExecuteScript("window.controlDashboardShell && window.controlDashboardShell.show(" JSON.Dump(sectionName) ")")
+			this.ExecuteScript("window.controlDeckShell && window.controlDeckShell.show(" JSON.Dump(sectionName) ")")
 		else
 			this._pendingSection := sectionName
 	}
@@ -414,7 +414,7 @@ Class ControlDashboard extends WebViewToo {
 	; The page is rendered by WebView2, so the runtime is present whether or not
 	; its version can be read; only the version is ever in doubt.
 	WebView2Runtime() {
-		for versionKey in ControlDashboard.WEBVIEW2_VERSION_KEYS {
+		for versionKey in ControlDeck.WEBVIEW2_VERSION_KEYS {
 			try {
 				version := RegRead(versionKey, "pv", "")
 				if (version != "")
@@ -437,9 +437,9 @@ Class ControlDashboard extends WebViewToo {
 	; names: the catalog is tracked, but what a machine has filled in is not.
 	SecretsState() {
 		catalogKeys := SecretsCatalog.Count
-		if !FileExist(ControlDashboard.SECRETS_FILE)
+		if !FileExist(ControlDeck.SECRETS_FILE)
 			return Map("status", "missing", "catalogKeys", catalogKeys, "keysWithValue", 0)
-		try secrets := JSON.parse(FileRead(ControlDashboard.SECRETS_FILE, "UTF-8"))
+		try secrets := JSON.parse(FileRead(ControlDeck.SECRETS_FILE, "UTF-8"))
 		catch
 			return Map("status", "invalid", "catalogKeys", catalogKeys, "keysWithValue", 0)
 		if !(secrets is Map)
@@ -467,7 +467,7 @@ Class ControlDashboard extends WebViewToo {
 	ExitSuite() => SuiteControl.ExitSuite(false)
 
 	RunAllTests() {
-		testRunner := 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' ControlDashboard.TEST_RUNNER_SCRIPT '"'
+		testRunner := 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' ControlDeck.TEST_RUNNER_SCRIPT '"'
 		return this.ReportOutcome(() => this.StartTestRun(testRunner))
 	}
 
@@ -484,7 +484,7 @@ Class ControlDashboard extends WebViewToo {
 		sessionStartedAt := this.SessionStartedAt(GetLogSessionId())
 		return JSON.Dump(Map(
 			"status", this.LastTestRun(sessionStartedAt),
-			"runs", TestRunStatus.ReadRuns(ControlDashboard.TEST_HISTORY_FILE, sessionStartedAt)
+			"runs", TestRunStatus.ReadRuns(ControlDeck.TEST_HISTORY_FILE, sessionStartedAt)
 		))
 	}
 
@@ -506,7 +506,7 @@ Class ControlDashboard extends WebViewToo {
 	)
 
 	LogTestMessage(severity) {
-		message := ControlDashboard.TestMessages.Get(severity, "Test message")
+		message := ControlDeck.TestMessages.Get(severity, "Test message")
 		return this.ReportOutcome(() => this.WriteTestMessage(severity, message))
 	}
 
@@ -524,7 +524,7 @@ Class ControlDashboard extends WebViewToo {
 	; the suite starts and on every Overview visit.
 	GetGitStatusForWeb() {
 		branch := "", ahead := 0, behind := 0
-		outputFile := A_Temp "\ahk-control-dashboard-git-" this.CurrentProcessId() ".txt"
+		outputFile := A_Temp "\ahk-control-deck-git-" this.CurrentProcessId() ".txt"
 		try {
 			RunWait(A_ComSpec ' /C git status -sb --porcelain=v1 > "' outputFile '" 2>nul', Paths.autohotkey, "Hide")
 			firstLine := StrSplit(FileRead(outputFile, "UTF-8"), "`n")[1]

@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-	window.controlDashboardShell = new ControlDashboardShell();
-	window.controlDashboardShell.start();
+	window.controlDeckShell = new ControlDeckShell();
+	window.controlDeckShell.start();
 });
 
 // The frame every section plugs into: rail navigation, the always-visible
 // status strip, and the shared toast and confirmation surfaces. Sections own
 // their own markup and refresh; the shell owns when they are shown and polled.
-class ControlDashboardShell {
+class ControlDeckShell {
 
 	// Matches the Logger's own polling cadence.
 	static POLL_INTERVAL_MS = 1000;
@@ -45,7 +45,7 @@ class ControlDashboardShell {
 		this._attachKeyboardShortcuts();
 		this._refreshStatus();
 		this.refreshGitStatus();
-		setInterval(() => this._tick(), ControlDashboardShell.POLL_INTERVAL_MS);
+		setInterval(() => this._tick(), ControlDeckShell.POLL_INTERVAL_MS);
 		// The dashboard runs hidden from startup; showing it catches up at once
 		// instead of waiting for the next tick.
 		document.addEventListener('visibilitychange', () => {
@@ -101,7 +101,7 @@ class ControlDashboardShell {
 	_requestedSection() {
 		let requested = '';
 		this._guard(() => requested = AhkDataService.GetPendingSection());
-		return this.sections.has(requested) ? requested : ControlDashboardShell.DEFAULT_SECTION;
+		return this.sections.has(requested) ? requested : ControlDeckShell.DEFAULT_SECTION;
 	}
 
 	show(sectionId) {
@@ -181,7 +181,7 @@ class ControlDashboardShell {
 		const gitStatus = document.querySelector('#git-status');
 		try {
 			this.git = await AhkDataService.GetGitStatus();
-			gitStatus.textContent = ControlDashboardShell.FormatGitStatus(this.git);
+			gitStatus.textContent = ControlDeckShell.FormatGitStatus(this.git);
 		} catch (error) {
 			this.git = { error: error.message };
 			gitStatus.textContent = 'git-status error: ' + error.message;
