@@ -1,6 +1,6 @@
 # Third-party notices
 
-The root [MIT License](LICENSE) applies only to original project code and
+The root [MIT License](../LICENSE) applies only to original project code and
 contributions whose copyright holders have licensed them under those terms. It
 does not replace, override, or relicense bundled third-party code, binaries,
 examples, or assets. Those materials remain subject to their upstream terms.

@@ -78,4 +78,4 @@ Feel free to explore, adapt the ideas, report a bug, or share feedback. I hope s
 Original project code is available under the [MIT License](LICENSE), so it may
 be used, modified, and redistributed, including commercially. Bundled
 third-party libraries retain their own terms; see the
-[third-party notices](THIRD-PARTY-NOTICES.md) for details.
+[third-party notices](docs/THIRD-PARTY-NOTICES.md) for details.
