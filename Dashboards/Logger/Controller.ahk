@@ -1,6 +1,6 @@
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Tools\Info.ahk
-#Include ..\..\Dashboards\Log Dashboard\Log Dashboard.ahk
+#Include ..\..\Dashboards\Control Dashboard\Control Dashboard.ahk
 
 ; The resident notification host uses a native GUI. The full dashboard remains
 ; WebView-based and starts only when requested.
@@ -89,7 +89,7 @@ Class LoggerPopup {
 
 	OpenDashboard() {
 		this.Dismiss()
-		ShowLogDashboard()
+		ShowControlDashboard("logs")
 	}
 
 	_Seed() {

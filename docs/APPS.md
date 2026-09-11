@@ -32,6 +32,7 @@ Integrated scripts either run as quiet background services or are loaded into a 
 | [Picture in Picture](../Apps%20Integrated/Picture%20In%20Picture.ahk) | Loaded by Age of Efficiency | Command `P` requests picture-in-picture for a YouTube video and pins its window. | Uses browser UI Automation and the desktops DLL. |
 | [Status Meme](../Apps%20Integrated/Status%20Memes/Status%20Meme.ahk) | Loaded by Age of Efficiency | Command `SC <code>` displays a matching status-code image temporarily. | Images belong under `Status Memes/Images/`; falls back to code 69. |
 | [Timer](../Apps%20Integrated/Timer.ahk) | Loaded by Age of Efficiency | Command `T <minutes>` opens a task timer; `F1` starts and `Esc` hides its GUI. | Callable as `Timer.Start(...)` from other scripts. |
+| [Suite Control](../Apps%20Integrated/Suite%20Control/Suite%20Control.ahk) | Loaded by the startup tray and dashboards | Reloads or exits the running suite, and restarts or stops one script without touching the rest. | Called from tray **Reload**/**Exit**, the Macro Board reload and kill buttons, and Age of Efficiency command `RE`. Its confirmation is injectable, so a caller with its own UI prompts instead of showing a message box. |
 | [Spell Checker](../Apps%20Integrated/Spell%20Checker.ahk) | Loaded by Macro Board | Expands common Dutch and English misspellings; toggle from Macro Board. | Add corrections as AutoHotkey hotstrings. |
 | [Nightlight](../Apps%20Integrated/Nightlight.ahk) | Optional include | Provides a configurable, click-through warm screen overlay. | Not in the current startup include chain; call its functions from a dashboard or hotkey. |
 
@@ -55,8 +56,7 @@ These files support the entry points above and are not intended to run independe
 | [Age of Efficiency](../Dashboards/Age%20of%20Efficiency/Age%20Of%20Efficiency.ahk) | Auto | `Alt+Space`, `Insert`, or `Numpad Insert` opens a command launcher for apps, bookmarks, and searches. | JSON databases live under `Database/`; commands call functions under `Input Handler/`. |
 | [Macro Board](../Dashboards/Macro%20Board/Macro%20Board.ahk) | Auto | `CapsLock+Space` opens a Stream Deck-style action grid. | Configure common and profile buttons in the entry point; window state is stored in the ignored profile-settings folder. |
 | [Logger](../Dashboards/Logger/Logger%20Host.ahk) | Auto through logging initialization | Small notification host that surfaces new structured errors. | `Logging.ahk` is the public facade; `Controller.ahk` controls presentation. |
-| [Log Dashboard](../Dashboards/Log%20Dashboard/Dashboard.ahk) | Auto through logging initialization | Open from the startup tray, Macro Board, or Age of Efficiency command `AL` to inspect and copy errors. | `Dashboard.ahk` renders `Logs/errors.log`; the active log is reset on suite startup. |
-| [Test Dashboard](../Dashboards/Test%20Dashboard/Dashboard.ahk) | On demand | Choose **Test Dashboard** in the tray or run `Tests/Run-Tests.ahk` to execute and monitor checks. | Reads test status and history from `Logs/`. See [Testing](TESTING.md). |
+| [Control Dashboard](../Dashboards/Control%20Dashboard/Dashboard.ahk) | On demand | Open from the startup tray, Macro Board, or Age of Efficiency command `AL`. Logger notifications open Logs; `Test` and `Tests/Run-Tests.ahk` open Tests and start a run. | Overview, Processes, Logs, Tests, Profiles, and Health share one lazy-started host. Keys `1`–`6` switch sections, `R` runs tests, `/` focuses the log filter, and `Esc` closes log details. |
 
 ## Startup and configuration scripts
 
@@ -64,7 +64,7 @@ These files support the entry points above and are not intended to run independe
 |---|---|---|
 | Suite owner | [Startup.ahk](../Startup/Startup.ahk) | Initializes configuration and launches the active app set. |
 | Startup UI | [Startup Message.ahk](../Startup/Startup%20Message.ahk), [Startup Menu Tray.ahk](../Startup/Startup%20Menu%20Tray.ahk) | Shows startup feedback and provides reload, profile, dashboard, and exit controls. |
-| Profiles | [Profile Manager.ahk](../Profiles/Profile%20Manager.ahk) | Detects, persists, and exposes the active machine profile. |
+| Profiles | [Profile Manager.ahk](../Profiles/Profile%20Manager.ahk), [Profile Request.ahk](../Profiles/Profile%20Request.ahk) | Detects, persists, and exposes the active machine profile. A recorded request lets the next start honor a profile chosen before a restart. |
 | Secrets | [Secrets File Manager.ahk](../Secrets/Secrets%20File%20Manager.ahk), [Secrets User Interface.ahk](../Secrets/Secrets%20User%20Interface.ahk) | Synchronizes local values with the tracked catalog and provides editing UI. |
 | Compatibility imports | [Core.ahk](../Lib/Core.ahk) | Preserves a broad include facade for external or personal scripts; maintained repository files declare immediate dependencies instead. |
 

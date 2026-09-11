@@ -9,6 +9,9 @@
 #Include Core\Paths.ahk
 #Include Core\Links.ahk
 
+; Suite control (kept here so personal scripts can reach it through the facade)
+#Include ..\Apps Integrated\Suite Control\Suite Control.ahk
+
 ; Extensions
 #Include Extensions\Array.ahk
 #Include Extensions\Dark Gui.ahk

@@ -43,11 +43,11 @@ Optional timeout parameters are available when diagnosing a slow machine:
 
 `Invoke-SyntaxCheck.ps1` parses each active AutoHotkey v2 entry point without running its hotkeys, GUIs, or startup actions. It creates a temporary wrapper that exits before including the target; AutoHotkey still parses the complete include tree first.
 
-Targets are discovered from the `Run(...)` calls in `Startup/Startup.ahk`, plus the logging hosts, Test Dashboard host, logging facade, and manual `Tests/Run-Tests.ahk` entry point. A missing file, non-zero exit, or blocked load-error dialog fails the suite. Optional scripts outside that target set are not covered.
+Targets are discovered from the suite startup wiring, plus the logging hosts, Control Dashboard host, logging facade, and manual `Tests/Run-Tests.ahk` entry point. A missing file, non-zero exit, or blocked load-error dialog fails the suite. Optional scripts outside that target set are not covered.
 
 ### Unit tests
 
-`Invoke-UnitTests.ps1` discovers every `Tests/Unit/*.Tests.ahk` file alphabetically and runs each as a separate process. Current coverage includes array, database/state behavior, structured logging, number conversion, and secrets-file behavior.
+`Invoke-UnitTests.ps1` discovers every `Tests/Unit/*.Tests.ahk` file alphabetically and runs each as a separate process. Current coverage includes array, database/state behavior, structured logging, number conversion, secrets-file behavior, suite control parsing, confirmation and processor arithmetic, the one-shot profile request, and test-run status scoping.
 
 `Tests/Support/Assert.ahk` provides the dependency-free `Assert` methods and `TestKit` runner. Each test file prints `PASS`/`FAIL` lines and reports through its process exit code.
 
@@ -55,14 +55,14 @@ Targets are discovered from the `Run(...)` calls in `Startup/Startup.ahk`, plus 
 
 `Invoke-IntegrationTests.ps1` runs `Tests/Integration/Logging.Integration.Tests.ahk`. It exercises real logger/dashboard processes and shared logging behavior while redirecting `AUTOHOTKEY_LOG_DIR` to a temporary directory. The runner restores the caller's environment and removes temporary files afterward.
 
-## Test Dashboard and results
+## Control Dashboard and results
 
-Double-click `Tests/Run-Tests.ahk`, choose **Test Dashboard** from the startup tray, or run the `Test` command in Age of Efficiency. The launcher opens the dashboard and runs `Invoke-AllTests.ps1` in a hidden PowerShell process.
+Double-click `Tests/Run-Tests.ahk` or run the `Test` command in Age of Efficiency. The launcher opens the Control Dashboard on **Tests** and runs `Invoke-AllTests.ps1` in a hidden PowerShell process. The section scopes status and history to the current suite session and refuses to start a second run while one is in progress.
 
 The combined runner executes all five suites and writes git-ignored runtime data:
 
-- `Logs/test-run-status.json` — current state and most recent result, polled by the dashboard;
-- `Logs/test-run-history.log` — one compact JSON object per completed run, oldest first.
+- `Logs/test-run-status.json` — current state, the suite currently running, and the most recent result with its duration, polled by the dashboard;
+- `Logs/test-run-history.log` — one compact JSON object per completed run, oldest first, each with the run's duration and a per-suite result, duration, and captured output.
 
 Direct individual-suite runs print results to the terminal but do not update dashboard history. Delete the two result files only when intentionally resetting the local dashboard history.
 

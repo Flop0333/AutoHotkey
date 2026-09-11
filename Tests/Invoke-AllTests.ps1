@@ -1,14 +1,14 @@
 <#
 .SYNOPSIS
     Runs documentation, architecture, syntax, unit, and integration checks and
-    logs a structured result for the Test Dashboard to display.
+    logs a structured result for the Control Dashboard to display.
 
 .DESCRIPTION
     Each suite script calls `exit` directly, so each one is launched
     as its own child process rather than dot-sourced or called in-process.
 
     Writes Logs\test-run-status.json (current run state, polled by the Test
-    Dashboard while a run is in progress) and appends one JSON line per run to
+    Dashboard Tests section while a run is in progress) and appends one JSON line per run to
     Logs\test-run-history.log (newest run last, same line-delimited-JSON
     convention as Logs\errors.log). Both files live under Logs\, which is
     already git-ignored.
@@ -49,8 +49,13 @@ $tempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("ahk-all-tests-" + [guid
 New-Item -ItemType Directory -Path $tempDir | Out-Null
 
 $results = @()
+$runTimer = [Diagnostics.Stopwatch]::StartNew()
 try {
     foreach ($suite in $suites) {
+        # Name the suite in the status file so a dashboard polling it can say
+        # what is running, not just that something is.
+        Write-Status "running" @{ currentSuite = $suite.name }
+        $suiteTimer = [Diagnostics.Stopwatch]::StartNew()
         $stdoutPath = Join-Path $tempDir ([guid]::NewGuid().Guid + ".stdout.txt")
         $stderrPath = Join-Path $tempDir ([guid]::NewGuid().Guid + ".stderr.txt")
 
@@ -66,7 +71,7 @@ try {
 
         if (-not $exited) {
             Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
-            $results += @{ name = $suite.name; status = "TIMEOUT"; exitCode = $null; output = "Timed out after ${TimeoutSeconds}s." }
+            $results += @{ name = $suite.name; status = "TIMEOUT"; exitCode = $null; output = "Timed out after ${TimeoutSeconds}s."; durationSeconds = [Math]::Round($suiteTimer.Elapsed.TotalSeconds, 1) }
             continue
         }
 
@@ -75,7 +80,7 @@ try {
         $output = ("$stdout`n$stderr").Trim()
 
         $status = if ($proc.ExitCode -eq 0) { "PASS" } else { "FAIL" }
-        $results += @{ name = $suite.name; status = $status; exitCode = $proc.ExitCode; output = $output }
+        $results += @{ name = $suite.name; status = $status; exitCode = $proc.ExitCode; output = $output; durationSeconds = [Math]::Round($suiteTimer.Elapsed.TotalSeconds, 1) }
     }
 } finally {
     Remove-Item -Recurse -Force $tempDir -ErrorAction SilentlyContinue
@@ -83,13 +88,14 @@ try {
 
 $overall = if (@($results | Where-Object { $_.status -ne "PASS" }).Count -gt 0) { "FAIL" } else { "PASS" }
 $run = @{
-    timestamp     = (Get-Date).ToString("o")
-    overallStatus = $overall
-    suites        = $results
+    timestamp       = (Get-Date).ToString("o")
+    overallStatus   = $overall
+    durationSeconds = [Math]::Round($runTimer.Elapsed.TotalSeconds, 1)
+    suites          = $results
 }
 
 ($run | ConvertTo-Json -Depth 5 -Compress) | Add-Content -Path $historyPath -Encoding UTF8
-Write-Status "idle" @{ lastRunAt = $run.timestamp; lastRunStatus = $overall }
+Write-Status "idle" @{ lastRunAt = $run.timestamp; lastRunStatus = $overall; lastRunDurationSeconds = $run.durationSeconds }
 
 if ($overall -eq "PASS") {
     Write-Host "All test suites passed."

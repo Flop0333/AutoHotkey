@@ -3,7 +3,7 @@
 ; ============================================================================
 ;
 ; Runs the syntax check, unit tests, and integration tests in the background
-; (Tests\Invoke-AllTests.ps1) and opens the Test Dashboard so you can watch
+; (Tests\Invoke-AllTests.ps1) and opens the Control Dashboard Tests section.
 ; progress and review pass/fail results as they land. Double-click this file,
 ; or run it with AutoHotkey64.exe, whenever you want a manual test run.
 ; ============================================================================
@@ -11,8 +11,8 @@
 #Requires AutoHotkey v2
 #SingleInstance Force
 
-#Include ..\Dashboards\Test Dashboard\Test Dashboard.ahk
+#Include ..\Dashboards\Control Dashboard\Control Dashboard.ahk
 
-ShowTestDashboard()
-Run('powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' TestDashboard.RUNNER_SCRIPT '"', , "Hide")
+ShowControlDashboard("tests")
+Run('powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' Paths.autohotkey '\Tests\Invoke-AllTests.ps1' '"', , "Hide")
 ExitApp()

@@ -13,11 +13,16 @@ It started as a collection of small scripts and grew into a profile-aware automa
 - 🚀 **Age of Efficiency** — search bookmarks, launch apps, and run commands from one WebView2-powered interface.
 - 🎹 **Macro Board** — a customizable Stream Deck-style dashboard for frequently used actions.
 - 📸 **Screen Snipper with OCR** — capture the screen, copy or save an image, and extract text.
+- 🎛️ **Control Dashboard** — inspect processes, logs, tests, profiles, and machine health from one control centre.
 - 🔊 **Text Speaker** — read selected text or an OCR screen region aloud with Windows speech synthesis.
 - 🖱️ **Mouse gestures and extra-button actions** — control common tasks without reaching for menus.
 - 🧩 **Profiles and local secrets** — adapt one checkout to different computers without committing personal data.
 
 ## 🚀 The dashboards
+
+### AutoHotkey Control Dashboard
+
+The suite control centre shows what is running, flags missing startup apps, surfaces logs and environment health, runs the complete test suite, and provides safe reload, exit, restart, stop, and profile-switch actions. Open it from the tray or Macro Board; Logger notifications land on Logs, and the Age of Efficiency `Test` command lands on Tests.
 
 ### Age of Efficiency
 
@@ -39,7 +44,7 @@ The suite brings several technologies and ideas together:
 - **WebView2 with HTML, CSS, and JavaScript** for richer dashboard interfaces backed by AutoHotkey controllers.
 - **Profile-aware startup** for machine-specific apps, desktops, hotkeys, and behavior.
 - **Local secrets management** that keeps personal values outside Git while maintaining a tracked catalog.
-- **Structured logging and a visual test dashboard** for understanding failures quickly.
+- **Structured logging and visual test results** for understanding failures quickly.
 - **Explicit dependency boundaries** that keep includes predictable and activation in executable entry points.
 - **PowerShell test runners and GitHub Actions** for documentation, architecture, syntax, unit, and integration checks.
 - **GitHub Projects and optional scheduled agents** for issue triage, implementation, review, changelogs, and project status. Agent workflows require the [documented GitHub configuration](docs/AUTOMATION.md#required-github-configuration).
@@ -58,7 +63,7 @@ The suite is intentionally code-first: editing a clear script can be faster—an
 - [Architecture](docs/ARCHITECTURE.md) — include direction, activation, composition, and testability
 - [Installation](docs/INSTALLATION.md) — requirements, profiles, secrets, and Windows auto-start
 - [Apps and scripts](docs/APPS.md) — every maintained user-facing tool and entry point
-- [Testing](docs/TESTING.md) — local tests, CI, and the Test Dashboard
+- [Testing](docs/TESTING.md) — local tests, CI, and the Control Dashboard Tests section
 - [Automation](docs/AUTOMATION.md) — GitHub workflows, board connections, and scheduled agents
 - [AI agent guide](AGENTS.md) — focused instructions for coding agents
 

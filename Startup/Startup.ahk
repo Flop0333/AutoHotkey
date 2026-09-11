@@ -13,8 +13,8 @@
 ; ============================================================================
 #Include ..\Lib\Core\OnError.ahk
 #Include ..\Dashboards\Logger\Logging.ahk
-#Include ..\Dashboards\Test Dashboard\Test Dashboard.ahk
 #Include ..\Lib\Core\Paths.ahk
+#Include ..\Apps Integrated\Suite Control\Startup Scripts.ahk
 #Include ..\Profiles\Profile Manager.ahk
 #Include ..\Secrets\Secrets File Manager.ahk
 #Include Startup Message.ahk
@@ -27,27 +27,13 @@ RunStartup(profile?) {
         () => StartupMessage(),
         () => StartupMenuTray(),
         () => SecretsFileManager.Initialize(),
-        () => IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetByComputerName(),
+        () => IsSet(profile) ? ProfileManager.Set(profile) : ProfileManager.SetForStartup(),
 
-        ; Run this before scripts that set a CapsLock hotkey.
-        () => Run(Paths.appsStandalone "\Capslock Service.ahk"),
-        () => Run(Paths.dashboards "\Age of Efficiency\Age of Efficiency.ahk"),
-        () => Run(Paths.dashboards "\Macro Board\Macro Board.ahk"),
-
-        () => Run(Paths.appsStandalone "\Desktops Manager\Desktops Manager.ahk"),
-        () => Run(Paths.appsStandalone "\Emoji Sender\Emoji Sender.ahk"),
-        () => Run(Paths.appsStandalone "\Mouse Gestures\Mouse Gestures.ahk"),
-        () => Run(Paths.appsStandalone "\Screen Snipper\Screen Snipper.ahk"),
-        () => Run(Paths.appsStandalone "\Key Bindings.ahk"),
-        () => Run(Paths.appsStandalone "\Text Speaker\Text Speaker.ahk"),
-        () => Run(Paths.appsStandalone "\Window Manager.ahk"),
-
-        () => Run(Paths.appsIntegrated "\Command Storer\Command Storer.ahk"),
-        () => Run(Paths.appsIntegrated "\App Hotkeys.ahk"),
-        () => Run(Paths.appsIntegrated "\Hotkeys.ahk"),
-        () => Run(Paths.appsIntegrated "\Mouse Toys.ahk"),
         () => InitializeLogging(),
     ]
+
+    for scriptPath in SuiteStartupScripts()
+        steps.InsertAt(7 + A_Index - 1, (path => () => Run(path))(scriptPath))
 
     failures := []
     for step in steps {

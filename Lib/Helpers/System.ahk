@@ -1,5 +1,6 @@
-#Include ..\Core\Paths.ahk
-
+; Machine-level helpers only. Suite lifecycle and AutoHotkey process control
+; live in Apps Integrated\Suite Control\Suite Control.ahk, which may depend on
+; suite state; a reusable Lib helper must not.
 class System {
 	static PowerDown() => Shutdown(1) ; Shutdown: ;0 = Logoff,  1 = Shutdown,  2 = Reboot,  4 = Force,  8 = Power down
 	
@@ -14,38 +15,4 @@ class System {
 	static SetDisplayToSecondScreenOnly() => Run(A_WinDir "\System32\DisplaySwitch.exe /external")
 
 	static SetDisplayToExtend() => Run(A_WinDir "\System32\DisplaySwitch.exe /extend")
-
-	static KillAllAHkProcesses() {
-		result := MsgBox("Kill all AutoHotkey processes?", "Kill AutoHotkey", "YesNo")
-		if (result = "No")
-			return
-
-		this._KillOtherAhkProcesses()
-		ExitApp
-	}
-
-	; Use instead of the built-in Reload() so other stray AHK processes get killed too.
-	static KillAndReload(promptUser := true) {
-		if (promptUser) {
-			result := MsgBox("Kill all AutoHotkey processes and reload?", "Kill and Reload", "YesNo")
-			if (result = "No")
-				return
-		}
-
-		this._KillOtherAhkProcesses()
-		Run(Paths.startup "\Startup.ahk")
-		ExitApp
-	}
-
-	static _KillOtherAhkProcesses() {
-		DetectHiddenWindows true
-		SetTitleMatchMode 'RegEx'
-		HWNDs := WinGetList('ahk_exe AutoHotkey')
-		For HWND in HWNDs
-		{
-			if HWND != A_ScriptHwnd
-				try
-					WinKill(HWND)
-		}
-	}
 }

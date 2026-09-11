@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2
 
 ; The logger/dashboard hosts spend most of their life hidden by design, and
-; WinGetPID (unlike FindLoggerWindow/FindLogDashboardWindow, which toggle this
+; WinGetPID (unlike FindLoggerWindow/FindControlDashboardWindow, which toggle this
 ; locally) needs this on to operate on them via ahk_id.
 DetectHiddenWindows(true)
 
@@ -96,7 +96,7 @@ DumpEntries() {
 }
 
 Test_RealHostsAndCrossProcessBehavior() {
-	if FindLoggerWindow() || FindLogDashboardWindow()
+	if FindLoggerWindow() || FindControlDashboardWindow()
 		return ; Never replace or close a developer's currently running hosts.
 
 	loggerPid := 0
@@ -106,7 +106,7 @@ Test_RealHostsAndCrossProcessBehavior() {
 		LogAndNotifyWarning("logged before logger host startup")
 		hosts := InitializeLogging()
 		loggerPid := WinGetPID("ahk_id " hosts["logger"])
-		Assert.False(FindLogDashboardWindow(), "Dashboard is lazy and must not start with the Logger")
+		Assert.False(FindControlDashboardWindow(), "Dashboard is lazy and must not start with the Logger")
 		Assert.Equal(hosts["logger"], EnsureLoggerRunning(), "Logger initialization reuses the existing host")
 		Assert.Equal(loggerPid, WinGetPID("ahk_id " FindLoggerWindow()), "Reusing the Logger must preserve its process")
 		Assert.True(WaitUntil(() => IsVisible(FindLoggerWindow())), "A notifying entry written before host startup must be surfaced")
@@ -163,21 +163,21 @@ Test_RealHostsAndCrossProcessBehavior() {
 		Assert.True(WaitUntil(() => IsVisible(FindLoggerWindow())), "Notify log should show logger")
 		Assert.Equal(1, GetUnreadLogCounts()["warning"])
 
-		ShowLogDashboard()
-		dashboardPid := WinGetPID("ahk_id " FindLogDashboardWindow())
+		ShowControlDashboard()
+		dashboardPid := WinGetPID("ahk_id " FindControlDashboardWindow())
 		Assert.NotEqual(loggerPid, dashboardPid, "Logger and dashboard must have separate host processes")
 		; A CI-only intermittent failure here (window found - dashboardPid
 		; above succeeded - but not yet visible) means the window handle
-		; already existed; only the WS_VISIBLE flip from ShowLogDashboard's
+		; already existed; only the WS_VISIBLE flip from ShowControlDashboard's
 		; WinShow call was still catching up. Widened from the previous
 		; 4000ms default (an arbitrary local-machine budget with no
 		; documented basis) to match this file's other generous, evidence-
 		; based waits rather than guess at a root cause a third time.
-		Assert.True(WaitUntil(() => IsVisible(FindLogDashboardWindow()), 8000), "Client API should show shared dashboard")
+		Assert.True(WaitUntil(() => IsVisible(FindControlDashboardWindow()), 8000), "Client API should show shared dashboard")
 		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Opening dashboard should hide logger; read=" GetReadLogEntryCount() ", total=" GetLogEntryCount() DumpEntries())
 		Assert.Equal(0, GetUnreadLogEntries().Length, "Opening dashboard should mark all logs read")
-		HideLogDashboard()
-		Assert.False(IsVisible(FindLogDashboardWindow()), "Client API should hide shared dashboard")
+		HideControlDashboard()
+		Assert.False(IsVisible(FindControlDashboardWindow()), "Client API should hide shared dashboard")
 
 		LogAndNotifyInfo("overlap info")
 		Assert.True(WaitUntil(() => IsVisible(FindLoggerWindow())))
