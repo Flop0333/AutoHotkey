@@ -1261,9 +1261,9 @@ function RenderTestState(element, tests, onRun) {
 	return state;
 }
 
-const LOG_SEVERITIES = ['error', 'warning', 'info'];
+const LOG_SEVERITIES = ['info', 'warning', 'error'];
 
-// One pill per severity that has entries, most severe first.
+// One pill per severity that has entries, least severe first.
 function LogCountPills(counts, emptyLabel) {
 	const present = LOG_SEVERITIES.filter(severity => Number(counts[severity]) > 0);
 	return present.length

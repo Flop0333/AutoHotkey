@@ -176,8 +176,13 @@ Test_RealHostsAndCrossProcessBehavior() {
 		Assert.True(WaitUntil(() => IsVisible(FindControlDeckWindow()), 8000), "Client API should show shared dashboard")
 		Assert.Equal(2, GetUnreadLogEntries().Length, "Overview should preserve unread logs for its counters")
 		ShowControlDeck("logs")
-		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Opening Logs should hide logger; read=" GetReadLogEntryCount() ", total=" GetLogEntryCount() DumpEntries())
-		Assert.Equal(0, GetUnreadLogEntries().Length, "Opening Logs should mark all logs read")
+		; Marking read is asynchronous: the section request is posted to the
+		; host, which switches the WebView page, whose Logs section then calls
+		; back MarkLogsRead. The popup can also hide on its own 5s timer before
+		; that lands, so wait for the read cursor itself rather than the popup.
+		logsMarkedRead := WaitUntil(() => GetUnreadLogEntries().Length = 0, 8000)
+		Assert.True(logsMarkedRead, "Opening Logs should mark all logs read; read=" GetReadLogEntryCount() ", total=" GetLogEntryCount() DumpEntries())
+		Assert.True(WaitUntil(() => !IsVisible(FindLoggerWindow())), "Opening Logs should hide logger")
 		HideControlDeck()
 		Assert.False(IsVisible(FindControlDeckWindow()), "Client API should hide shared dashboard")
 
