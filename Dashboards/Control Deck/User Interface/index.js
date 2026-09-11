@@ -124,6 +124,17 @@ class ControlDeckShell {
 		this.sections.get(sectionId).activate();
 	}
 
+	// A section requested by another script. The window stays loaded while
+	// hidden, so the section asked for may already be the current one; it is
+	// activated again all the same - a Logger notification reopening Logs
+	// expects its entries to be marked read.
+	open(sectionId) {
+		if (sectionId === this.activeSectionId)
+			this.sections.get(sectionId).activate();
+		else
+			this.show(sectionId);
+	}
+
 	showToast(message) {
 		this.toastElement.textContent = message;
 		this.toastElement.dataset.tone = /could not|error|failed/i.test(message)
@@ -301,19 +312,6 @@ class ConfirmDialog {
 		this.previouslyFocused = null;
 		resolve(accepted);
 	}
-}
-
-// A section whose markup is in place but whose behavior has not shipped yet.
-class PlaceholderSection {
-
-	constructor(id) {
-		this.id = id;
-		this.element = document.querySelector(`#section-${id}`);
-	}
-
-	activate() {}
-
-	refresh(status) {}
 }
 
 // Suite state at a glance, plus the actions worth one click. Every action
@@ -1102,7 +1100,8 @@ class ProcessesSection {
 }
 
 // Whether this machine is set up the way the suite expects, and what the
-// suite is costing it. Its data is read only while the section is on screen.
+// suite is costing it. The setup is read once per visit - it changes only
+// across a restart or a hand edit - while processor use follows every tick.
 class HealthSection {
 
 	// Above this share of the machine, something is spinning rather than
@@ -1133,13 +1132,13 @@ class HealthSection {
 			this._attachEvents();
 			this.wired = true;
 		}
-		this.refresh();
+		this._render(AhkDataService.GetHealth());
+		this.refresh(this.shell.lastStatus);
 	}
 
 	// Processor use comes with the suite status, sampled once per tick for the
 	// strip and this section alike.
-	refresh(status = this.shell.lastStatus) {
-		this._render(AhkDataService.GetHealth());
+	refresh(status) {
 		this._renderCpu(status.cpu || {});
 	}
 

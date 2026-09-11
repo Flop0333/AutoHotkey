@@ -306,7 +306,7 @@ Class ControlDeck extends WebViewToo {
 		if !allowed.Has(sectionName)
 			return
 		if this._pageReady
-			this.ExecuteScript("window.controlDeckShell && window.controlDeckShell.show(" JSON.Dump(sectionName) ")")
+			this.ExecuteScript("window.controlDeckShell && window.controlDeckShell.open(" JSON.Dump(sectionName) ")")
 		else
 			this._pendingSection := sectionName
 	}
@@ -372,8 +372,8 @@ Class ControlDeck extends WebViewToo {
 	; --- Health -------------------------------------------------------------
 
 	; Everything the Health section reports beyond processor use, which comes
-	; with the suite status. Only this section asks for it, so the registry and
-	; secrets lookups happen while it is on screen rather than on every tick.
+	; with the suite status. The section asks once per visit, so the registry
+	; and secrets lookups never run on the poll.
 	GetHealthForWeb() {
 		return JSON.Dump(Map(
 			"autoHotkey", Map("version", A_AhkVersion, "path", A_AhkPath),

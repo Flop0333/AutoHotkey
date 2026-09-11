@@ -1,15 +1,17 @@
 ; ============================================================================
-; Control Deck - Manages the running suite and reviews its log entries
+; Control Deck - Client API for the suite's control centre
 ; ============================================================================
 ;
 ; [FEATURES]
-;   - List view of Logs\errors.log with filtering/sorting by severity, script, time
-;   - Detail view showing the full message and stack trace for a selected entry
-;   - Web-based frontend using WebView2
+;   - Overview, Processes, Logs, Tests, Profiles, and Health sections in one
+;     WebView2 window, hosted by Dashboard.ahk
+;   - The host starts hidden with the suite; these functions show, hide, or
+;     start it from any other script and open it on a chosen section
 ;
 ; [USAGE]
-;   - Opened via the tray menu's "Control Deck" item, or by clicking an
-;     error TrayTip
+;   - ShowControlDeck(section?) / HideControlDeck()
+;   - Opened from the tray menu's "Control Deck" item, the Macro Board, the
+;     Age of Efficiency command AL, or a Logger notification (on Logs)
 ; ============================================================================
 
 #Include ..\..\Lib\Core\OnError.ahk

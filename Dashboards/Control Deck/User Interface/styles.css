@@ -277,23 +277,20 @@ img { image-rendering: pixelated; }
 }
 
 .button:hover, .toolbar button:hover, .test-btn:hover { border-image-source: url("assets/control-deck/button-generic-hover.png"); color: #fff0ce; }
-.button:active, .toolbar button:active, .test-btn:active, .button.is-pressed { border-image-source: url("assets/control-deck/button-generic-pressed.png"); transform: translate(1px, 2px); }
+.button:active, .toolbar button:active, .test-btn:active { border-image-source: url("assets/control-deck/button-generic-pressed.png"); transform: translate(1px, 2px); }
 .button:disabled, .toolbar button:disabled, .test-btn:disabled { border-image-source: url("assets/control-deck/button-generic-disabled.png"); color: var(--muted); cursor: not-allowed; filter: saturate(0.35); }
-.button-warning { border-image-source: url("assets/control-deck/button-generic-warning.png"); color: #f3cf83; }
 .button-danger { border-image-source: url("assets/control-deck/button-generic-destructive.png"); color: #ffd0be; }
 .button-danger:hover { border-image-source: url("assets/control-deck/button-generic-destructive.png"); filter: brightness(1.18); }
 
 .button[data-icon]::before, .toolbar button[data-icon]::before, .test-btn[data-icon]::before { width: 26px; height: 26px; flex: 0 0 26px; background-position: center; background-repeat: no-repeat; background-size: contain; content: ""; image-rendering: pixelated; }
 [data-icon="reload"]::before { background-image: url("assets/control-deck/action-reload.png"); }
 [data-icon="exit"]::before { background-image: url("assets/control-deck/action-exit.png"); }
-[data-icon="run-tests"]::before { background-image: url("assets/control-deck/action-run-tests.png"); }
 [data-icon="notify-info"]::before { background-image: url("assets/control-deck/action-notify-info.png"); }
 [data-icon="notify-warning"]::before { background-image: url("assets/control-deck/action-notify-warning.png"); }
 [data-icon="notify-error"]::before { background-image: url("assets/control-deck/action-notify-error.png"); }
 [data-icon="start"]::before { background-image: url("assets/control-deck/action-start.png"); }
 [data-icon="restart"]::before { background-image: url("assets/control-deck/action-restart.png"); }
 [data-icon="stop"]::before { background-image: url("assets/control-deck/action-stop.png"); }
-[data-icon="sort"]::before { background-image: url("assets/control-deck/action-sort.png"); }
 [data-icon="archive"]::before { background-image: url("assets/control-deck/action-archive.png"); }
 [data-icon="copy"]::before { background-image: url("assets/control-deck/action-copy.png"); }
 [data-icon="open-folder"]::before { background-image: url("assets/control-deck/action-open-folder.png"); }
