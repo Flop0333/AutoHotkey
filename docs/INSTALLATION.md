@@ -49,6 +49,7 @@ Most features tolerate empty values until that specific action is used.
 5. Start Age of Efficiency and Macro Board.
 6. Start the configured standalone apps.
 7. Start the configured integrated apps.
+8. Start the Control Dashboard hidden, so opening it later does not wait for WebView2 to load.
 
 The exact current list is documented in the [app catalog](APPS.md) and expressed by the `Run(...)` calls inside `RunStartup()`.
 

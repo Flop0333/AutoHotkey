@@ -16,5 +16,7 @@ SuiteStartupScripts() => [
     Paths.appsIntegrated "\Command Storer\Command Storer.ahk",
     Paths.appsIntegrated "\App Hotkeys.ahk",
     Paths.appsIntegrated "\Hotkeys.ahk",
-    Paths.appsIntegrated "\Mouse Toys.ahk"
+    Paths.appsIntegrated "\Mouse Toys.ahk",
+    ; Starts hidden, so the first time it is opened it is already loaded.
+    Paths.dashboards "\Control Dashboard\Dashboard.ahk"
 ]

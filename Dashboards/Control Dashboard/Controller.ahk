@@ -48,6 +48,9 @@ Class ControlDashboard extends WebViewToo {
 		this._startTimes := Map()
 		this.Gui.Title := ControlDashboard.INITIALIZING_TITLE
 		this.Gui.OnEvent("Close", (*) => this.Hide())
+		; The window is shown and hidden from other processes as well as this
+		; one, so visibility is followed through the window message itself.
+		OnMessage(0x0018, ObjBindMethod(this, "OnShowWindow")) ; WM_SHOWWINDOW
 		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Control Dashboard\User Interface", 0) ; block cors error, allow loading local files
 		this.Load("http://app.local/index.html")
 		this.AddCallbackToScript("GetPendingSection", (*) => this.TakePendingSection())
@@ -135,7 +138,19 @@ Class ControlDashboard extends WebViewToo {
 		; after the initial Hide has completed so a waiting caller cannot show
 		; this window just before the host hides it again.
 		super.Show("Hide " ControlDashboard.SHOW_OPTIONS, ControlDashboard.INITIALIZING_TITLE)
+		; A window that starts hidden never sends WM_SHOWWINDOW for it, so the
+		; page is told here. It still loads, ready for the first show.
+		this.IsVisible := false
 		this.Gui.Title := ControlDashboard.WIN_TITLE
+	}
+
+	; WebView2 passes this on to the page as document.hidden, which pauses its
+	; one-second poll: the dashboard now runs from startup, and a hidden window
+	; has nothing to keep current. Returns nothing so Windows still handles
+	; the message.
+	OnShowWindow(wParam, lParam, msg, hwnd) {
+		if (hwnd = this.Gui.Hwnd)
+			this.IsVisible := wParam ? true : false
 	}
 
 	Close() => this.Hide()
@@ -504,14 +519,15 @@ Class ControlDashboard extends WebViewToo {
 		}
 	}
 
+	; Git runs hidden and writes to a file: WScript.Shell.Exec, which would read
+	; its output from a pipe, always opens a console window, and this runs as
+	; the suite starts and on every Overview visit.
 	GetGitStatusForWeb() {
 		branch := "", ahead := 0, behind := 0
+		outputFile := A_Temp "\ahk-control-dashboard-git-" this.CurrentProcessId() ".txt"
 		try {
-			shell := ComObject("WScript.Shell")
-			exec := shell.Exec(A_ComSpec ' /C cd /d "' Paths.autohotkey '" && git status -sb --porcelain=v1', "Hxide")
-			while !exec.Status
-				Sleep(10)
-			firstLine := StrSplit(exec.StdOut.ReadAll(), "`n")[1]
+			RunWait(A_ComSpec ' /C git status -sb --porcelain=v1 > "' outputFile '" 2>nul', Paths.autohotkey, "Hide")
+			firstLine := StrSplit(FileRead(outputFile, "UTF-8"), "`n")[1]
 			if RegExMatch(firstLine, "^## ([^.\s]+)", &m)
 				branch := m[1]
 			if RegExMatch(firstLine, "ahead (\d+)", &m)
@@ -519,6 +535,7 @@ Class ControlDashboard extends WebViewToo {
 			if RegExMatch(firstLine, "behind (\d+)", &m)
 				behind := m[1]
 		}
+		try FileDelete(outputFile)
 		return JSON.Dump(Map("branch", branch, "ahead", ahead, "behind", behind))
 	}
 }

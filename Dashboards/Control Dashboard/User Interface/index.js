@@ -46,6 +46,12 @@ class ControlDashboardShell {
 		this._refreshStatus();
 		this.refreshGitStatus();
 		setInterval(() => this._tick(), ControlDashboardShell.POLL_INTERVAL_MS);
+		// The dashboard runs hidden from startup; showing it catches up at once
+		// instead of waiting for the next tick.
+		document.addEventListener('visibilitychange', () => {
+			if (!document.hidden)
+				this._tick();
+		});
 	}
 
 	// Any status readout marked with data-open-section - in the strip or on a
@@ -150,8 +156,11 @@ class ControlDashboardShell {
 	}
 
 	// Only the visible section is refreshed, so navigation, filters, and an open
-	// detail panel survive every tick.
+	// detail panel survive every tick. Nothing is read while the window is
+	// hidden.
 	_tick() {
+		if (document.hidden)
+			return;
 		this._guard(() => {
 			// One read per tick, shared by the strip and the visible section.
 			const status = this.lastStatus = AhkDataService.GetSuiteStatus();
@@ -394,7 +403,7 @@ class OverviewSection {
 	async _reload() {
 		const confirmed = await this.shell.confirm({
 			title: 'Reload the suite?',
-			message: 'Every AutoHotkey script is closed and started again, this dashboard included. It comes back the next time you open it.',
+			message: 'Every AutoHotkey script is closed and started again, this dashboard included. It restarts in the background with the rest of the suite.',
 			confirmLabel: 'Reload'
 		});
 		if (!confirmed)
