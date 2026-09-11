@@ -11,9 +11,9 @@ class ControlDashboardShell {
 	// Matches the Logger's own polling cadence.
 	static POLL_INTERVAL_MS = 1000;
 
-	// Logs is the default while the other sections are placeholders - it is the
-	// view the Logger popup and the error tray tip expect to land on.
-	static DEFAULT_SECTION = 'logs';
+	// Callers name the section they want - the Logger opens Logs, Run-Tests
+	// opens Tests. Overview is what opening the dashboard on its own shows.
+	static DEFAULT_SECTION = 'overview';
 
 	constructor() {
 		this.rail = document.querySelector('#rail');
@@ -38,7 +38,7 @@ class ControlDashboardShell {
 				this.show(item.dataset.section);
 		});
 
-		this.show(ControlDashboardShell.DEFAULT_SECTION);
+		this.show(this._requestedSection());
 		this._attachKeyboardShortcuts();
 		this._refreshStatus();
 		this.refreshGitStatus();
@@ -66,6 +66,14 @@ class ControlDashboardShell {
 				this.sections.get('logs')._renderEmptyDetail();
 			}
 		});
+	}
+
+	// A caller can ask for a section before this page exists, so the host holds
+	// the request until now.
+	_requestedSection() {
+		let requested = '';
+		this._guard(() => requested = AhkDataService.GetPendingSection());
+		return this.sections.has(requested) ? requested : ControlDashboardShell.DEFAULT_SECTION;
 	}
 
 	show(sectionId) {

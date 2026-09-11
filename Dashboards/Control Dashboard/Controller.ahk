@@ -30,6 +30,9 @@ Class ControlDashboard extends WebViewToo {
 
 	__New() {
 		super.__New()
+		; A section requested before the page has loaded, held until it asks.
+		this._pendingSection := ""
+		this._pageReady := false
 		; Processor use is a rate between two samples; these hold the last one.
 		this._cpuTicks := 0
 		this._cpuSampledAt := 0
@@ -40,6 +43,7 @@ Class ControlDashboard extends WebViewToo {
 		this.Gui.OnEvent("Close", (*) => this.Hide())
 		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Control Dashboard\User Interface", 0) ; block cors error, allow loading local files
 		this.Load("http://app.local/index.html")
+		this.AddCallbackToScript("GetPendingSection", (*) => this.TakePendingSection())
 		this.AddCallbackToScript("GetSuiteStatus", (*) => this.GetSuiteStatusForWeb())
 		this.AddCallbackToScript("GetLogEntries", (*) => this.GetLogEntriesForWeb())
 		this.AddCallbackToScript("SetClipboard", (webview, text) => A_Clipboard := text)
@@ -226,10 +230,28 @@ Class ControlDashboard extends WebViewToo {
 		return JSON.Dump(processes)
 	}
 
+	; Pushing the section works once the page is up. On a cold start it is not:
+	; the window title (the readiness signal a caller waits for) is published
+	; before the page finishes loading, so the request is held until the page
+	; asks for it. Without that, "open on Tests" from Run-Tests.ahk lands on
+	; whatever the page opens by default.
 	ShowSection(sectionName) {
 		allowed := Map("overview", 1, "processes", 1, "logs", 1, "tests", 1, "profiles", 1, "health", 1)
-		if allowed.Has(sectionName)
+		if !allowed.Has(sectionName)
+			return
+		if this._pageReady
 			this.ExecuteScript("window.controlDashboardShell && window.controlDashboardShell.show(" JSON.Dump(sectionName) ")")
+		else
+			this._pendingSection := sectionName
+	}
+
+	; The page calls this once, as it starts: it both collects a section
+	; requested before it existed and tells this side that pushes will land.
+	TakePendingSection() {
+		this._pageReady := true
+		requestedSection := this._pendingSection
+		this._pendingSection := ""
+		return JSON.Dump(requestedSection)
 	}
 
 	; The Logger popup is the suite's notification surface; stopping it leaves

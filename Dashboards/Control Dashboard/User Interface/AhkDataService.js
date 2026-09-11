@@ -2,6 +2,10 @@
 // these calls instead of touching `ahk` directly.
 class AhkDataService {
 
+  // Asked once at startup: the section a caller requested before this page
+  // existed, or an empty string.
+  static GetPendingSection = () => JSON.parse(ahk.sync.GetPendingSection());
+
   static GetSuiteStatus = () => JSON.parse(ahk.sync.GetSuiteStatus());
 
   static GetLogEntries = () => JSON.parse(ahk.sync.GetLogEntries());
