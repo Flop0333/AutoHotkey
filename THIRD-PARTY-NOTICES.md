@@ -1,0 +1,45 @@
+# Third-party notices
+
+The root [MIT License](LICENSE) applies only to original project code and
+contributions whose copyright holders have licensed them under those terms. It
+does not replace, override, or relicense bundled third-party code, binaries,
+examples, or assets. Those materials remain subject to their upstream terms.
+
+## Bundled libraries
+
+| Bundled path | Upstream project or author | Licensing and notices |
+|---|---|---|
+| `Lib/Tools/OCR/` | [Descolada/OCR](https://github.com/Descolada/OCR) | MIT. The upstream copyright and license text are preserved in `Lib/Tools/OCR/LICENSE`. Some examples also retain individual source credits. |
+| `Lib/Tools/UIA-v2/` | [Descolada/UIA-v2](https://github.com/Descolada/UIA-v2) | MIT. The upstream copyright and license text are preserved in `Lib/Tools/UIA-v2/LICENSE`. The library also credits thqby's UIAutomation work. |
+| `Lib/Tools/Desktops DLL Library/VirtualDesktopAccessor.dll` | [Ciantic/VirtualDesktopAccessor](https://github.com/Ciantic/VirtualDesktopAccessor) by Jari Pennanen | MIT. The required upstream license text is reproduced below because the bundled directory previously contained only a source credit. |
+| `Lib/Tools/Desktops DLL Library/Desktops DLL Library.ahk` | [adrian88888888/AHK-Virtual-Desktop-Library](https://github.com/adrian88888888/AHK-Virtual-Desktop-Library) | The source attribution is preserved in the file. No explicit license was identified in the bundled copy; the root license does not apply to upstream material in this file. |
+| `Lib/Tools/WebView/WebViewToo.ahk` | the-codingman's WebViewToo, based on [thqby's WebView2.ahk](https://github.com/thqby/ahk2_lib) and [G33kDude/Neutron.ahk](https://github.com/G33kDude/Neutron.ahk) | An MIT permission notice and source links are preserved in the file header. |
+| `Lib/Tools/WebView/WebView2.ahk` and `ComVar.ahk` | [thqby/ahk2_lib](https://github.com/thqby/ahk2_lib) | Author attribution is preserved in the source. No repository-level license was identified upstream; these files are not covered by the root license. |
+| `Lib/Tools/WebView/32bit/WebView2Loader.dll` and `64bit/WebView2Loader.dll` | Microsoft WebView2 | Microsoft redistributable binaries. They remain subject to Microsoft's applicable WebView2 terms and are not covered by the root license. |
+| `Lib/Tools/Gdip/` | [buliasz/AHKv2-Gdip](https://github.com/buliasz/AHKv2-Gdip), derived from work by tic, Rseding91, and mmikeww | The bundled README and change log preserve the upstream history and attribution. No explicit license was identified in the upstream repository or bundled copy; these materials are not covered by the root license. |
+
+Files under `Lib/Tools/` that are original to this project are covered by the
+root MIT License. A path being listed above does not imply that every file in
+that directory is third-party; file-level upstream notices take precedence.
+
+## VirtualDesktopAccessor license
+
+Copyright (c) 2015-2023 Jari Otto Oskari Pennanen
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
