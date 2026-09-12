@@ -52,12 +52,12 @@ KillAndReloadAllAHkProcesses() => SuiteControl.ReloadSuite()
 ; ============================================================================
 
 buttons := [
-    Button(ShowControlDeck, "Control Deck", "log dashboard.gif"),
-    Button(KillAndReloadAllAHkProcesses, "Reload AutoHotkey" , "Reload button.gif"),
-    Button(KillAllAHkProcesses, "Kill All AHK Processes", "Kill all AHK processes.gif"),
+    Button(ShowControlDeck, "Control Deck", "control deck.gif"),
+    Button(KillAndReloadAllAHkProcesses, "Reload AutoHotkey" , "control deck restart.gif"),
+    Button(KillAllAHkProcesses, "Kill All AHK Processes", "control deck shutdown.gif"),
     Button(PullAllWindowsToCurrentDesktop, "Pull All Windows to Current Desktop", "Pull all windows to current desktop.gif"),
-    ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "ai.gif"),
-    ToggleButton(ToggleSpellChecker, GetSpellCheckerState, "Spell Checker", "spell checker.gif"),
+    ToggleButton(ToggleFakeWorkMode, GetFakeWorkModeState, "Fake Work Mode", "control deck fake work mode.gif"),
+    ToggleButton(ToggleSpellChecker, GetSpellCheckerState, "Spell Checker", "spell check.gif"),
 ]
 
 profileButtons := Map(

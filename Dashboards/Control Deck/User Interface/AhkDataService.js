@@ -25,7 +25,19 @@ class AhkDataService {
 
   static GetTestRuns = () => JSON.parse(ahk.sync.GetTestRuns());
 
+  // Git starts a process per call, so every git call is asynchronous.
   static GetGitStatus = () => ahk.GetGitStatus().then(JSON.parse);
+
+  static GetGitBranches = () => ahk.GetGitBranches().then(JSON.parse);
+
+  static FetchGit = () => ahk.FetchGit().then(JSON.parse);
+
+  // The host only switches to a branch git itself lists. mode is '' for a clean
+  // tree, or 'stash' or 'discard'.
+  static SwitchGitBranch = (branch, mode, stashMessage) => ahk.SwitchGitBranch(branch, mode, stashMessage).then(JSON.parse);
+
+  // Pulls what is behind, then pushes what is ahead.
+  static SyncGit = () => ahk.SyncGit().then(JSON.parse);
 
   static GetHealth = () => JSON.parse(ahk.sync.GetHealth());
 

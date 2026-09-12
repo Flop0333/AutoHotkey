@@ -9,15 +9,29 @@
 ;     start it from any other script and open it on a chosen section
 ;
 ; [USAGE]
-;   - ShowControlDeck(section?) / HideControlDeck()
+;   - ShowControlDeck(section?) / HideControlDeck() / ToggleControlDeck(section?)
 ;   - Opened from the tray menu's "Control Deck" item, the Macro Board, the
 ;     Age of Efficiency command D, or a Logger notification (on Logs)
+;   - CapsLock+LWin toggles it; the hotkey is registered once, by the host in
+;     Dashboard.ahk, not by every script that includes this file
 ; ============================================================================
 
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Paths.ahk
 #Include Controller.ahk
 
+; Hides the Control Deck when it is the active window and shows it otherwise,
+; so a deck left open behind other windows is brought forward, not hidden.
+; Without a section it reopens on whichever section was showing.
+ToggleControlDeck(section := "") {
+	dashboardWindow := FindControlDeckWindow()
+	if (dashboardWindow && WinActive("ahk_id " dashboardWindow))
+		HideControlDeck()
+	else
+		ShowControlDeck(section)
+}
+
+; An empty section keeps the section that was showing.
 ShowControlDeck(section := "overview") {
 	dashboardWindow := FindControlDeckWindow()
 	if !dashboardWindow {

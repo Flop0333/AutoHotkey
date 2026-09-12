@@ -2,11 +2,14 @@
 Persistent(true)
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Paths.ahk
+#Include ..\..\Lib\Helpers\Capslock.ahk
 
 TraySetIcon(Paths.autoHotkeyIcon)
 
 myControlDeck := ControlDeck()
 myControlDeck.InitializeHidden()
+
+CapsLock.Hotkey("LWin", (*) => ToggleControlDeck())
 
 OnMessage(0x8001, ShowRequestedControlDeckSection)
 

@@ -9,7 +9,7 @@
 #Include Settings\Window State Tracker.ahk
 
 USER_INTERFACE_PATH := Paths.dashboards "\Macro Board\User Interface"
-TraySetIcon(USER_INTERFACE_PATH "\assets\tray icon.png")
+TraySetIcon(Paths.lib "\icon.png")
 
 Class MacroBoard extends WebViewToo {
 	static WIN_TITLE := "Macro Board"

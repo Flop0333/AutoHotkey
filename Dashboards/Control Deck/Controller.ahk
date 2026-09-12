@@ -11,6 +11,7 @@
 ; broke the three logging hosts when only the catalog was included here.
 #Include ..\..\Secrets\Secrets Service.ahk
 #Include Test Run Status.ahk
+#Include Git Repository.ahk
 
 Class ControlDeck extends WebViewToo {
 	static WIN_TITLE := "AutoHotkey Control Deck"
@@ -46,12 +47,16 @@ Class ControlDeck extends WebViewToo {
 		; Process start times come from WMI, so they are read once per process
 		; instead of on every poll of the Processes section.
 		this._startTimes := Map()
+		this.repository := GitRepository(Paths.autohotkey)
 		this.Gui.Title := ControlDeck.INITIALIZING_TITLE
 		this.Gui.OnEvent("Close", (*) => this.Hide())
 		; The window is shown and hidden from other processes as well as this
 		; one, so visibility is followed through the window message itself.
 		OnMessage(0x0018, ObjBindMethod(this, "OnShowWindow")) ; WM_SHOWWINDOW
 		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Control Deck\User Interface", 0) ; block cors error, allow loading local files
+		; The suite icon lives in Lib, outside the page's folder. Kind 2 lets the page
+		; show it as an image while still refusing scripted reads of that folder.
+		this.SetVirtualHostNameToFolderMapping("suite.local", Paths.lib, 2)
 		this.Load("http://app.local/index.html")
 		this.AddCallbackToScript("GetPendingSection", (*) => this.TakePendingSection())
 		this.AddCallbackToScript("GetSuiteStatus", (*) => this.GetSuiteStatusForWeb())
@@ -60,6 +65,11 @@ Class ControlDeck extends WebViewToo {
 		this.AddCallbackToScript("SetClipboard", (webview, text) => A_Clipboard := text)
 		this.AddCallbackToScript("LogTestMessage", (webview, severity) => this.LogTestMessage(severity))
 		this.AddCallbackToScript("GetGitStatus", (*) => this.GetGitStatusForWeb())
+		this.AddCallbackToScript("GetGitBranches", (*) => this.GetGitBranchesForWeb())
+		this.AddCallbackToScript("FetchGit", (*) => this.ReportOutcome(() => this.repository.Fetch()))
+		; The branch must be one git listed; the repository checks before switching.
+		this.AddCallbackToScript("SwitchGitBranch", (webview, branch, mode, stashMessage) => this.SwitchGitBranch(branch, mode, stashMessage))
+		this.AddCallbackToScript("SyncGit", (*) => this.SyncGit())
 		; Actions. Each one is a named callback: no path, command line, or script
 		; text ever crosses the bridge from the web layer.
 		this.AddCallbackToScript("ReloadSuite", (*) => this.ReloadSuite())
@@ -519,23 +529,37 @@ Class ControlDeck extends WebViewToo {
 		}
 	}
 
-	; Git runs hidden and writes to a file: WScript.Shell.Exec, which would read
-	; its output from a pipe, always opens a console window, and this runs as
-	; the suite starts and on every Overview visit.
+	; --- Git ----------------------------------------------------------------
+
+	; Read as the suite starts, on every Overview visit, and around each git
+	; action. A checkout git cannot read reports no branch, which hides the
+	; branch controls.
 	GetGitStatusForWeb() {
-		branch := "", ahead := 0, behind := 0
-		outputFile := A_Temp "\ahk-control-deck-git-" this.CurrentProcessId() ".txt"
+		try return JSON.Dump(this.repository.Status())
+		catch as gitError
+			return JSON.Dump(Map("branch", "", "error", gitError.Message))
+	}
+
+	; No fetch here, so the menu opens at once; the page fetches separately and
+	; asks again.
+	GetGitBranchesForWeb() {
+		try return JSON.Dump(this.repository.Branches())
+		catch as gitError
+			return JSON.Dump(Map("error", gitError.Message))
+	}
+
+	; mode is "" for a clean tree, or "stash" or "discard" as chosen in the page.
+	SwitchGitBranch(branch, mode, stashMessage) {
+		return this.ReportOutcome(() => this.repository.Switch(String(branch), String(mode), String(stashMessage)))
+	}
+
+	SyncGit() {
 		try {
-			RunWait(A_ComSpec ' /C git status -sb --porcelain=v1 > "' outputFile '" 2>nul', Paths.autohotkey, "Hide")
-			firstLine := StrSplit(FileRead(outputFile, "UTF-8"), "`n")[1]
-			if RegExMatch(firstLine, "^## ([^.\s]+)", &m)
-				branch := m[1]
-			if RegExMatch(firstLine, "ahead (\d+)", &m)
-				ahead := m[1]
-			if RegExMatch(firstLine, "behind (\d+)", &m)
-				behind := m[1]
+			synced := this.repository.Sync()
+			synced["ok"] := 1
+			return JSON.Dump(synced)
+		} catch as gitError {
+			return JSON.Dump(Map("ok", 0, "error", gitError.Message))
 		}
-		try FileDelete(outputFile)
-		return JSON.Dump(Map("branch", branch, "ahead", ahead, "behind", behind))
 	}
 }

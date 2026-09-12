@@ -5,7 +5,7 @@ This is a short historical record for [epic #108](https://github.com/Flop0333/Au
 ## Decisions retained
 
 - **One window, six sections.** Overview, Processes, Logs, Tests, Profiles, and Health share one host. The Logger popup stays the resident notification surface and opens the Control Deck on Logs.
-- **Three roles, kept apart.** `Dashboard.ahk` is the host process and composition root, `Controller.ahk` holds only the WebView callbacks, and `Control Deck.ahk` is the client API (`ShowControlDeck()`, `HideControlDeck()`) other scripts include. The page lives under `User Interface/`, with `AhkDataService.js` as its only route to the host.
+- **Three roles, kept apart.** `Dashboard.ahk` is the host process and composition root, `Controller.ahk` holds only the WebView callbacks, and `Control Deck.ahk` is the client API (`ShowControlDeck()`, `HideControlDeck()`, `ToggleControlDeck()`) other scripts include. The host registers the `CapsLock+LWin` toggle, so including the API never registers a hotkey. The page lives under `User Interface/`, with `AhkDataService.js` as its only route to the host.
 - **Suite control is a service, not controller code.** Reload, exit, inventory, restart, and stop live in `Apps Integrated/Suite Control`, so the tray, a hotkey, or a unit test can call them too. Inventory reads each script's path from its hidden main window title.
 - **One declarative startup list.** `SuiteStartupScripts()` drives both `RunStartup()` and the Processes section, which flags an expected script that is not running.
 - **Started hidden with the suite.** The host is the last entry in that list and loads hidden, so opening it is instant; it is still started on demand when it is missing. While hidden, the page is told so and its one-second poll pauses.
@@ -19,7 +19,8 @@ This is a short historical record for [epic #108](https://github.com/Flop0333/Au
 - Reload, exit, stop, and profile switching are confirmed in the page before anything happens, never through a message box the hidden host would open behind its own window.
 - Exiting or reloading the suite ends the Control Deck too, and the confirmation says so.
 - Secrets are reported as counts only. Values and key names never reach the page; the Secrets cards on the Overview and Health open the local file in VS Code rather than displaying it.
-- Everything is local: files, processes, and the git status of the checkout. External commands run hidden.
+- Git actions in the title bar go through `Git Repository.ahk`. The page names a branch, and the host switches only to one git itself listed; a stash message reaches git through an environment variable, never as shell text. Pulls only fast-forward, so a diverged branch is left for a person to merge. Discarding changes resets tracked files and removes untracked ones but keeps ignored files such as secrets, profiles, and logs.
+- Everything else is local: files, processes, and the git status of the checkout. External commands run hidden, and git never waits on a credential prompt.
 
 ## Visual direction
 
