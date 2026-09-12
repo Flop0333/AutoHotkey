@@ -1,5 +1,12 @@
-<!-- last-pr: 130 -->
+<!-- last-pr: 133 -->
 # Changelog
+
+## 2026-09-11
+
+### Other
+- Restyle the Logger popup with the Control Deck artwork ([#132](https://github.com/Flop0333/AutoHotkey/pull/132))
+- Add MIT license and third-party notices ([#133](https://github.com/Flop0333/AutoHotkey/pull/133))
+
 
 ## 2026-09-11
 
