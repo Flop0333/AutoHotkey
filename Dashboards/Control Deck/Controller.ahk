@@ -54,6 +54,9 @@ Class ControlDeck extends WebViewToo {
 		; one, so visibility is followed through the window message itself.
 		OnMessage(0x0018, ObjBindMethod(this, "OnShowWindow")) ; WM_SHOWWINDOW
 		this.SetVirtualHostNameToFolderMapping("app.local", Paths.dashboards "\Control Deck\User Interface", 0) ; block cors error, allow loading local files
+		; The suite icon lives in Lib, outside the page's folder. Kind 2 lets the page
+		; show it as an image while still refusing scripted reads of that folder.
+		this.SetVirtualHostNameToFolderMapping("suite.local", Paths.lib, 2)
 		this.Load("http://app.local/index.html")
 		this.AddCallbackToScript("GetPendingSection", (*) => this.TakePendingSection())
 		this.AddCallbackToScript("GetSuiteStatus", (*) => this.GetSuiteStatusForWeb())

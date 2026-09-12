@@ -10,7 +10,8 @@
 <body>
   <div class="title-bar">
     <div class="drag-region" onmousedown="ahk.DragWindow()">
-      <img class="title-emblem" src="assets/control-deck/app-emblem.png" alt="">
+      <!-- The suite's own icon (Lib/icon.png), served by the host as suite.local. -->
+      <img class="title-emblem" src="http://suite.local/icon.png" alt="">
       <span class="title-text"><span class="title-kicker">AutoHotkey</span> CONTROL DECK</span>
       <!-- Pushed to the right edge, beside the window controls. Its mousedown
            stops here so clicking a control does not start a window drag. -->
