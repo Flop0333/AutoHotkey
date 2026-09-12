@@ -20,6 +20,7 @@ class ControlDeckShell {
 		this.toastElement = document.querySelector('#toast');
 		this.statusStrip = new StatusStrip(this);
 		this.confirmDialog = new ConfirmDialog();
+		this.git = new GitControl(this);
 		this.sections = new Map();
 		this.activeSectionId = null;
 		// The last suite status read, for a section that activates between ticks.
@@ -44,7 +45,7 @@ class ControlDeckShell {
 		this.show(this._requestedSection());
 		this._attachKeyboardShortcuts();
 		this._refreshStatus();
-		this.refreshGitStatus();
+		this.git.refresh().then(() => this.git.fetch());
 		setInterval(() => this._tick(), ControlDeckShell.POLL_INTERVAL_MS);
 		// The dashboard runs hidden from startup; showing it catches up at once
 		// instead of waiting for the next tick.
@@ -77,8 +78,9 @@ class ControlDeckShell {
 		document.addEventListener('keydown', (event) => {
 			// A confirmation owns the keyboard while it waits for an answer:
 			// switching section behind it would leave the question stranded.
-			// Escape still reaches the dialog, which listens for it itself.
-			if (this.confirmDialog.isOpen) return;
+			// Escape still reaches the dialog, which listens for it itself. The
+			// branch menu and its changes dialog hold the keyboard the same way.
+			if (this.confirmDialog.isOpen || this.git.isOpen) return;
 			const typing = event.target.matches('input, select, textarea, [contenteditable="true"]');
 			if (typing) return;
 			// The keys follow the rail, so reordering the rail reorders them too.
@@ -207,31 +209,6 @@ class ControlDeckShell {
 		this._guard(() => this.statusStrip.render(this.lastStatus = AhkDataService.GetSuiteStatus()));
 	}
 
-	// Reading git status starts a process, so it is loaded on demand rather than
-	// polled: once at startup, and again whenever a section asks for it.
-	async refreshGitStatus() {
-		const gitStatus = document.querySelector('#git-status');
-		try {
-			this.git = await AhkDataService.GetGitStatus();
-			gitStatus.textContent = ControlDeckShell.FormatGitStatus(this.git);
-		} catch (error) {
-			this.git = { error: error.message };
-			gitStatus.textContent = 'git-status error: ' + error.message;
-		}
-		return this.git;
-	}
-
-	static FormatGitStatus(status) {
-		if (!status || !status.branch)
-			return '';
-		const ahead = Number(status.ahead) || 0;
-		const behind = Number(status.behind) || 0;
-		let text = status.branch;
-		if (ahead) text += ` ↑${ahead}`;
-		if (behind) text += ` ↓${behind}`;
-		return text;
-	}
-
 	// A failing bridge call must not kill the polling interval.
 	_guard(work) {
 		try {
@@ -335,6 +312,417 @@ class ConfirmDialog {
 	}
 }
 
+// The branch in the title bar: a menu to switch branch, and arrows that sync
+// with the upstream when there is something to pull or push. Git runs in the
+// host; the page only names a branch the host listed.
+class GitControl {
+
+	// Fetching reaches the network, so visits to the Overview fetch at most this
+	// often. Opening the branch menu always fetches.
+	static FETCH_INTERVAL_MS = 5 * 60 * 1000;
+
+	constructor(shell) {
+		this.shell = shell;
+		this.element = document.querySelector('#git-status');
+		this.branchButton = document.querySelector('#git-branch');
+		this.syncButton = document.querySelector('#git-sync');
+		this.menu = document.querySelector('#git-menu');
+		this.filter = document.querySelector('#git-branch-filter');
+		this.list = document.querySelector('#git-branch-list');
+		this.note = document.querySelector('#git-menu-note');
+		this.changesDialog = new GitChangesDialog();
+		this.status = {};
+		this.branches = null;
+		this.busy = false;
+		this.lastFetchAt = 0;
+		this._attachEvents();
+	}
+
+	get isOpen() {
+		return !this.menu.hidden || this.changesDialog.isOpen;
+	}
+
+	_attachEvents() {
+		this.branchButton.addEventListener('click', () => this.menu.hidden ? this.openMenu() : this.closeMenu());
+		this.syncButton.addEventListener('click', () => this.sync());
+		this.list.addEventListener('click', event => {
+			const item = event.target.closest('[data-branch]');
+			if (item)
+				this.switchTo(item.dataset.branch);
+		});
+		this.filter.addEventListener('input', () => this._renderBranches());
+		this.menu.addEventListener('keydown', event => this._onMenuKey(event));
+		// A click anywhere else closes the menu, as does leaving the window.
+		document.addEventListener('mousedown', event => {
+			if (!this.menu.hidden && !this.menu.contains(event.target) && event.target !== this.branchButton)
+				this.closeMenu();
+		});
+		window.addEventListener('blur', () => this.closeMenu());
+		window.addEventListener('resize', () => this.closeMenu());
+	}
+
+	async refresh() {
+		try {
+			this.render(await AhkDataService.GetGitStatus());
+		} catch (error) {
+			this.render({ error: error.message });
+		}
+		return this.status;
+	}
+
+	// Brings the ahead and behind counts up to date. Quietly skipped when it
+	// ran recently; a failure (offline, no credentials) only leaves them stale.
+	async fetch({ force = false } = {}) {
+		if (!this.status.upstream && !force)
+			return;
+		if (!force && Date.now() - this.lastFetchAt < GitControl.FETCH_INTERVAL_MS)
+			return;
+		this.lastFetchAt = Date.now();
+		let result;
+		try {
+			result = await AhkDataService.FetchGit();
+		} catch (error) {
+			result = { ok: 0, error: error.message };
+		}
+		if (!this.busy)
+			await this.refresh();
+		return result;
+	}
+
+	render(status) {
+		this.status = status || {};
+		if (this.status.error)
+			console.warn(`git status failed: ${this.status.error}`);
+		const branch = this.status.branch;
+		this.element.hidden = !branch;
+		if (!branch)
+			return;
+
+		this.branchButton.textContent = Number(this.status.detached) ? 'detached HEAD' : branch;
+		this.branchButton.disabled = this.busy;
+
+		const behind = Number(this.status.behind) || 0;
+		const ahead = Number(this.status.ahead) || 0;
+		this.syncButton.hidden = !(behind || ahead);
+		this.syncButton.disabled = this.busy;
+		this.syncButton.classList.toggle('is-busy', this.busy);
+		const counts = [];
+		if (behind)
+			counts.push(GitControl.Count('↓', behind, 'git-behind'));
+		if (ahead)
+			counts.push(GitControl.Count('↑', ahead, 'git-ahead'));
+		this.syncButton.replaceChildren(...counts);
+		const title = GitControl.SyncTitle(behind, ahead, this.status);
+		this.syncButton.title = title;
+		this.syncButton.setAttribute('aria-label', title);
+	}
+
+	static Count(arrow, amount, className) {
+		const count = document.createElement('span');
+		count.className = className;
+		count.textContent = `${arrow}${amount}`;
+		return count;
+	}
+
+	// A branch that was never pushed has only commits to publish.
+	static SyncTitle(behind, ahead, { upstream, remote, branch }) {
+		if (!upstream)
+			return `Publish ${branch} to ${remote || 'the remote'}: push ${Count(ahead, 'commit', 'commits')}`;
+		const steps = [];
+		if (behind)
+			steps.push(`pull ${Count(behind, 'commit', 'commits')}`);
+		if (ahead)
+			steps.push(`push ${Count(ahead, 'commit', 'commits')}`);
+		const text = steps.join(', then ');
+		return `Sync with ${upstream}: ${text}`;
+	}
+
+	// --- Branch menu ------------------------------------------------------
+
+	async openMenu() {
+		if (this.busy)
+			return;
+		this.menu.hidden = false;
+		this.branchButton.setAttribute('aria-expanded', 'true');
+		this._placeMenu();
+		this.filter.value = '';
+		this.branches = null;
+		this._showNote('Reading branches…');
+		this.list.replaceChildren();
+		this.filter.focus();
+
+		await this._loadBranches();
+		// Remote branches are only as fresh as the last fetch, so the menu
+		// fetches and redraws; the list above is usable in the meantime.
+		this._showNote(this.branches ? 'Fetching remote branches…' : this.note.textContent, !this.branches);
+		const fetched = await this.fetch({ force: true });
+		if (this.menu.hidden)
+			return;
+		await this._loadBranches();
+		if (fetched && !fetched.ok)
+			this._showNote(`Could not fetch, so remote branches may be out of date: ${fetched.error}`, true);
+		else if (this.branches)
+			this._showNote('');
+	}
+
+	closeMenu(restoreFocus = false) {
+		if (this.menu.hidden)
+			return;
+		this.menu.hidden = true;
+		this.branchButton.setAttribute('aria-expanded', 'false');
+		if (restoreFocus)
+			this.branchButton.focus();
+	}
+
+	// Under the branch button, kept inside the window.
+	_placeMenu() {
+		const anchor = this.branchButton.getBoundingClientRect();
+		const width = this.menu.offsetWidth;
+		this.menu.style.top = `${Math.round(anchor.bottom + 8)}px`;
+		this.menu.style.left = `${Math.round(Math.max(12, Math.min(anchor.left, window.innerWidth - width - 12)))}px`;
+	}
+
+	async _loadBranches() {
+		let branches;
+		try {
+			branches = await AhkDataService.GetGitBranches();
+		} catch (error) {
+			branches = { error: error.message };
+		}
+		if (this.menu.hidden)
+			return;
+		if (branches.error) {
+			this.branches = null;
+			this.list.replaceChildren();
+			this._showNote(`Could not list branches: ${branches.error}`, true);
+			return;
+		}
+		this.branches = {
+			local: Array.isArray(branches.local) ? branches.local : [],
+			remote: Array.isArray(branches.remote) ? branches.remote : []
+		};
+		this._renderBranches();
+	}
+
+	// Redrawing keeps keyboard focus on the branch it was on.
+	_renderBranches() {
+		if (!this.branches)
+			return;
+		const focused = document.activeElement && document.activeElement.dataset
+			? document.activeElement.dataset.branch
+			: undefined;
+		const query = this.filter.value.trim().toLowerCase();
+		const matches = name => !query || name.toLowerCase().includes(query);
+		const children = [
+			...this._group('Local', this.branches.local.filter(matches)),
+			...this._group('Remote', this.branches.remote.filter(matches))
+		];
+		if (!children.length) {
+			const empty = document.createElement('p');
+			empty.className = 'git-menu-note';
+			empty.textContent = query ? 'No branch matches the filter.' : 'No branches.';
+			children.push(empty);
+		}
+		this.list.replaceChildren(...children);
+		if (focused !== undefined) {
+			const item = this._items().find(button => button.dataset.branch === focused);
+			if (item)
+				item.focus();
+		}
+	}
+
+	_group(label, names) {
+		if (!names.length)
+			return [];
+		const heading = document.createElement('div');
+		heading.className = 'git-menu-group';
+		heading.textContent = label;
+		return [heading, ...names.map(name => this._item(name))];
+	}
+
+	_item(name) {
+		const item = document.createElement('button');
+		item.type = 'button';
+		item.className = 'git-menu-item';
+		item.setAttribute('role', 'menuitem');
+		item.dataset.branch = name;
+		item.textContent = name;
+		if (name === this.status.branch) {
+			item.classList.add('is-current');
+			item.setAttribute('aria-current', 'true');
+			item.title = 'The checked-out branch';
+		}
+		return item;
+	}
+
+	_items() {
+		return [...this.list.querySelectorAll('.git-menu-item')];
+	}
+
+	_showNote(text, isError = false) {
+		this.note.textContent = text;
+		this.note.hidden = !text;
+		this.note.classList.toggle('is-error', isError);
+	}
+
+	// Arrow keys move through the branches, Enter in the filter picks the first
+	// match, and Escape closes the menu.
+	_onMenuKey(event) {
+		const items = this._items();
+		const index = items.indexOf(document.activeElement);
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			this.closeMenu(true);
+		} else if (event.key === 'ArrowDown' && items.length) {
+			event.preventDefault();
+			items[Math.min(index + 1, items.length - 1)].focus();
+		} else if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			if (index <= 0)
+				this.filter.focus();
+			else
+				items[index - 1].focus();
+		} else if (event.key === 'Enter' && event.target === this.filter && items.length) {
+			event.preventDefault();
+			this.switchTo(items[0].dataset.branch);
+		} else if (event.key === 'Tab') {
+			this.closeMenu();
+		}
+	}
+
+	// --- Actions ----------------------------------------------------------
+
+	async switchTo(branch) {
+		if (this.busy)
+			return;
+		if (branch === this.status.branch) {
+			this.closeMenu(true);
+			return;
+		}
+		this.closeMenu();
+
+		// Files change outside the page, so the changes are counted now rather
+		// than trusted from the last read.
+		const status = await this.refresh();
+		const changes = Number(status.changes) || 0;
+		let choice = { mode: '', message: '' };
+		if (changes) {
+			choice = await this.changesDialog.ask({ branch, current: status.branch, changes });
+			if (!choice) {
+				this.branchButton.focus();
+				return;
+			}
+		}
+
+		const handled = { stash: ', changes stashed', discard: ', changes discarded' }[choice.mode] || '';
+		await this._run({
+			started: `Switching to ${branch}…`,
+			failed: `Could not switch to ${branch}`,
+			work: () => AhkDataService.SwitchGitBranch(branch, choice.mode, choice.message),
+			// Running scripts keep the code they started with.
+			done: () => `Switched to ${branch}${handled}. Reload the suite to run its scripts.`
+		});
+	}
+
+	sync() {
+		const behind = Number(this.status.behind) || 0;
+		const ahead = Number(this.status.ahead) || 0;
+		if (!behind && !ahead)
+			return;
+		return this._run({
+			started: behind && ahead ? 'Pulling, then pushing…' : behind ? 'Pulling…' : 'Pushing…',
+			failed: 'Could not sync',
+			work: () => AhkDataService.SyncGit(),
+			done: result => GitControl.SyncDone(result)
+		});
+	}
+
+	static SyncDone(result) {
+		const pulled = Number(result.pulled) || 0;
+		const pushed = Number(result.pushed) || 0;
+		const steps = [];
+		if (pulled)
+			steps.push(`pulled ${Count(pulled, 'commit', 'commits')}`);
+		if (pushed)
+			steps.push(`pushed ${Count(pushed, 'commit', 'commits')}`);
+		if (!steps.length)
+			return 'Already in sync';
+		return `Synced: ${steps.join(', ')}` + (pulled ? '. Reload the suite to run the new code.' : '');
+	}
+
+	// One git action at a time: the controls stay disabled until it reports.
+	async _run({ started, failed, work, done }) {
+		if (this.busy)
+			return;
+		this.busy = true;
+		this.render(this.status);
+		this.shell.showToast(started);
+		try {
+			const result = await work();
+			this.shell.showToast(result.ok ? done(result) : `${failed}: ${result.error}`);
+		} catch (error) {
+			this.shell.showToast(`${failed}: ${error.message}`);
+		} finally {
+			this.busy = false;
+			await this.refresh();
+		}
+	}
+}
+
+// Asked before switching away from uncommitted changes: stash them with a
+// message, or discard them. Resolves with { mode, message }, or null when
+// the switch is cancelled.
+class GitChangesDialog {
+
+	constructor() {
+		this.element = document.querySelector('#git-changes-modal');
+		this.form = document.querySelector('#git-changes-form');
+		this.title = document.querySelector('#git-changes-title');
+		this.message = document.querySelector('#git-changes-message');
+		this.input = document.querySelector('#git-stash-message');
+		this.resolve = null;
+
+		this.form.addEventListener('submit', event => {
+			event.preventDefault();
+			this._close({ mode: 'stash', message: this.input.value.trim() || this.input.placeholder });
+		});
+		document.querySelector('#git-changes-discard').addEventListener('click', () => this._close({ mode: 'discard', message: '' }));
+		document.querySelector('#git-changes-cancel').addEventListener('click', () => this._close(null));
+		this.element.addEventListener('click', event => {
+			if (event.target === this.element)
+				this._close(null);
+		});
+		document.addEventListener('keydown', event => {
+			if (this.isOpen && event.key === 'Escape')
+				this._close(null);
+		});
+	}
+
+	get isOpen() {
+		return !this.element.hidden;
+	}
+
+	ask({ branch, current, changes }) {
+		this.title.textContent = `Switch to ${branch}?`;
+		this.message.textContent = `${current} has ${Count(changes, 'uncommitted change', 'uncommitted changes')}. `
+			+ 'Stash them to keep them for later, or discard them. Discarding resets tracked files and deletes untracked ones, and cannot be undone; ignored files such as secrets and logs are kept.';
+		this.input.value = '';
+		this.input.placeholder = `Changes on ${current}`;
+		this.element.hidden = false;
+		this.input.focus();
+		return new Promise(resolve => this.resolve = resolve);
+	}
+
+	_close(choice) {
+		if (!this.resolve)
+			return;
+		this.element.hidden = true;
+		const resolve = this.resolve;
+		this.resolve = null;
+		resolve(choice);
+	}
+}
+
 // Suite state at a glance, plus the actions worth one click. Every action
 // confirms in the page when it is destructive, and reports its outcome.
 class OverviewSection {
@@ -358,8 +746,9 @@ class OverviewSection {
 			this._attachEvents();
 			this.wired = true;
 		}
-		// The branch lives in the title bar; a visit here keeps it current.
-		this.shell.refreshGitStatus();
+		// The branch lives in the title bar; a visit here keeps it current, and
+		// fetches now and then so there is something to pull when there is.
+		this.shell.git.refresh().then(() => this.shell.git.fetch());
 		// Reading the secrets file on every tick would be wasted work for a value
 		// that changes only when the file is edited, so it is read per visit.
 		RenderSecrets(this.secrets, this.secretsNote, AhkDataService.GetSecretsState());

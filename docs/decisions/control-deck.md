@@ -19,7 +19,8 @@ This is a short historical record for [epic #108](https://github.com/Flop0333/Au
 - Reload, exit, stop, and profile switching are confirmed in the page before anything happens, never through a message box the hidden host would open behind its own window.
 - Exiting or reloading the suite ends the Control Deck too, and the confirmation says so.
 - Secrets are reported as counts only. Values and key names never reach the page; the Secrets cards on the Overview and Health open the local file in VS Code rather than displaying it.
-- Everything is local: files, processes, and the git status of the checkout. External commands run hidden.
+- Git actions in the title bar go through `Git Repository.ahk`. The page names a branch, and the host switches only to one git itself listed; a stash message reaches git through an environment variable, never as shell text. Pulls only fast-forward, so a diverged branch is left for a person to merge. Discarding changes resets tracked files and removes untracked ones but keeps ignored files such as secrets, profiles, and logs.
+- Everything else is local: files, processes, and the git status of the checkout. External commands run hidden, and git never waits on a credential prompt.
 
 ## Visual direction
 

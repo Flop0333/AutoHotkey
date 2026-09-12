@@ -12,8 +12,13 @@
     <div class="drag-region" onmousedown="ahk.DragWindow()">
       <img class="title-emblem" src="assets/control-deck/app-emblem.png" alt="">
       <span class="title-text"><span class="title-kicker">AutoHotkey</span> CONTROL DECK</span>
-      <!-- Pushed to the right edge, beside the window controls. -->
-      <span id="git-status" class="git-status"></span>
+      <!-- Pushed to the right edge, beside the window controls. Its mousedown
+           stops here so clicking a control does not start a window drag. -->
+      <div id="git-status" class="git-status" hidden onmousedown="event.stopPropagation()">
+        <span class="git-label">BRANCH</span>
+        <button type="button" id="git-branch" class="git-branch" aria-haspopup="menu" aria-expanded="false" aria-controls="git-menu" title="Switch branch"></button>
+        <button type="button" id="git-sync" class="git-sync" hidden></button>
+      </div>
     </div>
     <div class="title-btn-container">
       <button type="button" class="title-btn" onclick="ahk.Minimize()" aria-label="Minimize dashboard"><img src="assets/control-deck/window-minimize.png" alt=""></button>
@@ -234,6 +239,28 @@
         <button type="button" class="button button-danger" id="confirm-accept" data-icon="confirm">Confirm</button>
       </div>
     </div>
+  </div>
+
+  <!-- Placed under the branch button when it opens. -->
+  <div class="git-menu" id="git-menu" hidden>
+    <input type="text" id="git-branch-filter" class="text-input" placeholder="Filter branches" aria-label="Filter branches" autocomplete="off" spellcheck="false">
+    <div class="git-menu-list" id="git-branch-list" role="menu" aria-label="Branches"></div>
+    <p class="git-menu-note" id="git-menu-note" hidden></p>
+  </div>
+
+  <!-- Asked before switching away from uncommitted changes. -->
+  <div class="modal" id="git-changes-modal" hidden>
+    <form class="modal-box modal-box-wide" id="git-changes-form" data-kicker="WORKING TREE" role="dialog" aria-modal="true" aria-labelledby="git-changes-title">
+      <h2 class="modal-title" id="git-changes-title"></h2>
+      <p class="modal-message" id="git-changes-message"></p>
+      <label class="field-label" for="git-stash-message">Stash message</label>
+      <input type="text" id="git-stash-message" class="text-input field-input" maxlength="200" autocomplete="off" spellcheck="false">
+      <div class="modal-actions">
+        <button type="button" class="button" id="git-changes-cancel" data-icon="cancel">Cancel</button>
+        <button type="button" class="button button-danger" id="git-changes-discard" data-icon="stop">Discard</button>
+        <button type="submit" class="button" id="git-changes-stash" data-icon="archive">Stash</button>
+      </div>
+    </form>
   </div>
 
   <div id="toast" role="status" aria-live="polite"></div>
