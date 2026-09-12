@@ -372,8 +372,11 @@ class GitControl {
 
 	// Brings the ahead and behind counts up to date. Quietly skipped when it
 	// ran recently; a failure (offline, no credentials) only leaves them stale.
+	// Also skipped while the window is hidden: the host starts hidden with the
+	// suite, and a network fetch on its one thread then would only delay the
+	// callbacks of a caller that is opening the deck, with nobody to see it.
 	async fetch({ force = false } = {}) {
-		if (!this.status.upstream && !force)
+		if (!force && (document.hidden || !this.status.upstream))
 			return;
 		if (!force && Date.now() - this.lastFetchAt < GitControl.FETCH_INTERVAL_MS)
 			return;

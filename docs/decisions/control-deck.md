@@ -5,7 +5,7 @@ This is a short historical record for [epic #108](https://github.com/Flop0333/Au
 ## Decisions retained
 
 - **One window, six sections.** Overview, Processes, Logs, Tests, Profiles, and Health share one host. The Logger popup stays the resident notification surface and opens the Control Deck on Logs.
-- **Three roles, kept apart.** `Dashboard.ahk` is the host process and composition root, `Controller.ahk` holds only the WebView callbacks, and `Control Deck.ahk` is the client API (`ShowControlDeck()`, `HideControlDeck()`) other scripts include. The page lives under `User Interface/`, with `AhkDataService.js` as its only route to the host.
+- **Three roles, kept apart.** `Dashboard.ahk` is the host process and composition root, `Controller.ahk` holds only the WebView callbacks, and `Control Deck.ahk` is the client API (`ShowControlDeck()`, `HideControlDeck()`, `ToggleControlDeck()`) other scripts include. The host registers the `CapsLock+LWin` toggle, so including the API never registers a hotkey. The page lives under `User Interface/`, with `AhkDataService.js` as its only route to the host.
 - **Suite control is a service, not controller code.** Reload, exit, inventory, restart, and stop live in `Apps Integrated/Suite Control`, so the tray, a hotkey, or a unit test can call them too. Inventory reads each script's path from its hidden main window title.
 - **One declarative startup list.** `SuiteStartupScripts()` drives both `RunStartup()` and the Processes section, which flags an expected script that is not running.
 - **Started hidden with the suite.** The host is the last entry in that list and loads hidden, so opening it is instant; it is still started on demand when it is missing. While hidden, the page is told so and its one-second poll pauses.
