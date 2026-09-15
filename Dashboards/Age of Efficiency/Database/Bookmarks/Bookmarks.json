@@ -394,8 +394,89 @@
 		"command": "Weer",
 		"icon": "default",
 		"id": 50,
-		"isSecret": "0",
+		"isSecret": 0,
 		"title": "Weer",
 		"url": "https://www.weeronline.nl/Europa/Nederland/Blitterswijck/4058134/weersverwachting-48uur"
+	},
+	{
+		"category": "GitHub",
+		"command": "G",
+		"icon": "GitHub",
+		"id": 51,
+		"isSecret": 0,
+		"title": "GitHub",
+		"url": "https://github.com/Flop0333?tab=repositories"
+	},
+	{
+		"category": "GitHub",
+		"command": "GA",
+		"icon": "GitHub",
+		"id": 52,
+		"isSecret": 0,
+		"title": "GitHub AutoHotkey",
+		"url": "https://github.com/Flop0333/AutoHotkey"
+	},
+	{
+		"category": "GitHub",
+		"command": "GAB",
+		"icon": "GitHub",
+		"id": 53,
+		"isSecret": 0,
+		"title": "GitHub AutoHotkey Board",
+		"url": "https://github.com/users/Flop0333/projects/8"
+	},
+	{
+		"category": "GitHub",
+		"command": "GNB",
+		"icon": "GitHub",
+		"id": 54,
+		"isSecret": 0,
+		"title": "GitHub Notification Service Board",
+		"url": "https://github.com/users/Flop0333/projects/11"
+	},
+	{
+		"category": "GitHub",
+		"command": "GN",
+		"icon": "GitHub",
+		"id": 55,
+		"isSecret": 0,
+		"title": "GitHub Notification Service",
+		"url": "https://github.com/Flop0333/Notification-Service"
+	},
+	{
+		"category": "GitHub",
+		"command": "GP",
+		"icon": "GitHub",
+		"id": 56,
+		"isSecret": 0,
+		"title": "GitHub Personal OS",
+		"url": "https://github.com/Flop0333/Personal-OS"
+	},
+	{
+		"category": "GitHub",
+		"command": "GPB",
+		"icon": "GitHub",
+		"id": 57,
+		"isSecret": 0,
+		"title": "GitHub Personal OS Board",
+		"url": "https://github.com/users/Flop0333/projects/9"
+	},
+	{
+		"category": "GitHub",
+		"command": "GOB",
+		"icon": "GitHub",
+		"id": 58,
+		"isSecret": 0,
+		"title": "Github OpenClaw Board",
+		"url": "https://github.com/users/Flop0333/projects/6"
+	},
+	{
+		"category": "GitHub",
+		"command": "GO",
+		"icon": "GitHub",
+		"id": 59,
+		"isSecret": 0,
+		"title": "GitHub OpenClaw",
+		"url": "https://github.com/Flop0333/openclaw-home"
 	}
 ]
