@@ -1,5 +1,11 @@
-<!-- last-pr: 133 -->
+<!-- last-pr: 136 -->
 # Changelog
+
+## 2026-09-12
+
+### Other
+- Add Git actions to the Control Deck ([#136](https://github.com/Flop0333/AutoHotkey/pull/136))
+
 
 ## 2026-09-11
 
