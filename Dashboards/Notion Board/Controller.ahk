@@ -1,6 +1,8 @@
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Paths.ahk
 #Include ..\..\Lib\Core\Persistent WebView.ahk
+#Include ..\..\Lib\Tools\Window Settings Service.ahk
+#Include ..\..\Lib\Tools\Window State Tracker.ahk
 #Include ..\..\Secrets\Secrets Service.ahk
 
 class NotionBoardController extends PersistentWebView {
@@ -8,11 +10,11 @@ class NotionBoardController extends PersistentWebView {
     static WM_SYSCOMMAND := 0x0112
     static SC_MINIMIZE := 0xF020
     static SC_CLOSE := 0xF060
-    ; Fixed, git-ignored profile folder derived through Paths.ahk. Cookies and
-    ; session state land here instead of in a per-process temp folder, so a
+    ; Fixed, git-ignored browser-data folder derived through Paths.ahk. Cookies
+    ; and session state land here instead of in a per-process temp folder, so a
     ; single manual login survives a full suite restart.
-    static PROFILE_DIR := Paths.dashboards "\Notion Board\Profile"
-    static SHOW_OPTIONS := Format("w{} h{}", Round(A_ScreenWidth * 0.85), Round(A_ScreenHeight * 0.85))
+    static BROWSER_DATA_DIR := Paths.dashboards "\Notion Board\Browser Data"
+    static SETTINGS_PATH := Paths.dashboards "\Notion Board\window settings.ini"
     
     ; Script to hide elements from Notion to show only a focus view
     static HIDE_NOTION_CHROME_SCRIPT := "
@@ -36,9 +38,21 @@ class NotionBoardController extends PersistentWebView {
     })();
     )"
 
-    __New() {
-        super.__New(NotionBoardController.PROFILE_DIR,,,,false) ; false to set default caption
+    __New(settingsPath := NotionBoardController.SETTINGS_PATH) {
+        super.__New(NotionBoardController.BROWSER_DATA_DIR,,,,false) ; false to set default caption
         this.Gui.Title := NotionBoardController.WIN_TITLE
+        defaultWidth := Round(A_ScreenWidth * 0.85)
+        defaultHeight := Round(A_ScreenHeight * 0.85)
+        defaultX := Round((A_ScreenWidth - defaultWidth) / 2)
+        defaultY := Round((A_ScreenHeight - defaultHeight) / 2)
+        this.settingsService := WindowSettingsService(
+            settingsPath, defaultWidth, defaultHeight, defaultX, defaultY)
+        this.showOptions := Format("x{} y{} w{} h{}",
+            this.settingsService.Window.x,
+            this.settingsService.Window.y,
+            this.settingsService.Window.Width,
+            this.settingsService.Window.Height)
+        this.windowPositionTracker := WindowPositionTracker(this.Gui, this.settingsService)
         this.Gui.OnEvent("Close", (*) => this.SendToDesktop())
         this.Gui.OnEvent("Escape", (*) => this.SendToDesktop())
         this.SystemCommandHandler := ObjBindMethod(this, "HandleSystemCommand")
@@ -47,9 +61,14 @@ class NotionBoardController extends PersistentWebView {
         this.LoadBoard()
     }
 
+
+    ToggleNotionBoard() => WinActive("ahk_id " myNotionBoard.Hwnd) ? myNotionBoard.SendToDesktop() WinActivate("ahk_class Shell_TrayWnd") : myNotionBoard.Show()
+    
     Show() {
         this.IsVisible := true
-        super.Show(NotionBoardController.SHOW_OPTIONS, NotionBoardController.WIN_TITLE)
+        this.Gui.GetPos(&x, &y, &width, &height)
+        currentOptions := Format("x{} y{} w{} h{}", x, y, width, height)
+        super.Show(currentOptions, NotionBoardController.WIN_TITLE)
     }
 
     Hide() {
@@ -59,7 +78,7 @@ class NotionBoardController extends PersistentWebView {
     ; Starts behind all other application windows, where it remains visible as
     ; part of the desktop whenever those windows do not cover it.
     InitializeOnDesktop() {
-        super.Show("NA " NotionBoardController.SHOW_OPTIONS, NotionBoardController.WIN_TITLE)
+        super.Show("NA " this.showOptions, NotionBoardController.WIN_TITLE)
         this.SendToDesktop()
     }
 

@@ -4,7 +4,7 @@
 ;
 ; [FEATURES]
 ;   - Shows the Notion board from the NotionBoardUrl secret in a WebView2 host
-;   - A fixed, persistent WebView2 profile folder keeps the Notion session
+;   - A fixed, persistent Browser Data folder keeps the Notion session
 ;     logged in across suite restarts; log in manually once
 ;
 ; [USAGE]
@@ -30,6 +30,5 @@ if (ProfileManager.IsNot(Profiles.woonkamerLaptops)) {
 myNotionBoard := NotionBoardController()
 myNotionBoard.InitializeOnDesktop()
 
-CapsLock.Hotkey("n", (*) => ToggleNotionBoard())
+CapsLock.Hotkey("n", (*) => myNotionBoard.ToggleNotionBoard())
 
-ToggleNotionBoard() => WinActive("ahk_id " myNotionBoard.Hwnd) ? myNotionBoard.SendToDesktop() : myNotionBoard.Show()

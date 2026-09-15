@@ -38,7 +38,7 @@ Profiles let one checkout behave differently on work machines, personal laptops,
 
 Most features tolerate empty values until that specific action is used.
 
-The Notion Board dashboard (`CapsLock+N`) is a separate case: its `NotionBoardUrl` secret points at your Notion board, and its WebView2 session persists in the git-ignored `Dashboards/Notion Board/Profile/` folder instead of a per-process temp folder. Fill in the secret, open the board once, and log in to Notion manually; that login then survives a full suite restart (and a reboot), so it never needs to be automated or stored. If the secret is empty, the window shows a short notice instead of a blank page.
+The Notion Board dashboard (`CapsLock+N`) is a separate case: its `NotionBoardUrl` secret points at your Notion board, and its WebView2 session persists in the git-ignored `Dashboards/Notion Board/Browser Data/` folder instead of a per-process temp folder. Fill in the secret, open the board once, and log in to Notion manually; that login then survives a full suite restart (and a reboot), so it never needs to be automated or stored. Its normal position and dimensions are stored separately in the ignored `Dashboards/Notion Board/window settings.ini`; minimized and maximized bounds are not saved. If the secret is empty, the window shows a short notice instead of a blank page.
 
 ## What starts automatically
 

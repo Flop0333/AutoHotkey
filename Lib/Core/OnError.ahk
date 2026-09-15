@@ -5,6 +5,7 @@
 OnError(HandleUnhandledError)
 HandleUnhandledError(error, mode) {
     try {
+		MsgBox(error.Message, error.HasProp("Stack") ? error.Stack : "")
         LogAndNotifyError(error.Message, error.HasProp("Stack") ? error.Stack : "")
         return true ; Suppress the default dialog only after persistence succeeds.
     }
