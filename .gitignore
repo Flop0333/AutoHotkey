@@ -4,6 +4,9 @@ Profiles/current_profile.ini
 # Profile-specific settings for Macro Board - Changes when resizing Marco Baord
 Dashboards/Macro Board/Settings/Profile Settings/
 
+# Notion Board - Persistent WebView2 profile (browser session data), never tracked
+Dashboards/Notion Board/Profile/
+
 Lib/Test.ahk
 Secrets/My Secrets.json
 Secrets/Removed Secrets.json

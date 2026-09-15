@@ -14,6 +14,7 @@ It started as a collection of small scripts and grew into a profile-aware automa
 - 🎹 **Macro Board** — a customizable Stream Deck-style dashboard for frequently used actions.
 - 📸 **Screen Snipper with OCR** — capture the screen, copy or save an image, and extract text.
 - 🎛️ **Control Deck** — inspect processes, logs, tests, profiles, and machine health from one control centre.
+- 📋 **Notion Board** — your Notion board in its own persistent WebView2 window; log in once and stay signed in across restarts.
 - 🔊 **Text Speaker** — read selected text or an OCR screen region aloud with Windows speech synthesis.
 - 🖱️ **Mouse gestures and extra-button actions** — control common tasks without reaching for menus.
 - 🧩 **Profiles and local secrets** — adapt one checkout to different computers without committing personal data.
@@ -39,6 +40,10 @@ A keyboard-first command launcher for bookmarks, searches, applications, scripts
 A customizable action grid that brings frequently used commands together in a visual, Stream Deck-style interface.
 
 ![Macro Board demo](Dashboards/Macro%20Board/Demo.gif)
+
+### Notion Board
+
+Your Notion board, hosted in its own WebView2 window with a fixed, persistent profile folder instead of a per-process temp one. Log in to Notion manually once and the session survives a full suite restart. `CapsLock+N` toggles it; closing the window hides it rather than exiting.
 
 ## 🏗️ More than a folder of scripts
 

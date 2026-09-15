@@ -38,6 +38,8 @@ Profiles let one checkout behave differently on work machines, personal laptops,
 
 Most features tolerate empty values until that specific action is used.
 
+The Notion Board dashboard (`CapsLock+N`) is a separate case: its `NotionBoardUrl` secret points at your Notion board, and its WebView2 session persists in the git-ignored `Dashboards/Notion Board/Profile/` folder instead of a per-process temp folder. Fill in the secret, open the board once, and log in to Notion manually; that login then survives a full suite restart (and a reboot), so it never needs to be automated or stored. If the secret is empty, the window shows a short notice instead of a blank page.
+
 ## What starts automatically
 
 `Startup/Startup.ahk` is the source of truth. It performs this sequence:
@@ -50,6 +52,7 @@ Most features tolerate empty values until that specific action is used.
 6. Start the configured standalone apps.
 7. Start the configured integrated apps.
 8. Start the Control Deck hidden, so opening it later does not wait for WebView2 to load.
+9. Start the Notion Board hidden, so opening it later does not wait for WebView2 to load.
 
 The exact current list is documented in the [app catalog](APPS.md) and expressed by the `Run(...)` calls inside `RunStartup()`.
 

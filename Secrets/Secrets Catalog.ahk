@@ -20,6 +20,7 @@ SecretsCatalog := Map(
     "NotionShitFixenUrl", Secret("Notion SHIT FIXEN URL", "Used to open the SHIT FIXEN page in Notion"),
     "NotionHuisNotesUrl", Secret("Notion Huis Notes URL", "Used to open the Huis Notes page in Notion"),
     "NotionWorkDashboardUrl", Secret("Notion Work Dashboard URL", "Used to open the Work Dashboard page in Notion"),
+    "NotionBoardUrl", Secret("Notion Board URL", "Used to open the Notion board dashboard"),
     "WorkDeviceNames", Secret("Work Device Names", "Used for profiles to identify work devices by computer name"),
     "WorkBoard", Secret("Work Board", "Link to board"),
     "WorkVM", Secret("Work Virtual Machine", "Link to work virtual machine"),

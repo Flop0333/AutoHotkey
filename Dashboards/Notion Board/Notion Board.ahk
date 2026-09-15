@@ -1,0 +1,33 @@
+; ============================================================================
+; Notion Board Dashboard - Notion board in its own persistent WebView2 window
+; ============================================================================
+;
+; [FEATURES]
+;   - Shows the Notion board from the NotionBoardUrl secret in a WebView2 host
+;   - A fixed, persistent WebView2 profile folder keeps the Notion session
+;     logged in across suite restarts; log in manually once
+;
+; [USAGE]
+;   - CapsLock+N toggles the window; closing it hides it instead of exiting
+; ============================================================================
+
+#SingleInstance Force
+Persistent(true)
+#Include ..\..\Lib\Core\OnError.ahk
+#Include ..\..\Lib\Core\Paths.ahk
+#Include ..\..\Lib\Helpers\Capslock.ahk
+#Include Controller.ahk
+
+TraySetIcon(Paths.autoHotkeyIcon)
+
+myNotionBoard := NotionBoardController()
+myNotionBoard.InitializeHidden()
+
+CapsLock.Hotkey("n", (*) => ToggleNotionBoard())
+
+ToggleNotionBoard() {
+    if (WinActive("ahk_id " myNotionBoard.Hwnd))
+        myNotionBoard.Hide()
+    else
+        myNotionBoard.Show()
+}

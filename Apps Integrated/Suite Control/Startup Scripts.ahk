@@ -18,5 +18,7 @@ SuiteStartupScripts() => [
     Paths.appsIntegrated "\Hotkeys.ahk",
     Paths.appsIntegrated "\Mouse Toys.ahk",
     ; Starts hidden, so the first time it is opened it is already loaded.
-    Paths.dashboards "\Control Deck\Dashboard.ahk"
+    Paths.dashboards "\Control Deck\Dashboard.ahk",
+    ; Starts hidden, so the first time it is opened it is already loaded.
+    Paths.dashboards "\Notion Board\Notion Board.ahk"
 ]
