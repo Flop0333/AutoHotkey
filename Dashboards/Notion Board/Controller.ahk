@@ -31,7 +31,7 @@ class NotionBoardController extends PersistentWebView {
 
             const style = document.createElement('style');
             style.id = styleId;
-            style.textContent = 'header:has(.notion-topbar), .notion-topbar, .notion-assistant-corner-origin-container, .notion-page-controls, .content-editable-void-no-select, nav.notion-sidebar-container[aria-label=\'Sidebar\'], aside[aria-label=\'Page comments\'] { display: none !important; }';
+            style.textContent = 'header:has(.notion-topbar), .notion-topbar, .notion-assistant-corner-origin-container, .notion-page-controls, .content-editable-void-no-select, .layout-content.layout-content-with-divider, [aria-roledescription=\'page title\'], nav.notion-sidebar-container[aria-label=\'Sidebar\'], aside[aria-label=\'Page comments\'] { display: none !important; } .notion-board-view { margin: 5px !important; }';
             document.head.appendChild(style);
         };
         installStyle();
@@ -41,6 +41,7 @@ class NotionBoardController extends PersistentWebView {
     __New(settingsPath := NotionBoardController.SETTINGS_PATH) {
         super.__New(NotionBoardController.BROWSER_DATA_DIR,,,,false) ; false to set default caption
         this.Gui.Title := NotionBoardController.WIN_TITLE
+        this.EnableDarkCaption()
         defaultWidth := Round(A_ScreenWidth * 0.85)
         defaultHeight := Round(A_ScreenHeight * 0.85)
         defaultX := Round((A_ScreenWidth - defaultWidth) / 2)
@@ -61,14 +62,34 @@ class NotionBoardController extends PersistentWebView {
         this.LoadBoard()
     }
 
+    EnableDarkCaption() {
+        enabled := Buffer(4, 0)
+        NumPut("Int", 1, enabled)
+        result := DllCall("dwmapi\DwmSetWindowAttribute",
+            "Ptr", this.Hwnd,
+            "Int", 20, ; DWMWA_USE_IMMERSIVE_DARK_MODE
+            "Ptr", enabled,
+            "Int", enabled.Size,
+            "Int")
+        if (result != 0) {
+            DllCall("dwmapi\DwmSetWindowAttribute",
+                "Ptr", this.Hwnd,
+                "Int", 19, ; Fallback for older Windows 10 builds
+                "Ptr", enabled,
+                "Int", enabled.Size,
+                "Int")
+        }
+    }
 
     ToggleNotionBoard() => WinActive("ahk_id " myNotionBoard.Hwnd) ? myNotionBoard.SendToDesktop() WinActivate("ahk_class Shell_TrayWnd") : myNotionBoard.Show()
     
     Show() {
         this.IsVisible := true
-        this.Gui.GetPos(&x, &y, &width, &height)
-        currentOptions := Format("x{} y{} w{} h{}", x, y, width, height)
-        super.Show(currentOptions, NotionBoardController.WIN_TITLE)
+        ; The GUI already has its restored geometry. Passing that geometry back
+        ; through WebViewToo.Show() would apply its border adjustment again and
+        ; make the window drift slightly on every toggle.
+        this.Gui.Show()
+        WinActivate("ahk_id " this.Hwnd)
     }
 
     Hide() {
