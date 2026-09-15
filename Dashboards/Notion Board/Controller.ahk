@@ -18,12 +18,20 @@ class NotionBoardController extends PersistentWebView {
         this.LoadBoard()
     }
 
-    Show() => super.Show(NotionBoardController.SHOW_OPTIONS, NotionBoardController.WIN_TITLE)
+    Show() {
+        this.IsVisible := true
+        super.Show(NotionBoardController.SHOW_OPTIONS, NotionBoardController.WIN_TITLE)
+    }
 
+    Hide() {
+        this.IsVisible := false
+        super.Hide()
+    }
+    
     ; Starts hidden with the suite so the first CapsLock+N is instant.
     InitializeHidden() {
         super.Show("Hide " NotionBoardController.SHOW_OPTIONS, NotionBoardController.WIN_TITLE)
-        this.IsVisible := false
+        This.IsVisible := false
     }
 
     Close() => this.Hide()
@@ -34,7 +42,7 @@ class NotionBoardController extends PersistentWebView {
     LoadBoard() {
         url := Secrets.NotionBoardUrl.Get()
         if (url = "") {
-            this.NavigateToString('<html><body style="margin:0;height:100vh;display:flex;align-items:center;justify-content:center;background:#1b1b1b;color:#eee;font-family:sans-serif;text-align:center;"><p>The <code>NotionBoardUrl</code> secret is not configured.<br>Add it and restart the Notion Board.</p></body></html>')
+            LogAndNotifyWarning("Notion bord url is not set!")
             return false
         }
         this.Load(url)

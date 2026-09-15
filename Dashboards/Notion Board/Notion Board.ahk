@@ -16,18 +16,18 @@ Persistent(true)
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Paths.ahk
 #Include ..\..\Lib\Helpers\Capslock.ahk
+#Include ..\..\Profiles\Profile Manager.ahk
 #Include Controller.ahk
-
 TraySetIcon(Paths.autoHotkeyIcon)
+
+; Only launch for woonkamer laptops. ExitApp for the others.
+if (ProfileManager.IsNot(Profiles.woonkamerLaptops)) {
+    LogAndNotifyInfo("Notion Board not launched. It will only launch for woonkamer laptops")
+    ExitApp()
+}
 
 myNotionBoard := NotionBoardController()
 myNotionBoard.InitializeHidden()
-
 CapsLock.Hotkey("n", (*) => ToggleNotionBoard())
 
-ToggleNotionBoard() {
-    if (WinActive("ahk_id " myNotionBoard.Hwnd))
-        myNotionBoard.Hide()
-    else
-        myNotionBoard.Show()
-}
+ToggleNotionBoard() => WinActive("ahk_id " myNotionBoard.Hwnd) ? myNotionBoard.Hide() : myNotionBoard.Show()
