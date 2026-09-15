@@ -52,7 +52,7 @@ The Notion Board dashboard (`CapsLock+N`) is a separate case: its `NotionBoardUr
 6. Start the configured standalone apps.
 7. Start the configured integrated apps.
 8. Start the Control Deck hidden, so opening it later does not wait for WebView2 to load.
-9. Start the Notion Board hidden, so opening it later does not wait for WebView2 to load.
+9. Start the Notion Board at the bottom of the window stack, so it is immediately available on the desktop without covering other applications.
 
 The exact current list is documented in the [app catalog](APPS.md) and expressed by the `Run(...)` calls inside `RunStartup()`.
 

@@ -8,7 +8,8 @@
 ;     logged in across suite restarts; log in manually once
 ;
 ; [USAGE]
-;   - CapsLock+N toggles the window; closing it hides it instead of exiting
+;   - CapsLock+N brings the window forward or sends it behind other windows
+;   - Closing or minimizing sends it to the desktop instead
 ; ============================================================================
 
 #SingleInstance Force
@@ -27,7 +28,8 @@ if (ProfileManager.IsNot(Profiles.woonkamerLaptops)) {
 }
 
 myNotionBoard := NotionBoardController()
-myNotionBoard.InitializeHidden()
+myNotionBoard.InitializeOnDesktop()
+
 CapsLock.Hotkey("n", (*) => ToggleNotionBoard())
 
-ToggleNotionBoard() => WinActive("ahk_id " myNotionBoard.Hwnd) ? myNotionBoard.Hide() : myNotionBoard.Show()
+ToggleNotionBoard() => WinActive("ahk_id " myNotionBoard.Hwnd) ? myNotionBoard.SendToDesktop() : myNotionBoard.Show()

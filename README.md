@@ -43,7 +43,7 @@ A customizable action grid that brings frequently used commands together in a vi
 
 ### Notion Board
 
-Your Notion board, hosted in its own WebView2 window with a fixed, persistent profile folder instead of a per-process temp one. Log in to Notion manually once and the session survives a full suite restart. `CapsLock+N` toggles it; closing the window hides it rather than exiting.
+Your Notion board, hosted in its own focused WebView2 window without Notion's header, sidebar, or page-comments panel. Its fixed, persistent profile folder keeps the session across suite restarts after one manual login. The board stays open on the desktop: `CapsLock+N` brings it forward or sends it behind other windows, and closing or minimizing it also sends it to the desktop instead.
 
 ## 🏗️ More than a folder of scripts
 
