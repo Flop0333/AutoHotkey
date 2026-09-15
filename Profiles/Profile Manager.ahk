@@ -62,6 +62,8 @@ Class ProfileManager {
         return false
     }
 
+    static IsNot(profiles) => !this.Is(profiles)
+
     ; Startup entry point: honor a profile requested before the restart, then
     ; fall back to auto-detection. Callers that already know the profile call
     ; Set() directly instead.

@@ -3,10 +3,9 @@
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Paths.ahk
 #Include ..\..\Lib\Extensions\Json.ahk
-#Include ..\..\Profiles\Profile Manager.ahk
 #Include ..\..\Lib\Core\WebView.ahk
-#Include Settings\Settings Service.ahk
-#Include Settings\Window State Tracker.ahk
+#Include ..\..\Lib\Tools\Window Settings Service.ahk
+#Include ..\..\Lib\Tools\Window State Tracker.ahk
 
 USER_INTERFACE_PATH := Paths.dashboards "\Macro Board\User Interface"
 TraySetIcon(Paths.lib "\icon.png")
@@ -14,11 +13,11 @@ TraySetIcon(Paths.lib "\icon.png")
 Class MacroBoard extends WebViewToo {
 	static WIN_TITLE := "Macro Board"
 	static showOptions := {}
-	settingsService := SettingsService
+	settingsService := WindowSettingsService
 
-	__New(buttons, settingsPath :=  Paths.dashboards "\Macro Board\Settings\Profile Settings\" ProfileManager.current.displayName " settings.ini") {
+	__New(buttons, settingsPath := Paths.dashboards "\Macro Board\window settings.ini") {
 		super.__new()
-		this.settingsService := SettingsService(settingsPath)
+		this.settingsService := WindowSettingsService(settingsPath, 420, 240, 560, 70)
 		this.BorderSize := 1  ; Increase border size for easier resizing
 		
 		this.SetVirtualHostNameToFolderMapping("app.local", USER_INTERFACE_PATH, 0) ; block cors error, allow loading local files
@@ -32,7 +31,7 @@ Class MacroBoard extends WebViewToo {
 		; this.OpenDevToolsWindow()
 		
 		; Initialize window state tracker
-		WindowPositionTracker(this.Gui, this.settingsService)
+		this.windowPositionTracker := WindowPositionTracker(this.Gui, this.settingsService)
 	}
 
 	Show() => super.Show(this.showOptions, MacroBoard.WIN_TITLE)

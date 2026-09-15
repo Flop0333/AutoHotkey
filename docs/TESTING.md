@@ -47,7 +47,7 @@ Targets are discovered from the suite startup wiring, plus the logging hosts, Co
 
 ### Unit tests
 
-`Invoke-UnitTests.ps1` discovers every `Tests/Unit/*.Tests.ahk` file alphabetically and runs each as a separate process. Current coverage includes array, database/state behavior, structured logging, number conversion, secrets-file behavior, suite control parsing, confirmation and processor arithmetic, the one-shot profile request, and test-run status scoping.
+`Invoke-UnitTests.ps1` discovers every `Tests/Unit/*.Tests.ahk` file alphabetically and runs each as a separate process. Current coverage includes array, database/state behavior, structured logging, number conversion, secrets-file behavior, suite control parsing, confirmation and processor arithmetic, the one-shot profile request, persisted window geometry, and test-run status scoping.
 
 `Tests/Support/Assert.ahk` provides the dependency-free `Assert` methods and `TestKit` runner. Each test file prints `PASS`/`FAIL` lines and reports through its process exit code.
 
