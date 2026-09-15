@@ -6,6 +6,8 @@
 ;   - Shows the Notion board from the NotionBoardUrl secret in a WebView2 host
 ;   - A fixed, persistent Browser Data folder keeps the Notion session
 ;     logged in across suite restarts; log in manually once
+;   - Remembers the last windowed position and size across restarts
+;   - Removes surrounding Notion controls for a focused board view
 ;
 ; [USAGE]
 ;   - CapsLock+N brings the window forward or sends it behind other windows
@@ -30,5 +32,5 @@ if (ProfileManager.IsNot(Profiles.woonkamerLaptops)) {
 myNotionBoard := NotionBoardController()
 myNotionBoard.InitializeOnDesktop()
 
-CapsLock.Hotkey("n", (*) => myNotionBoard.ToggleNotionBoard())
+CapsLock.Hotkey("n", (*) => myNotionBoard.Toggle())
 
