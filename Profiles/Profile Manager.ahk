@@ -41,7 +41,7 @@ Class Profile {
 Class Profiles {
     static work := Profile("Work", () => Secrets.WorkDeviceNames.Get())
     static devbox := Profile("Dev Box", ["DESKTOP-2NC1KCL", "CPC-fbrem-HLWU3"]) ; [VM, Dev Box]
-    static woonkamerLaptops := Profile("Woonkamer Laptops", ["FLOPLAPTOP", "LAPTOP-LNTJIJKB"]) ; [Amyrion, Magneet]
+    static woonkamerLaptops := Profile("Woonkamer Laptops", ["FLOPLAPTOP", "LAPTOP-LNTJIJKB", "FRMWRK_ESTHER"]) ; [Amyrion, Magneet, Esthers]
     static default := Profile("Default", "")
 }
 
