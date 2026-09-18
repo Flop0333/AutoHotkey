@@ -478,5 +478,23 @@
 		"isSecret": 0,
 		"title": "GitHub OpenClaw",
 		"url": "https://github.com/Flop0333/openclaw-home"
+	},
+	{
+		"category": "GitHub",
+		"command": "GD",
+		"icon": "GitHub",
+		"id": 60,
+		"isSecret": 0,
+		"title": "GitHub Dev HQ",
+		"url": "https://github.com/Flop0333/Dev-HQ"
+	},
+	{
+		"category": "GitHub",
+		"command": "GDB",
+		"icon": "GitHub",
+		"id": 61,
+		"isSecret": 0,
+		"title": "GitHub Dev HQ Board",
+		"url": "https://github.com/users/Flop0333/projects/12"
 	}
 ]
