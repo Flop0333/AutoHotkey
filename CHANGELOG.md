@@ -1,5 +1,11 @@
-<!-- last-pr: 136 -->
+<!-- last-pr: 140 -->
 # Changelog
+
+## 2026-09-18
+
+### Other
+- Add Notion Board dashboard with persistent WebView2 session ([#140](https://github.com/Flop0333/AutoHotkey/pull/140))
+
 
 ## 2026-09-12
 
