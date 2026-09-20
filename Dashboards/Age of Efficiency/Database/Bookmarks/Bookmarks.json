@@ -496,5 +496,23 @@
 		"isSecret": 0,
 		"title": "GitHub Dev HQ Board",
 		"url": "https://github.com/users/Flop0333/projects/12"
+	},
+	{
+		"category": "GitHub",
+		"command": "GTB",
+		"icon": "GitHub",
+		"id": 62,
+		"isSecret": 0,
+		"title": "GitHub Timo Board",
+		"url": "https://github.com/users/Flop0333/projects/13/views/1"
+	},
+	{
+		"category": "GitHub",
+		"command": "GT",
+		"icon": "GitHub",
+		"id": 63,
+		"isSecret": 0,
+		"title": "GitHub TImo",
+		"url": "https://github.com/Flop0333/Timo-Comic-Book"
 	}
 ]
