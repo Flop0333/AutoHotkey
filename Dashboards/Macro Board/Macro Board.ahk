@@ -46,6 +46,12 @@ PullAllWindowsToCurrentDesktop() => DesktopsDDL.PullAllWindowsToCurrentDesktop()
 OpenNotionShitFixen() => Notion.OpenPage(NotionPages.shitFixen)
 CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 KillAndReloadAllAHkProcesses() => SuiteControl.ReloadSuite()
+UpdateKlusLogboek() {
+    if (MsgBox("Run the klus-logboek update as administrator?", "Update klus-logboek", 0x4) != "Yes")
+        return
+
+    Run('*RunAs powershell.exe -NoProfile -Command ".\\deploy\\windows\\update.ps1"', "C:\\klus-logboek")
+}
 
 ; ============================================================================
 ; === BUTTONS REGISTRATION ======================---==========================
@@ -64,6 +70,7 @@ profileButtons := Map(
     Profiles.woonkamerLaptops, [
         Button(OpenNotionShitFixen, "S H I T  F I X E N", "notion.gif"),
         Button(StartSpotifyGoodMorningJazz, "Start Spotify Playlist", "spotify.gif"),
+        Button(UpdateKlusLogboek, "Update klus-logboek", "control deck restart.gif"),
     ],
     Profiles.work, [
         Button(CloseAllBrowsers, "Kill Browsers", "game over.gif"),
