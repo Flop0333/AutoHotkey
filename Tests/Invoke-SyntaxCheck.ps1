@@ -12,8 +12,8 @@
     target has a load-time error, AutoHotkey shows a blocking error dialog instead
     of exiting, which this script detects as a timeout.
 
-    Entry points are discovered from Startup/Startup.ahk's RunStartup() function,
-    which is the single source of truth for what actually launches on this machine.
+    Entry points are discovered from the shared startup inventory, which is the
+    single source of truth for profile-enabled applications.
 #>
 
 param(
@@ -40,7 +40,8 @@ $pathsMap = @{
 }
 
 $startupFile = Join-Path $repoRoot "Startup\Startup.ahk"
-$startupContent = Get-Content -Raw $startupFile
+$startupInventoryFile = Join-Path $repoRoot "Apps Integrated\Suite Control\Startup Scripts.ahk"
+$startupInventoryContent = Get-Content -Raw $startupInventoryFile
 
 $targets = [System.Collections.Generic.List[string]]::new()
 $targets.Add($startupFile)
@@ -49,8 +50,8 @@ $targets.Add((Join-Path $repoRoot "Dashboards\Control Deck\Dashboard.ahk"))
 $targets.Add((Join-Path $repoRoot "Dashboards\Logger\Logging.ahk"))
 $targets.Add((Join-Path $repoRoot "Tests\Run-Tests.ahk"))
 
-$runCalls = [regex]::Matches($startupContent, 'Run\(Paths\.(\w+)\s*"([^"]+)"\)')
-foreach ($m in $runCalls) {
+$catalogPaths = [regex]::Matches($startupInventoryContent, 'path:\s*Paths\.(\w+)\s*"([^"]+)"')
+foreach ($m in $catalogPaths) {
     $pathsKey = $m.Groups[1].Value
     $relativePath = $m.Groups[2].Value
     if (-not $pathsMap.ContainsKey($pathsKey)) {
