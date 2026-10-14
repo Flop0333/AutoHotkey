@@ -50,7 +50,8 @@ UpdateKlusLogboek() {
     if (MsgBox("Run the klus-logboek update as administrator?", "Update klus-logboek", 0x4) != "Yes")
         return
 
-    Run('*RunAs powershell.exe -NoProfile -Command ".\\deploy\\windows\\update.ps1"', "C:\\klus-logboek")
+    command := "$ErrorActionPreference = 'Stop'; try { Set-Location C:\klus-logboek; .\deploy\windows\update.ps1; if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw ('Update script exited with code ' + $LASTEXITCODE) } } catch { Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show(($_ | Out-String), 'Klus Logboek update mislukt') }"
+    Run("*RunAs powershell.exe -NoProfile -Command " . Chr(34) . command . Chr(34), , "Hide")
 }
 
 ; ============================================================================
