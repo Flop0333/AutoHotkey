@@ -50,7 +50,7 @@ UpdateKlusLogboek() {
     if (MsgBox("Run the klus-logboek update as administrator?", "Update klus-logboek", 0x4) != "Yes")
         return
 
-    command := "$ErrorActionPreference = 'Stop'; try { Set-Location C:\klus-logboek; .\deploy\windows\update.ps1; if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw ('Update script exited with code ' + $LASTEXITCODE) } } catch { Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show(($_ | Out-String), 'Klus Logboek update mislukt') }"
+    command := "$ErrorActionPreference = 'Stop'; $failed = $false; $logPath = Join-Path $env:TEMP 'klus-logboek-update-output.txt'; Start-Transcript -Path $logPath -Force; try { Set-Location C:\klus-logboek; .\deploy\windows\update.ps1; if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw ('Update script exited with code ' + $LASTEXITCODE) } } catch { $failed = $true; Write-Output ($_ | Out-String) } finally { Stop-Transcript | Out-Null; if ($failed) { Start-Process notepad.exe -ArgumentList $logPath } }"
     Run("*RunAs powershell.exe -NoProfile -Command " . Chr(34) . command . Chr(34), , "Hide")
 }
 
