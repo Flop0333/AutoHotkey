@@ -514,5 +514,14 @@
 		"isSecret": 0,
 		"title": "GitHub TImo",
 		"url": "https://github.com/Flop0333/Timo-Comic-Book"
+	},
+	{
+		"category": "Tools",
+		"command": "K",
+		"icon": "default",
+		"id": 64,
+		"isSecret": 0,
+		"title": "Klus Logboek",
+		"url": "https://floplaptop.taildf8bfc.ts.net/"
 	}
 ]

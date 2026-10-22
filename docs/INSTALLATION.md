@@ -47,18 +47,23 @@ The Notion Board dashboard (`CapsLock+N`) is a separate case: its `NotionBoardUr
 1. Build the tray menu and initialize structured logging.
 2. Synchronize the local secrets files.
 3. Select a requested profile or detect one from the computer name.
-4. Start `Capslock Service.ahk` before scripts that register CapsLock hotkeys.
-5. Start Age of Efficiency and Macro Board.
-6. Start the configured standalone apps.
-7. Start the configured integrated apps.
-8. Start the Control Deck hidden, so opening it later does not wait for WebView2 to load.
-9. Start the Notion Board at the bottom of the window stack, so it is immediately available on the desktop without covering other applications.
+4. Resolve the selected profile's startup policy.
+5. Start `Capslock Service.ahk` before scripts that register CapsLock hotkeys, when that profile enables it.
+6. Start the profile-enabled dashboards, standalone apps, and integrated apps in their configured order.
 
-The exact current list is documented in the [app catalog](APPS.md) and expressed by the `Run(...)` calls inside `RunStartup()`.
+The ordered application catalog and its profile policy live in `Apps Integrated/Suite Control/Startup Scripts.ahk`. The Control Deck uses the same resolved list when it reports missing applications.
+
+| Profile | Startup applications |
+|---|---|
+| Work | Everything except Desktops Manager and Notion Board. |
+| Dev Box | Everything except Notion Board. |
+| Woonkamer Laptops | Everything. |
+| Esthers Laptop | Notion Board only. |
+| Default | Everything except Notion Board. |
 
 Logging initialization archives the active `Logs/errors.log` and resets `Logs/errors.read`. The Control Deck therefore shows the current suite session; earlier sessions stay available under `Logs/Archive`.
 
-To change auto-run behavior, add, remove, or reorder those calls. Keep the CapsLock service ahead of its consumers.
+To change auto-run behavior, add an application to the ordered catalog once, then list only the profile exceptions in `SuiteStartupExcludedScriptIds()`. Keep the CapsLock service ahead of its consumers.
 
 ## Start with Windows
 

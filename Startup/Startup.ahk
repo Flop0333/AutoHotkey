@@ -32,8 +32,9 @@ RunStartup(profile?) {
         () => InitializeLogging(),
     ]
 
-    for scriptPath in SuiteStartupScripts()
-        steps.InsertAt(7 + A_Index - 1, (path => () => Run(path))(scriptPath))
+    ; Resolve the profile-aware inventory only after the profile selection step
+    ; has run, including a one-shot request passed in from a previous restart.
+    steps.Push(() => RunSuiteStartupScripts())
 
     failures := []
     for step in steps {
@@ -56,6 +57,11 @@ RunStartup(profile?) {
             summary .= "`n`n• " failure
         MsgBox summary, "AutoHotkey Startup Error", 16
     }
+}
+
+RunSuiteStartupScripts() {
+    for scriptPath in SuiteStartupScripts(ProfileManager.current)
+        Run(scriptPath)
 }
 
 ; Auto-run only when in Startup folder or run as standalone (not when #Include'd)
