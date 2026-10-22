@@ -45,6 +45,8 @@ SecretsCatalog := Map(
     "ApolloPRInsightsUrl", Secret("Apollo PR Insights", "Application Insights for Apollo PR"),
     "ApolloOTSwaggerUrl", Secret("Apollo OT Swagger", "Apollo OT API documentation"),
     "ApolloATSwaggerUrl", Secret("Apollo AT Swagger", "Apollo AT API documentation"),
+    "ApolloATRelatienummerUrl", Secret("Apollo AT relatienummer", "Apollo AT relation-number lookup URL"),
+    "ApolloOTRelatienummerUrl", Secret("Apollo OT relatienummer", "Apollo OT relation-number lookup URL"),
     "APIPullRequestsUrl", Secret("API Pull Requests", "Azure DevOps Athena API pull requests"),
     "KennisPullRequestsUrl", Secret("Kennis Pull Requests", "Azure DevOps Athena Kennis pull requests"),
     "CallcenterPullRequestsUrl", Secret("Callcenter Pull Requests", "Azure DevOps Athena Callcenter pull requests"),

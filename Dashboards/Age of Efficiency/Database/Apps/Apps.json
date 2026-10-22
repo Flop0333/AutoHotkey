@@ -128,5 +128,35 @@
 		"icon": "AutoHotkey",
 		"id": 19,
 		"title": "Run Tests"
+	},
+	{
+		"action": "OpenApolloATRelatienummer",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "Dev Tools",
+		"command": "APAR",
+		"icon": "default",
+		"id": 21,
+		"title": "Apollo AT Relatienummer"
+	},
+	{
+		"action": "OpenApolloOTRelatienummer",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "Dev Tools",
+		"command": "APOR",
+		"icon": "default",
+		"id": 22,
+		"title": "Apollo OT Relatienummer"
+	},
+	{
+		"action": "OpenApolloLocalRelatienummer",
+		"argument": "",
+		"argumentRequired": 0,
+		"category": "Dev Tools",
+		"command": "APLR",
+		"icon": "default",
+		"id": 23,
+		"title": "Apollo Local Relatienummer"
 	}
 ]

@@ -17,6 +17,7 @@
 #Include ..\..\..\Lib\Tools\Desktops DLL Library\Desktops DLL Library.ahk
 #Include ..\..\..\Lib\Helpers\System.ahk
 #Include ..\..\..\Apps Integrated\Suite Control\Suite Control.ahk
+#Include ..\..\..\Secrets\Secrets Service.ahk
 
 StartPBIReformat() => PBIReformat.Start()
 
@@ -43,3 +44,11 @@ CloseOnAllDesktops() => DesktopsDDL.CloseOnAllDesktops()
 OpenAutoHotkeyDashboard() => ShowControlDeck()
 
 RunTests() => ShowControlDeck("tests")
+
+OpenApolloATRelatienummer() => OpenApolloRelatienummer(Secrets.ApolloATRelatienummerUrl.Get())
+
+OpenApolloOTRelatienummer() => OpenApolloRelatienummer(Secrets.ApolloOTRelatienummerUrl.Get())
+
+OpenApolloLocalRelatienummer() => OpenApolloRelatienummer("http://localhost:4200/cic?relatienummer=")
+
+OpenApolloRelatienummer(url) => Run(url Trim(A_Clipboard) "&callerid=&kanaal=Messaging&auth=True")
