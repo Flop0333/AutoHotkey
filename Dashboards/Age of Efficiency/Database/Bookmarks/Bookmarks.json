@@ -516,6 +516,15 @@
 		"url": "https://github.com/Flop0333/Timo-Comic-Book"
 	},
 	{
+		"category": "GitHub",
+		"command": "GK",
+		"icon": "GitHub",
+		"id": 65,
+		"isSecret": 0,
+		"title": "GitHub Klus Logboek",
+		"url": "https://github.com/Flop0333/klus-logboek"
+	},
+	{
 		"category": "Tools",
 		"command": "K",
 		"icon": "default",
