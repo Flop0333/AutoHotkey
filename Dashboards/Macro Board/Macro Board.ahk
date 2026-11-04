@@ -46,9 +46,18 @@ PullAllWindowsToCurrentDesktop() => DesktopsDDL.PullAllWindowsToCurrentDesktop()
 OpenNotionShitFixen() => Notion.OpenPage(NotionPages.shitFixen)
 CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 KillAndReloadAllAHkProcesses() => SuiteControl.ReloadSuite()
-UpdateKlusLogboek() {
-    command := "$ErrorActionPreference = 'Stop'; $failed = $false; $logPath = Join-Path $env:TEMP 'klus-logboek-update-output.txt'; Start-Transcript -Path $logPath -Force; try { Set-Location C:\klus-logboek; .\deploy\windows\update.ps1; if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw ('Update script exited with code ' + $LASTEXITCODE) } } catch { $failed = $true; Write-Output ($_ | Out-String) } finally { Stop-Transcript | Out-Null; if ($failed) { Start-Process notepad.exe -ArgumentList $logPath } }"
-    Run("*RunAs powershell.exe -NoExit -NoProfile -Command " . Chr(34) . command . Chr(34))
+UpdateKaartelen() => RunDockerUpdate("C:\Kaartelen", "Kaartelen")
+UpdateKlusLogboek() => RunDockerUpdate("C:\klus-logboek", "Klus-logboek")
+
+RunDockerUpdate(appPath, name) {
+    script := A_ScriptDir "\Update-DockerApp.ps1"
+    Run('powershell.exe -NoProfile -File "' script '" -AppPath "' appPath '" -Name "' name '"')
+}
+
+UpdateNotificationService() {
+    script := StrReplace(A_ScriptDir "\Update-Notification-Service.sh", "\", "/")
+    script := "/" StrLower(SubStr(script, 1, 1)) SubStr(script, 3)
+    Run('"C:\Program Files\Git\usr\bin\mintty.exe" -t "Update Notification Service" -e /usr/bin/bash --login "' script '"')
 }
 
 ; ============================================================================
@@ -68,7 +77,9 @@ profileButtons := Map(
     Profiles.woonkamerLaptops, [
         Button(OpenNotionShitFixen, "S H I T  F I X E N", "notion.gif"),
         Button(StartSpotifyGoodMorningJazz, "Start Spotify Playlist", "spotify.gif"),
+        Button(UpdateKaartelen, "Update Kaartelen", "Kaartelen-icon.gif"),
         Button(UpdateKlusLogboek, "Update klus-logboek", "klus-logboek restart.gif"),
+        Button(UpdateNotificationService, "Update Notification Service", "notification-service-icon.gif"),
     ],
     Profiles.work, [
         Button(CloseAllBrowsers, "Kill Browsers", "game over.gif"),
