@@ -521,8 +521,35 @@
 		"icon": "GitHub",
 		"id": 65,
 		"isSecret": 0,
+		"title": "GitHub Kaartelen",
+		"url": "https://github.com/Flop0333/Kaartelen"
+	},
+	{
+		"category": "GitHub",
+		"command": "GKB",
+		"icon": "GitHub",
+		"id": 66,
+		"isSecret": 0,
+		"title": "GitHub Kaartelen Board",
+		"url": "https://github.com/users/Flop0333/projects/15/views/1"
+	},
+	{
+		"category": "GitHub",
+		"command": "GKL",
+		"icon": "GitHub",
+		"id": 67,
+		"isSecret": 0,
 		"title": "GitHub Klus Logboek",
 		"url": "https://github.com/Flop0333/klus-logboek"
+	},
+	{
+		"category": "GitHub",
+		"command": "GKLB",
+		"icon": "GitHub",
+		"id": 68,
+		"isSecret": 0,
+		"title": "GitHub Klus Logboek Board",
+		"url": "https://github.com/users/Flop0333/projects/14"
 	},
 	{
 		"category": "Tools",
