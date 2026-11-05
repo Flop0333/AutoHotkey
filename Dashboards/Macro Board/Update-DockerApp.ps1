@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory)][string]$AppPath,
-    [Parameter(Mandatory)][string]$Name
+    [Parameter(Mandatory)][string]$Name,
+    [string]$EnvFile = ''
 )
 
 function Run-Checked([string]$Command, [string[]]$Arguments) {
@@ -18,6 +19,11 @@ function Notify([string]$Message) {
 
 try {
     Set-Location -LiteralPath $AppPath -ErrorAction Stop
+    $composeArgs = @('compose')
+    if ($EnvFile) {
+        if (-not (Test-Path -LiteralPath $EnvFile -PathType Leaf)) { throw "Compose env-bestand ontbreekt: $EnvFile" }
+        $composeArgs += @('--env-file', $EnvFile)
+    }
     $changes = (& git status --short 2>&1 | Out-String).Trim()
     if ($LASTEXITCODE -ne 0) { throw "git status --short mislukt:`n$changes" }
     if ($changes) { Write-Host "Lokale wijzigingen blijven behouden:`n$changes" }
@@ -26,10 +32,10 @@ try {
 
     Run-Checked git @('pull', '--ff-only', 'origin', 'main') | Out-Null
 
-    Run-Checked docker @('compose', 'up', '-d', '--build', '--force-recreate') | Out-Null
-    $psOutput = Run-Checked docker @('compose', 'ps')
-    $expectedText = Run-Checked docker @('compose', 'config', '--services')
-    $runningText = Run-Checked docker @('compose', 'ps', '--status', 'running', '--services')
+    Run-Checked docker ($composeArgs + @('up', '-d', '--build', '--force-recreate')) | Out-Null
+    $psOutput = Run-Checked docker ($composeArgs + @('ps'))
+    $expectedText = Run-Checked docker ($composeArgs + @('config', '--services'))
+    $runningText = Run-Checked docker ($composeArgs + @('ps', '--status', 'running', '--services'))
     $expected = @($expectedText -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
     $running = @($runningText -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
     if (-not $expected.Count -or @($expected | Where-Object { $_ -notin $running }).Count) {

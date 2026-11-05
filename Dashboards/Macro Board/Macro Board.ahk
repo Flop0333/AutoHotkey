@@ -48,10 +48,11 @@ CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 KillAndReloadAllAHkProcesses() => SuiteControl.ReloadSuite()
 UpdateKaartelen() => RunDockerUpdate("C:\Kaartelen", "Kaartelen")
 UpdateKlusLogboek() => RunDockerUpdate("C:\klus-logboek", "Klus-logboek")
+UpdateGeldzaken() => RunDockerUpdate("C:\Geldzaken", "Geldzaken", ".env.production.local")
 
-RunDockerUpdate(appPath, name) {
+RunDockerUpdate(appPath, name, envFile := "") {
     script := A_ScriptDir "\Update-DockerApp.ps1"
-    Run('powershell.exe -NoProfile -File "' script '" -AppPath "' appPath '" -Name "' name '"')
+    Run('powershell.exe -NoProfile -File "' script '" -AppPath "' appPath '" -Name "' name '"' (envFile ? ' -EnvFile "' envFile '"' : ''))
 }
 
 UpdateNotificationService() {
@@ -79,6 +80,7 @@ profileButtons := Map(
         Button(StartSpotifyGoodMorningJazz, "Start Spotify Playlist", "spotify.gif"),
         Button(UpdateKaartelen, "Update Kaartelen", "Kaartelen-icon.gif"),
         Button(UpdateKlusLogboek, "Update klus-logboek", "klus-logboek restart.gif"),
+        Button(UpdateGeldzaken, "Update Geldzaken", "geldzaken-icon.gif"),
         Button(UpdateNotificationService, "Update Notification Service", "notification-service-icon.gif"),
     ],
     Profiles.work, [
