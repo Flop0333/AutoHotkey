@@ -55,12 +55,12 @@ The ordered application catalog and its profile policy live in `Apps Integrated/
 
 | Profile | Startup applications |
 |---|---|
-| Work | Everything except Desktops Manager and Notion Board. |
-| Dev Box | Everything except Notion Board. |
-| Woonkamer Laptops | Everything. |
-| Djengus | Everything (same as Woonkamer Laptops). |
+| Work | Everything except Desktops Manager, Notion Board, and Remote Board. |
+| Dev Box | Everything except Notion Board and Remote Board. |
+| Woonkamer Laptops | Everything except Remote Board. |
+| Djengus | Everything, including the Djengus-only Remote Board. |
 | Esthers Laptop | Notion Board only. |
-| Default | Everything except Notion Board. |
+| Default | Everything except Notion Board and Remote Board. |
 
 Logging initialization archives the active `Logs/errors.log` and resets `Logs/errors.read`. The Control Deck therefore shows the current suite session; earlier sessions stay available under `Logs/Archive`.
 

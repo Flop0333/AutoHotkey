@@ -8,7 +8,6 @@ Class Paths {
 	static dashboards		:= this.autohotkey "\Dashboards"
 	static profiles			:= this.autohotkey "\Profiles"
 	static startup			:= this.autohotkey "\Startup"
-	static tools			:= this.autohotkey "\Tools"
 	static lib				:= this.autohotkey "\Lib"
 	static autoHotkeyIcon	:= this.lib "\icon.png"
 	static profileIniFile	:= this.profiles "\current_profile.ini"

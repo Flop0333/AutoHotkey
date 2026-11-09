@@ -3,6 +3,7 @@ Profiles/current_profile.ini
 
 # Dashboard window geometry - changes when moving or resizing
 Dashboards/Macro Board/window settings.ini
+Dashboards/Remote Board/window settings.ini
 
 # Notion Board - Persistent WebView2 browser/session data, never tracked
 Dashboards/Notion Board/Browser Data/

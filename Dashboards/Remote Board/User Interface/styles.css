@@ -1,0 +1,132 @@
+:root {
+  --bg: #0b0f1a;
+  --bg-glow-1: rgba(124, 92, 255, 0.28);
+  --bg-glow-2: rgba(0, 200, 255, 0.18);
+  --tile: rgba(255, 255, 255, 0.06);
+  --tile-hover: rgba(255, 255, 255, 0.11);
+  --tile-border: rgba(255, 255, 255, 0.10);
+  --text: #f4f6fb;
+  --text-dim: rgba(244, 246, 251, 0.72);
+  --accent-1: #7c5cff;
+  --accent-2: #00c8ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI Variable Display', 'Segoe UI', Roboto, Arial, sans-serif;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------------------------------------------------------------- board */
+body.board {
+  background:
+    radial-gradient(60vmax 60vmax at 0% 0%, var(--bg-glow-1), transparent 60%),
+    radial-gradient(60vmax 60vmax at 100% 100%, var(--bg-glow-2), transparent 60%),
+    var(--bg);
+}
+
+#grid {
+  height: 100%;
+  padding: clamp(10px, 2.5vmin, 32px);
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows, 3), minmax(0, 1fr));
+  gap: var(--gap, 16px);
+}
+
+.tile {
+  container-type: size;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6cqmin;
+  padding: 6cqmin;
+  border: 1px solid var(--tile-border);
+  border-radius: clamp(12px, 9cqmin, 36px);
+  background: var(--tile);
+  background-size: cover;
+  background-position: center;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+  touch-action: manipulation;
+}
+
+.tile:hover { background-color: var(--tile-hover); transform: translateY(-2px); }
+.tile:active { transform: scale(0.96); }
+
+.icon {
+  font-size: min(50cqh, 50cqw);
+  line-height: 1;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+}
+
+.label {
+  max-width: 100%;
+  font-size: clamp(12px, 10cqmin, 34px);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-dim);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tile.has-image { justify-content: flex-end; }
+.tile.has-image .label {
+  padding: 2cqmin 5cqmin;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--text);
+}
+
+/* Tap feedback: a quick accent ring */
+.tile.fired { animation: fired 0.45s ease-out; }
+@keyframes fired {
+  0%   { box-shadow: 0 0 0 0 rgba(0, 200, 255, 0.75), 0 10px 30px rgba(0, 0, 0, 0.35); }
+  100% { box-shadow: 0 0 0 4cqmin rgba(0, 200, 255, 0), 0 10px 30px rgba(0, 0, 0, 0.35); }
+}
+
+/* The toggle tile: the bubble itself, and the "close" tile on the board */
+.toggle {
+  border: none;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  color: #fff;
+}
+.toggle .label { color: rgba(255, 255, 255, 0.9); }
+.toggle .icon-open { display: none; }
+.toggle .icon-close { font-weight: 300; }
+
+/* --------------------------------------------------------------- bubble */
+body.bubble { background: transparent; }
+body.bubble #grid { display: block; padding: 0; }
+body.bubble .tile:not(.toggle) { display: none; }
+
+body.bubble .toggle {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.25);
+  cursor: grab;
+  touch-action: none; /* let a finger drag the bubble instead of scrolling */
+}
+body.bubble .toggle:hover { transform: none; filter: brightness(1.1); }
+body.bubble .toggle .icon-open { display: block; font-size: 52vmin; }
+body.bubble .toggle .icon-close,
+body.bubble .toggle .label { display: none; }

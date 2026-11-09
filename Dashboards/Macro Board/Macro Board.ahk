@@ -30,6 +30,7 @@
 #Include ..\..\Lib\Apps\Notion.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
 #Include ..\Control Deck\Control Deck.ahk
+#Include ..\Remote Board\Remote Board Client.ahk
 
 ; ===========================================================================
 ; === ACTIONS REGISTRATION ==================================================
@@ -46,6 +47,7 @@ PullAllWindowsToCurrentDesktop() => DesktopsDDL.PullAllWindowsToCurrentDesktop()
 OpenNotionShitFixen() => Notion.OpenPage(NotionPages.shitFixen)
 CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 KillAndReloadAllAHkProcesses() => SuiteControl.ReloadSuite()
+OpenRemoteBoard() => RemoteBoardClient.Open()
 UpdateKlusLogboek() {
     command := "$ErrorActionPreference = 'Stop'; $failed = $false; $logPath = Join-Path $env:TEMP 'klus-logboek-update-output.txt'; Start-Transcript -Path $logPath -Force; try { Set-Location C:\klus-logboek; .\deploy\windows\update.ps1; if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw ('Update script exited with code ' + $LASTEXITCODE) } } catch { $failed = $true; Write-Output ($_ | Out-String) } finally { Stop-Transcript | Out-Null; if ($failed) { Start-Process notepad.exe -ArgumentList $logPath } }"
     Run("*RunAs powershell.exe -NoExit -NoProfile -Command " . Chr(34) . command . Chr(34))
@@ -70,9 +72,12 @@ woonkamerButtons := [
     Button(UpdateKlusLogboek, "Update klus-logboek", "klus-logboek restart.gif"),
 ]
 
+djengusButtons := woonkamerButtons.Clone()
+djengusButtons.Push(Button(OpenRemoteBoard, "Remote Board", "control deck marine radar.gif"))
+
 profileButtons := Map(
     Profiles.woonkamerLaptops, woonkamerButtons,
-    Profiles.djengus, woonkamerButtons,
+    Profiles.djengus, djengusButtons,
     Profiles.work, [
         Button(CloseAllBrowsers, "Kill Browsers", "game over.gif"),
         Button(CommandStorer_ShowMainGui, "Command Storer", "tetris.gif"),

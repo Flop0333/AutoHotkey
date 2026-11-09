@@ -12,6 +12,7 @@ HasScript(scripts, scriptPath) {
 
 notionBoard := Paths.dashboards "\Notion Board\Notion Board.ahk"
 desktopsManager := Paths.appsStandalone "\Desktops Manager\Desktops Manager.ahk"
+remoteBoard := Paths.dashboards "\Remote Board\Remote Board.ahk"
 
 Test_WorkExcludesNotionBoardAndDesktopsManager() {
     scripts := SuiteStartupScripts(Profiles.work)
@@ -30,15 +31,17 @@ Test_DevboxExcludesOnlyNotionBoard() {
 Test_WoonkamerLaptopsStartsEverything() {
     scripts := SuiteStartupScripts(Profiles.woonkamerLaptops)
     Assert.Equal(16, scripts.Length)
+    Assert.False(HasScript(scripts, remoteBoard))
     Assert.True(HasScript(scripts, notionBoard))
     Assert.True(HasScript(scripts, desktopsManager))
 }
 
 Test_DjengusStartsEverything() {
     scripts := SuiteStartupScripts(Profiles.djengus)
-    Assert.Equal(16, scripts.Length)
+    Assert.Equal(17, scripts.Length)
     Assert.True(HasScript(scripts, notionBoard))
     Assert.True(HasScript(scripts, desktopsManager))
+    Assert.True(HasScript(scripts, remoteBoard))
 }
 
 Test_EstherStartsOnlyNotionBoard() {

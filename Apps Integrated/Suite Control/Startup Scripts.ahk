@@ -33,12 +33,21 @@ SuiteStartupScriptCatalog() => [
     {id: "mouseToys", path: Paths.appsIntegrated "\Mouse Toys.ahk"},
     ; Starts hidden, so the first time it is opened it is already loaded.
     {id: "controlDeck", path: Paths.dashboards "\Control Deck\Dashboard.ahk"},
-    {id: "notionBoard", path: Paths.dashboards "\Notion Board\Notion Board.ahk"}
+    {id: "notionBoard", path: Paths.dashboards "\Notion Board\Notion Board.ahk"},
+    {id: "remoteBoard", path: Paths.dashboards "\Remote Board\Remote Board.ahk"}
 ]
 
 ; The default policy is the full catalog. List exceptions only, keeping each
 ; profile's difference from that baseline visible and easy to change.
 SuiteStartupExcludedScriptIds(profile) {
+    excluded := SuiteStartupProfileExclusions(profile)
+    ; The Remote Board belongs to the Djengus laptop only.
+    if (profile != Profiles.djengus)
+        excluded["remoteBoard"] := true
+    return excluded
+}
+
+SuiteStartupProfileExclusions(profile) {
     if (profile = Profiles.esther) {
         allowed := Map("notionBoard", true)
         excluded := Map()
