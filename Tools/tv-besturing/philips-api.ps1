@@ -3,6 +3,8 @@
 $script:TvIp       = "192.168.1.169"
 $script:ApiBase    = "https://$($script:TvIp):1926/5"
 $script:ConfigPath = Join-Path $PSScriptRoot "tv-config.json"
+# TODO: Vernieuw de Philips-koppeling, bewaar de nieuwe koppelgegevens lokaal buiten Git
+# en beoordeel daarna hoe de oude gegevens uit de Git-geschiedenis worden verwijderd.
 
 # De tv gebruikt een zelfondertekend certificaat: dat accepteren we alleen voor deze sessie
 if (-not ("TvTrustAll" -as [type])) {

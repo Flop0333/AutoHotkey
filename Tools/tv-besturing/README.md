@@ -28,6 +28,14 @@ powershell -ExecutionPolicy Bypass -File "pad\naar\tv-uit.ps1"
 - Op de tv: *Instellingen > Draadloos en netwerken > Bekabeld of Wi-Fi* > **Bekabeld**, en Wake-on-LAN aan.
 - Laptop in hetzelfde netwerk (192.168.1.x).
 
+## Tv aanzetten bij het vergrendelscherm
+
+Voer `Install-TvSchermwekken.ps1` uit in Windows PowerShell vanuit je gewone aangemelde account. Taakplanner start de beeldlistener bij aanmelden en herstart hem zo nodig. De listener staat in `%LOCALAPPDATA%\TvBesturing` en gebruikt het bestaande `tv-aan.ps1` uit deze map.
+
+Vergrendel Windows en wacht tot Windows het beeldsignaal uitzet. Tik daarna op **Ctrl** om het beeldsignaal te wekken en wacht op het aanmeldscherm. De listener reageert op die Windows-beeldmelding in een vergrendelde sessie. Een Philips-tv in diepe standby kan circa 20 seconden nodig hebben. Na een volledige herstart gebruik je voor de eerste aanmelding de tv-afstandsbediening.
+
+In `%LOCALAPPDATA%\TvBesturing\wake-status.txt` staat het laatste resultaat. Je kunt de automatisering uitzetten door de taak **Tv-besturing - Beeld bij Windows-vergrendeling** in Taakplanner uit te schakelen en te beëindigen.
+
 ## Als het niet meer werkt
 
 - **Ander IP-adres?** De tv had 192.168.1.169. Pas `$script:TvIp` aan in `philips-api.ps1`,
