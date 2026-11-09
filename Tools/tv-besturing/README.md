@@ -32,7 +32,7 @@ powershell -ExecutionPolicy Bypass -File "pad\naar\tv-uit.ps1"
 
 Voer `Install-TvSchermwekken.ps1` uit in Windows PowerShell vanuit je gewone aangemelde account. Taakplanner start de beeldlistener bij aanmelden en herstart hem zo nodig. De listener staat in `%LOCALAPPDATA%\TvBesturing` en gebruikt het bestaande `tv-aan.ps1` uit deze map.
 
-Vergrendel Windows en wacht tot Windows het beeldsignaal uitzet. Tik daarna op **Ctrl** om het beeldsignaal te wekken en wacht op het aanmeldscherm. De listener reageert op die Windows-beeldmelding in een vergrendelde sessie. Een Philips-tv in diepe standby kan circa 20 seconden nodig hebben. Na een volledige herstart gebruik je voor de eerste aanmelding de tv-afstandsbediening.
+Vergrendel Windows en wacht minstens vijf seconden. Tik daarna op **Ctrl** en wacht op het aanmeldscherm. De listener reageert op een Windows-beeldmelding of nieuwe activiteit in de vergrendelde lokale sessie. Voor de activiteitscontrole leest hij alleen het tijdstip van de laatste invoer. Een Philips-tv in diepe standby kan circa 20 seconden nodig hebben. Na een volledige herstart gebruik je voor de eerste aanmelding de tv-afstandsbediening.
 
 In `%LOCALAPPDATA%\TvBesturing\wake-status.txt` staat het laatste resultaat. Je kunt de automatisering uitzetten door de taak **Tv-besturing - Beeld bij Windows-vergrendeling** in Taakplanner uit te schakelen en te beëindigen.
 

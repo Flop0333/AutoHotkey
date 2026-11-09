@@ -30,6 +30,16 @@ namespace TvBesturing
         [DllImport("kernel32.dll")]
         private static extern uint WTSGetActiveConsoleSessionId();
 
+        [StructLayout(LayoutKind.Sequential)]
+        private struct LastInput
+        {
+            public uint Size;
+            public uint Tick;
+        }
+
+        [DllImport("user32.dll")]
+        private static extern bool GetLastInputInfo(ref LastInput input);
+
         // The native Level 1 union is aligned on eight bytes, followed by session ID, state and flags.
         private const int SessionFlagsOffset = 16;
         private readonly string tvOnScript;
@@ -41,6 +51,8 @@ namespace TvBesturing
         private DateTime startedAt;
         private DateTime lastAttempt = DateTime.MinValue;
         private int previousDisplay = -1;
+        private DateTime? lockedSince;
+        private uint? previousInput;
 
         public DisplayWake(string tvOnScript, string statusFile)
         {
@@ -57,8 +69,9 @@ namespace TvBesturing
                 DestroyHandle();
                 throw new Win32Exception(error);
             }
-            timer = new Timer { Interval = 1000 };
-            timer.Tick += CheckPowerOn;
+            timer = new Timer { Interval = 500 };
+            timer.Tick += CheckSession;
+            timer.Start();
             Record("Gereed");
         }
 
@@ -82,6 +95,17 @@ namespace TvBesturing
             return previous == 0 && current == 1 && locked;
         }
 
+        public static bool ShouldWakeForInput(uint? previous, uint current, uint age, TimeSpan lockedFor)
+        {
+            return previous.HasValue && previous.Value != current && age <= 2000 &&
+                lockedFor >= TimeSpan.FromSeconds(3);
+        }
+
+        private bool IsConsoleLocked()
+        {
+            return WTSGetActiveConsoleSessionId() == (uint)sessionId && ReadSessionFlags() == 0;
+        }
+
         protected override void WndProc(ref Message message)
         {
             if (message.Msg == PowerBroadcast && message.WParam.ToInt32() == PowerSettingChange &&
@@ -92,16 +116,37 @@ namespace TvBesturing
                 int current = Marshal.ReadInt32(message.LParam, 20);
                 if (previousDisplay == 0 && current == 1)
                 {
-                    bool locked = WTSGetActiveConsoleSessionId() == (uint)sessionId && ReadSessionFlags() == 0;
-                    if (ShouldWake(previousDisplay, current, locked))
-                        StartPowerOn();
+                    if (ShouldWake(previousDisplay, current, IsConsoleLocked()))
+                        StartPowerOn("beeldmelding");
                 }
                 previousDisplay = current;
             }
             base.WndProc(ref message);
         }
 
-        private void StartPowerOn()
+        private void CheckSession(object sender, EventArgs args)
+        {
+            if (powerOn != null)
+                CheckPowerOn();
+            if (!IsConsoleLocked())
+            {
+                lockedSince = null;
+                previousInput = null;
+                return;
+            }
+            DateTime now = DateTime.UtcNow;
+            if (!lockedSince.HasValue)
+                lockedSince = now;
+            var input = new LastInput { Size = (uint)Marshal.SizeOf(typeof(LastInput)) };
+            if (!GetLastInputInfo(ref input))
+                return;
+            uint age = unchecked((uint)Environment.TickCount - input.Tick);
+            if (ShouldWakeForInput(previousInput, input.Tick, age, now - lockedSince.Value))
+                StartPowerOn("lokale activiteit");
+            previousInput = input.Tick;
+        }
+
+        private void StartPowerOn(string reason)
         {
             if (String.IsNullOrEmpty(tvOnScript) || powerOn != null || DateTime.UtcNow - lastAttempt < TimeSpan.FromSeconds(45))
                 return;
@@ -122,20 +167,17 @@ namespace TvBesturing
                 startedAt = DateTime.UtcNow;
                 powerOn.BeginOutputReadLine();
                 powerOn.BeginErrorReadLine();
-                timer.Start();
-                Record("Tv-aan gestart");
+                Record("Tv-aan gestart (" + reason + ")");
             }
             catch (Exception exception)
             {
                 if (!(exception is Win32Exception) && !(exception is InvalidOperationException))
                     throw;
-                if (powerOn != null)
-                    timer.Start();
                 Record("Tv-aan kon niet starten");
             }
         }
 
-        private void CheckPowerOn(object sender, EventArgs args)
+        private void CheckPowerOn()
         {
             if (!powerOn.HasExited && DateTime.UtcNow - startedAt < TimeSpan.FromSeconds(50))
                 return;
@@ -149,7 +191,6 @@ namespace TvBesturing
             }
             powerOn.Dispose();
             powerOn = null;
-            timer.Stop();
         }
 
         private void Record(string status)

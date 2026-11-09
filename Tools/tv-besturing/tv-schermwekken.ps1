@@ -9,7 +9,10 @@ if ($SelfTest) {
     if (![TvBesturing.DisplayWake]::ShouldWake(0, 1, $true) -or
         [TvBesturing.DisplayWake]::ShouldWake(0, 1, $false) -or
         [TvBesturing.DisplayWake]::ShouldWake(-1, 1, $true) -or
-        [TvBesturing.DisplayWake]::ShouldWake(1, 1, $true)) {
+        [TvBesturing.DisplayWake]::ShouldWake(1, 1, $true) -or
+        ![TvBesturing.DisplayWake]::ShouldWakeForInput(100, 400, 500, [timespan]::FromSeconds(4)) -or
+        [TvBesturing.DisplayWake]::ShouldWakeForInput(100, 400, 500, [timespan]::FromSeconds(1)) -or
+        [TvBesturing.DisplayWake]::ShouldWakeForInput(400, 400, 500, [timespan]::FromSeconds(4))) {
         throw 'Onjuiste activering van de tv.'
     }
     $test = [TvBesturing.DisplayWake]::new($null, $null)
