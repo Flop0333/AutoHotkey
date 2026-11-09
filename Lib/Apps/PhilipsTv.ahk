@@ -3,18 +3,17 @@
 ; ============================================================================
 ;
 ; [SETUP]
-;   Pair once with Tools/tv-besturing/tv-koppelen.ps1 (see its README).
+;   Pair once with Appbeheer/beheer/tv-besturing/tv-koppelen.ps1 (see its README).
 ;
 ; [USAGE]
 ;   PhilipsTv.On()
 ;   PhilipsTv.Off()
 ; ============================================================================
 
-#Include ..\Core\Paths.ahk
 #Include ..\Tools\Info.ahk
 
 class PhilipsTv {
-    static scriptsDir := Paths.tools "\tv-besturing"
+    static scriptsDir := A_MyDocuments "\Appbeheer\beheer\tv-besturing"
 
     static On() {
         Info("Tv aanzetten...", 5000)
@@ -28,6 +27,11 @@ class PhilipsTv {
 
     ; Runs hidden and without waiting: switching on can take ~20 seconds.
     static _RunScript(scriptName) {
-        Run('powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' this.scriptsDir "\" scriptName '"', , "Hide")
+        script := this.scriptsDir "\" scriptName
+        if !FileExist(script) {
+            Info("Tv-besturing van Appbeheer ontbreekt.")
+            return
+        }
+        Run('powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File "' script '"', , "Hide")
     }
 }
