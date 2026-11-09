@@ -18,13 +18,17 @@ class RemoteBoardClient {
     static OPEN_ARGUMENT := "open"
 
     static Open() {
+        ; The board's window stays hidden while no Parsec guest is connected,
+        ; so hidden windows must be detectable for both the lookup and the post.
         previous := DetectHiddenWindows(true)
-        hwnd := WinExist(RemoteBoardClient.WIN_TITLE)
-        DetectHiddenWindows(previous)
+        try {
+            if hwnd := WinExist(RemoteBoardClient.WIN_TITLE) {
+                PostMessage(RemoteBoardClient.OPEN_MESSAGE, 0, 0, , hwnd)
+                return
+            }
+        } finally
+            DetectHiddenWindows(previous)
 
-        if hwnd
-            PostMessage(RemoteBoardClient.OPEN_MESSAGE, 0, 0, , "ahk_id " hwnd)
-        else
-            Run('"' A_AhkPath '" "' Paths.dashboards '\Remote Board\Remote Board.ahk" ' RemoteBoardClient.OPEN_ARGUMENT)
+        Run('"' A_AhkPath '" "' Paths.dashboards '\Remote Board\Remote Board.ahk" ' RemoteBoardClient.OPEN_ARGUMENT)
     }
 }
