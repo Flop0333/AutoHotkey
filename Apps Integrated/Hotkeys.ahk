@@ -26,6 +26,10 @@
 #Include ..\Lib\Apps\Notion.ahk
 #Include ..\Lib\Apps\Spotify.ahk
 #Include ..\Lib\Apps\KeePass.ahk
+#Include ..\Lib\Apps\PhilipsTv.ahk
+#Include ..\Lib\Apps\YouTube.ahk
+#Include ..\Lib\Core\Links.ahk
+#Include ..\Lib\Helpers\DoubleTap.ahk
 
 ; ================================
 ; Generic Hotkeys
@@ -47,3 +51,22 @@
 #HotIf ProfileManager.Is(Profiles.work)
 CapsLock.Hotkey("D", (*) => KeePass.InsertMainPassword())
 CapsLock.Hotkey("!D", (*) => KeePass.InsertSecondaryPassword())
+#HotIf
+
+; Djengus: double tap an F-key; a single tap keeps its normal function
+if ProfileManager.Is(Profiles.djengus) {
+    DoubleTap.Hotkey("F1", () => PhilipsTv.On())
+    DoubleTap.Hotkey("F2", () => PhilipsTv.Off())
+    DoubleTap.Hotkey("F3", () => Run(Links.youtube))
+    DoubleTap.Hotkey("F4", () => StartSpotifyGoodMorningJazz())
+    DoubleTap.Hotkey("F5", StartWoonkamerScene)
+}
+
+; Tv on, jazz on Spotify, and a muted YouTube video fullscreen as backdrop.
+; Spotify goes first: opening the playlist activates its window, which would
+; otherwise pull focus away from the fullscreen video.
+StartWoonkamerScene() {
+    PhilipsTv.On()
+    try StartSpotifyGoodMorningJazz()
+    YouTube.PlayFullscreen("RDfjXj5EGqI", 0, true) ; from the start, muted
+}

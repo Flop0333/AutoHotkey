@@ -64,12 +64,15 @@ buttons := [
     ToggleButton(ToggleSpellChecker, GetSpellCheckerState, "Spell Checker", "spell check.gif"),
 ]
 
+woonkamerButtons := [
+    Button(OpenNotionShitFixen, "S H I T  F I X E N", "notion.gif"),
+    Button(StartSpotifyGoodMorningJazz, "Start Spotify Playlist", "spotify.gif"),
+    Button(UpdateKlusLogboek, "Update klus-logboek", "klus-logboek restart.gif"),
+]
+
 profileButtons := Map(
-    Profiles.woonkamerLaptops, [
-        Button(OpenNotionShitFixen, "S H I T  F I X E N", "notion.gif"),
-        Button(StartSpotifyGoodMorningJazz, "Start Spotify Playlist", "spotify.gif"),
-        Button(UpdateKlusLogboek, "Update klus-logboek", "klus-logboek restart.gif"),
-    ],
+    Profiles.woonkamerLaptops, woonkamerButtons,
+    Profiles.djengus, woonkamerButtons,
     Profiles.work, [
         Button(CloseAllBrowsers, "Kill Browsers", "game over.gif"),
         Button(CommandStorer_ShowMainGui, "Command Storer", "tetris.gif"),

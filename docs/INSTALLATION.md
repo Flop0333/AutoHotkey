@@ -58,6 +58,7 @@ The ordered application catalog and its profile policy live in `Apps Integrated/
 | Work | Everything except Desktops Manager and Notion Board. |
 | Dev Box | Everything except Notion Board. |
 | Woonkamer Laptops | Everything. |
+| Djengus | Everything (same as Woonkamer Laptops). |
 | Esthers Laptop | Notion Board only. |
 | Default | Everything except Notion Board. |
 

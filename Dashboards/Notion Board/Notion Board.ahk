@@ -24,7 +24,7 @@ Persistent(true)
 TraySetIcon(Paths.autoHotkeyIcon)
 
 ; Only launch for woonkamer laptops. ExitApp for the others.
-if (ProfileManager.IsNot(Profiles.woonkamerLaptops)) {
+if !ProfileManager.Is(Profiles.woonkamerLaptops, Profiles.djengus) {
     LogAndNotifyInfo("Notion Board not launched. It will only launch for woonkamer laptops")
     ExitApp()
 }

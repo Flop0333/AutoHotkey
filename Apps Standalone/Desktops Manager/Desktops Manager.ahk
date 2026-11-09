@@ -60,7 +60,7 @@ GetDesktopsForProfile() {
         config["N"] := Desktop(desktopCounter++,  RequiredWindows.Notion)
     }
 
-    if (ProfileManager.Is(Profiles.woonkamerLaptops)) {
+    if (ProfileManager.Is(Profiles.woonkamerLaptops, Profiles.djengus)) {
         config["1"] := Desktop(desktopCounter++)
         config["2"] := Desktop(desktopCounter++)
         config["3"] := Desktop(desktopCounter++)

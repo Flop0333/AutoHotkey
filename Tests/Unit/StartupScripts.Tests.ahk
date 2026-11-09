@@ -34,6 +34,13 @@ Test_WoonkamerLaptopsStartsEverything() {
     Assert.True(HasScript(scripts, desktopsManager))
 }
 
+Test_DjengusStartsEverything() {
+    scripts := SuiteStartupScripts(Profiles.djengus)
+    Assert.Equal(16, scripts.Length)
+    Assert.True(HasScript(scripts, notionBoard))
+    Assert.True(HasScript(scripts, desktopsManager))
+}
+
 Test_EstherStartsOnlyNotionBoard() {
     scripts := SuiteStartupScripts(Profiles.esther)
     Assert.ArrayEqual([notionBoard], scripts)
@@ -49,6 +56,7 @@ Test_DefaultExcludesOnlyNotionBoard() {
 TestKit.Run("Work excludes Notion Board and Desktops Manager", Test_WorkExcludesNotionBoardAndDesktopsManager)
 TestKit.Run("Dev Box excludes only Notion Board", Test_DevboxExcludesOnlyNotionBoard)
 TestKit.Run("Woonkamer Laptops starts every application", Test_WoonkamerLaptopsStartsEverything)
+TestKit.Run("Djengus starts every application", Test_DjengusStartsEverything)
 TestKit.Run("Esthers Laptop starts only Notion Board", Test_EstherStartsOnlyNotionBoard)
 TestKit.Run("Default excludes only Notion Board", Test_DefaultExcludesOnlyNotionBoard)
 TestKit.Report()

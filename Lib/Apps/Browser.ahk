@@ -24,6 +24,31 @@ Class Browser extends App {
 
     static OpenInNewBrowser(url) => Run(Browser.defaultBrowser.ahk_exe ' --new-window "' url '"',,"Max")
 
+    ; Opens url in a new, active window of the default browser and returns that
+    ; window's handle (0 on timeout). Waits for the new window itself, so
+    ; follow-up keystrokes never land on a browser window that was already open.
+    static OpenNewWindow(url, timeoutMs := 10000) {
+        exe := Browser.defaultBrowser.ahk_exe
+        existing := Map()
+        for hwnd in WinGetList("ahk_exe " exe)
+            existing[hwnd] := true
+
+        Run(exe ' --new-window "' url '"')
+
+        deadline := A_TickCount + timeoutMs
+        while (A_TickCount < deadline) {
+            for hwnd in WinGetList("ahk_exe " exe) {
+                if !existing.Has(hwnd) && WinGetTitle(hwnd) != "" {
+                    WinActivate(hwnd)
+                    WinWaitActive(hwnd, , 3)
+                    return hwnd
+                }
+            }
+            Sleep(200)
+        }
+        return 0
+    }
+
     static OpenUrlUnderMouse(url) {
         ; Get window under mouse
         MouseGetPos(, , &mouseWinID)

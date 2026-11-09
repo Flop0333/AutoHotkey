@@ -24,7 +24,7 @@ A_MaxHotkeysPerInterval := 420
 WheelLeft:: WheelRight
 WheelRight:: WheelLeft
 
-#HotIf ProfileManager.Is(Profiles.woonkamerLaptops)
+#HotIf ProfileManager.Is(Profiles.woonkamerLaptops, Profiles.djengus)
 ; Manage Volume with Left Mouse Button + Scroll
 ~RButton & WheelDown:: {
     If GetKeyState("RButton", "P")
