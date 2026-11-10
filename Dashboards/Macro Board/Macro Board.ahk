@@ -30,7 +30,6 @@
 #Include ..\..\Lib\Apps\Notion.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
 #Include ..\Control Deck\Control Deck.ahk
-#Include ..\Notion Board\Notion Board Client.ahk
 #Include ..\Remote Board\Remote Board Client.ahk
 
 ; ===========================================================================
@@ -45,12 +44,7 @@ KillAllAHkProcesses() => SuiteControl.ExitSuite()
 ToggleFakeWorkMode() => FakeWorkMode.Toggle()
 GetFakeWorkModeState() => FakeWorkMode.Enabled
 PullAllWindowsToCurrentDesktop() => DesktopsDDL.PullAllWindowsToCurrentDesktop()
-OpenNotionShitFixen() {
-    if ProfileManager.Is(Profiles.djengus)
-        NotionBoardClient.OpenFromMacro()
-    else
-        Notion.OpenPage(NotionPages.shitFixen)
-}
+OpenNotionShitFixen() => Notion.OpenPage(NotionPages.shitFixen)
 CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 KillAndReloadAllAHkProcesses() => SuiteControl.ReloadSuite()
 OpenRemoteBoard() => RemoteBoardClient.Open()

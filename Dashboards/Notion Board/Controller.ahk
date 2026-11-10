@@ -7,6 +7,7 @@
 
 class NotionBoardController extends PersistentWebView {
     static WIN_TITLE := "Notion Board"
+    static WM_ACTIVATE := 0x0006
     static WM_SYSCOMMAND := 0x0112
     static SC_MINIMIZE := 0xF020
     static SC_CLOSE := 0xF060
@@ -49,9 +50,8 @@ class NotionBoardController extends PersistentWebView {
     })();
     )"
 
-    __New(onDemand := false, settingsPath := NotionBoardController.SETTINGS_PATH) {
+    __New(settingsPath := NotionBoardController.SETTINGS_PATH) {
         super.__New(NotionBoardController.BROWSER_DATA_DIR,,,,false) ; false to set default caption
-        this.onDemand := onDemand
         this.Gui.Title := NotionBoardController.WIN_TITLE
         this.EnableDarkCaption()
         defaultWidth := Round(A_ScreenWidth * 0.85)
@@ -66,7 +66,7 @@ class NotionBoardController extends PersistentWebView {
             this.settingsService.Window.Width,
             this.settingsService.Window.Height)
         this.windowPositionTracker := WindowPositionTracker(this.Gui, this.settingsService)
-        this.Gui.OnEvent("Close", (*) => this.Close())
+        this.Gui.OnEvent("Close", (*) => this.SendToDesktop())
         this.Gui.OnEvent("Escape", (*) => this.SendToDesktop())
         this.SystemCommandHandler := ObjBindMethod(this, "HandleSystemCommand")
         OnMessage(NotionBoardController.WM_SYSCOMMAND, this.SystemCommandHandler)
@@ -91,6 +91,29 @@ class NotionBoardController extends PersistentWebView {
                 "Int", enabled.Size,
                 "Int")
         }
+    }
+
+    EnableBackgroundMemorySaving() {
+        ; Older runtimes can still display the board without this optional API.
+        try memoryInterface := ComObjQuery(this.wv.ptr, WebView2.Core.IID_19)
+        catch
+            return
+
+        this.memoryView := WebView2.Core(ComObjValue(memoryInterface))
+        this.memoryUsageUpdate := ObjBindMethod(this, "UpdateMemoryUsage")
+        OnMessage(NotionBoardController.WM_ACTIVATE, ObjBindMethod(this, "HandleActivation"))
+        this.UpdateMemoryUsage()
+    }
+
+    HandleActivation(wParam, lParam, msg, hwnd) {
+        if (hwnd = this.Hwnd)
+            SetTimer(this.memoryUsageUpdate, -1)
+    }
+
+    UpdateMemoryUsage() {
+        ; Read the foreground window after Windows completes the activation.
+        ; WebView2 levels: 0 = normal, 1 = low.
+        this.memoryView.MemoryUsageTargetLevel := WinActive("ahk_id " this.Hwnd) ? 0 : 1
     }
 
     Toggle() {
@@ -123,23 +146,7 @@ class NotionBoardController extends PersistentWebView {
         this.SendToDesktop()
     }
 
-    OpenWithSavedGeometry() {
-        window := this.settingsService.Window
-        ; The tracker saves outer dimensions. Gui.Show's w/h are client sizes.
-        this.Gui.Move(window.x, window.y, window.Width, window.Height)
-        this.Show()
-    }
-
-    Close() {
-        if this.onDemand
-            ExitApp()
-        this.SendToDesktop()
-    }
-
-    Release() {
-        try this.windowPositionTracker.SaveSettings()
-        finally this.Destroy()
-    }
+    Close() => this.SendToDesktop()
 
     Minimize() => this.SendToDesktop()
 
@@ -157,7 +164,7 @@ class NotionBoardController extends PersistentWebView {
 
         command := wParam & 0xFFF0
         if (command = NotionBoardController.SC_MINIMIZE
-            || (!this.onDemand && command = NotionBoardController.SC_CLOSE)) {
+            || command = NotionBoardController.SC_CLOSE) {
             this.SendToDesktop()
             return 0
         }
