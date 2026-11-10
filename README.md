@@ -14,7 +14,7 @@ It started as a collection of small scripts and grew into a profile-aware automa
 - 🎹 **Macro Board** — a customizable Stream Deck-style dashboard for frequently used actions.
 - 📸 **Screen Snipper with OCR** — capture the screen, copy or save an image, and extract text.
 - 🎛️ **Control Deck** — inspect processes, logs, tests, profiles, and machine health from one control centre.
-- 📋 **Notion Board** — your Notion board in its own persistent WebView2 window; log in once and stay signed in across restarts.
+- 📋 **Notion Board** — your Notion board in its own WebView2 window, with sign-in preserved across restarts.
 - 🔊 **Text Speaker** — read selected text or an OCR screen region aloud with Windows speech synthesis.
 - 🖱️ **Mouse gestures and extra-button actions** — control common tasks without reaching for menus.
 - 🧩 **Profiles and local secrets** — adapt one checkout to different computers without committing personal data.
@@ -43,7 +43,7 @@ A customizable action grid that brings frequently used commands together in a vi
 
 ### Notion Board
 
-Your Notion board, hosted in its own focused WebView2 window without Notion's header, sidebar, or page-comments panel. Its fixed, persistent `Browser Data` folder keeps the session across suite restarts after one manual login. The board stays open on the desktop: `CapsLock+N` brings it forward or sends it behind other windows, and closing or minimizing it also sends it to the desktop instead.
+Your Notion board, hosted in its own focused WebView2 window without Notion's header, sidebar, or page-comments panel. Its persistent `Browser Data` folder keeps the session across suite restarts after one manual login. On Djengus, `CapsLock+N` or the **S H I T F I X E N** macro opens the board on demand, and closing the window releases its WebView2 processes. On Woonkamer Laptops the board starts on the desktop and returns there when closed. In both profiles, `CapsLock+N` toggles the open board and minimizing sends it behind other windows.
 
 ## 🏗️ More than a folder of scripts
 

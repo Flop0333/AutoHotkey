@@ -59,7 +59,7 @@ SuiteStartupProfileExclusions(profile) {
 
     if (profile = Profiles.work)
         return Map("desktopsManager", true, "notionBoard", true)
-    if (profile = Profiles.devbox || profile = Profiles.default)
+    if (profile = Profiles.devbox || profile = Profiles.default || profile = Profiles.djengus)
         return Map("notionBoard", true)
     return Map()
 }

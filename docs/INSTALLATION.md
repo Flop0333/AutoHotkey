@@ -58,7 +58,7 @@ The ordered application catalog and its profile policy live in `Apps Integrated/
 | Work | Everything except Desktops Manager, Notion Board, and Remote Board. |
 | Dev Box | Everything except Notion Board and Remote Board. |
 | Woonkamer Laptops | Everything except Remote Board. |
-| Djengus | Everything, including the Djengus-only Remote Board. |
+| Djengus | Everything except Notion Board, which opens on demand. Includes the Djengus-only Remote Board. |
 | Esthers Laptop | Notion Board only. |
 | Default | Everything except Notion Board and Remote Board. |
 
