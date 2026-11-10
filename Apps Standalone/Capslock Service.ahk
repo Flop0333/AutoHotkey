@@ -20,17 +20,8 @@
 
 #Include ..\Lib\Core\OnError.ahk
 #Include ..\Lib\Tools\Info.ahk
-#Include ..\Lib\Helpers\Capslock.ahk
-#Include ..\Profiles\Profile Manager.ahk
-#Include ..\Dashboards\Notion Board\Notion Board Client.ahk
 #SingleInstance Force
    #NoTrayIcon
-
-; The keyboard hook that handles CapsLock also sees its physical state.
-if ProfileManager.Is(Profiles.djengus) {
-   CapsLock.Hotkey("n", (*) => NotionBoardClient.Open(true))
-   OnMessage(NotionBoardClient.MACRO_OPEN_MESSAGE, (*) => NotionBoardClient.Open())
-}
 
 CapsLock:: {
    EnsureHostFocus()                              ; Always return focus to host if in VM
