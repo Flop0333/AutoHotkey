@@ -47,7 +47,7 @@ GetFakeWorkModeState() => FakeWorkMode.Enabled
 PullAllWindowsToCurrentDesktop() => DesktopsDDL.PullAllWindowsToCurrentDesktop()
 OpenNotionShitFixen() {
     if ProfileManager.Is(Profiles.djengus)
-        NotionBoardClient.Open()
+        NotionBoardClient.OpenFromMacro()
     else
         Notion.OpenPage(NotionPages.shitFixen)
 }
@@ -97,5 +97,3 @@ buttons.Push(profileButtons.Get(ProfileManager.Current, [])*)
 myMacroBoard := MacroBoard(buttons)
 DesktopsDDL.PinApp(myMacroBoard.Hwnd)
 CapsLock.Hotkey("Space", (*) => myMacroBoard.Show())
-if ProfileManager.Is(Profiles.djengus)
-    CapsLock.Hotkey("n", (*) => NotionBoardClient.Open(true))

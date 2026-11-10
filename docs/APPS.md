@@ -8,7 +8,7 @@ Hotkeys reflect the current defaults. Profile conditions and active-window rules
 
 | App | Starts | Use | Notes and configuration |
 |---|---|---|---|
-| [CapsLock Service](../Apps%20Standalone/Capslock%20Service.ahk) | Auto, first | Hold CapsLock as the suite modifier; double-tap to toggle Caps Lock normally. | Must start before desktop and window hotkeys. VM-aware behavior is in the script. |
+| [CapsLock Service](../Apps%20Standalone/Capslock%20Service.ahk) | Auto, first | Hold CapsLock as the suite modifier; double-tap to toggle Caps Lock normally. On Djengus, `CapsLock+N` opens or toggles Notion Board. | Must start before desktop and window hotkeys. VM-aware behavior is in the script. |
 | [Desktops Manager](../Apps%20Standalone/Desktops%20Manager/Desktops%20Manager.ahk) | Auto | `CapsLock+configured key` switches desktops; `CapsLock+Tab` returns; `CapsLock+P` pins a window. | Edit `GetDesktopsForProfile()` to define each profile's apps and layouts. Uses `VirtualDesktopAccessor.dll`; `Desktop.ahk` is its model. |
 | [Emoji Sender](../Apps%20Standalone/Emoji%20Sender/Emoji%20Sender.ahk) | Auto | `Alt+X` opens a 4×4 picker; click or press the displayed grid key. | Edit `MY_EMOJIS` and `SIZE` in the entry point. |
 | [Key Bindings](../Apps%20Standalone/Key%20Bindings.ahk) | Auto | Type configured hotstrings for dates, addresses, email addresses, development text, and text faces. | Several replacements use local secrets. Review this personal configuration before use. |
