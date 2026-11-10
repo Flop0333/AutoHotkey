@@ -7,6 +7,7 @@
 
 class NotionBoardController extends PersistentWebView {
     static WIN_TITLE := "Notion Board"
+    static WM_ACTIVATE := 0x0006
     static WM_SYSCOMMAND := 0x0112
     static SC_MINIMIZE := 0xF020
     static SC_CLOSE := 0xF060
@@ -90,6 +91,29 @@ class NotionBoardController extends PersistentWebView {
                 "Int", enabled.Size,
                 "Int")
         }
+    }
+
+    EnableBackgroundMemorySaving() {
+        ; Older runtimes can still display the board without this optional API.
+        try memoryInterface := ComObjQuery(this.wv.ptr, WebView2.Core.IID_19)
+        catch
+            return
+
+        this.memoryView := WebView2.Core(ComObjValue(memoryInterface))
+        this.memoryUsageUpdate := ObjBindMethod(this, "UpdateMemoryUsage")
+        OnMessage(NotionBoardController.WM_ACTIVATE, ObjBindMethod(this, "HandleActivation"))
+        this.UpdateMemoryUsage()
+    }
+
+    HandleActivation(wParam, lParam, msg, hwnd) {
+        if (hwnd = this.Hwnd)
+            SetTimer(this.memoryUsageUpdate, -1)
+    }
+
+    UpdateMemoryUsage() {
+        ; Read the foreground window after Windows completes the activation.
+        ; WebView2 levels: 0 = normal, 1 = low.
+        this.memoryView.MemoryUsageTargetLevel := WinActive("ahk_id " this.Hwnd) ? 0 : 1
     }
 
     Toggle() {

@@ -12,6 +12,7 @@
 ; [USAGE]
 ;   - CapsLock+N brings the window forward or sends it behind other windows
 ;   - Closing or minimizing sends it to the desktop instead
+;   - On Djengus, WebView2 uses its low memory target in the background
 ; ============================================================================
 
 #SingleInstance Force
@@ -30,6 +31,8 @@ if !ProfileManager.Is(Profiles.woonkamerLaptops, Profiles.djengus) {
 }
 
 myNotionBoard := NotionBoardController()
+if ProfileManager.Is(Profiles.djengus)
+    myNotionBoard.EnableBackgroundMemorySaving()
 myNotionBoard.InitializeOnDesktop()
 
 CapsLock.Hotkey("n", (*) => myNotionBoard.Toggle())
