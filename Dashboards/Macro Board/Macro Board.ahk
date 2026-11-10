@@ -30,6 +30,7 @@
 #Include ..\..\Lib\Apps\Notion.ahk
 #Include ..\..\Lib\Apps\Browser.ahk
 #Include ..\Control Deck\Control Deck.ahk
+#Include ..\Notion Board\Notion Board Client.ahk
 #Include ..\Remote Board\Remote Board Client.ahk
 
 ; ===========================================================================
@@ -44,7 +45,12 @@ KillAllAHkProcesses() => SuiteControl.ExitSuite()
 ToggleFakeWorkMode() => FakeWorkMode.Toggle()
 GetFakeWorkModeState() => FakeWorkMode.Enabled
 PullAllWindowsToCurrentDesktop() => DesktopsDDL.PullAllWindowsToCurrentDesktop()
-OpenNotionShitFixen() => Notion.OpenPage(NotionPages.shitFixen)
+OpenNotionShitFixen() {
+    if ProfileManager.Is(Profiles.djengus)
+        NotionBoardClient.Open()
+    else
+        Notion.OpenPage(NotionPages.shitFixen)
+}
 CloseAllBrowsers() => (Info("Close all browsers"), Browser.CloseAll())
 KillAndReloadAllAHkProcesses() => SuiteControl.ReloadSuite()
 OpenRemoteBoard() => RemoteBoardClient.Open()
@@ -91,3 +97,5 @@ buttons.Push(profileButtons.Get(ProfileManager.Current, [])*)
 myMacroBoard := MacroBoard(buttons)
 DesktopsDDL.PinApp(myMacroBoard.Hwnd)
 CapsLock.Hotkey("Space", (*) => myMacroBoard.Show())
+if ProfileManager.Is(Profiles.djengus)
+    CapsLock.Hotkey("n", (*) => NotionBoardClient.Open(true))

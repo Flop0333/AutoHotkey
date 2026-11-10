@@ -11,16 +11,17 @@
 ;
 ; [USAGE]
 ;   - CapsLock+N brings the window forward or sends it behind other windows
-;   - Closing or minimizing sends it to the desktop instead
+;   - On Djengus the board starts on demand and closes its WebView2 on exit
+;   - Minimizing sends it to the desktop
 ; ============================================================================
 
 #SingleInstance Force
-Persistent(true)
 #Include ..\..\Lib\Core\OnError.ahk
 #Include ..\..\Lib\Core\Paths.ahk
 #Include ..\..\Lib\Helpers\Capslock.ahk
 #Include ..\..\Profiles\Profile Manager.ahk
 #Include Controller.ahk
+#Include Notion Board Client.ahk
 TraySetIcon(Paths.autoHotkeyIcon)
 
 ; Only launch for woonkamer laptops. ExitApp for the others.
@@ -29,8 +30,24 @@ if !ProfileManager.Is(Profiles.woonkamerLaptops, Profiles.djengus) {
     ExitApp()
 }
 
-myNotionBoard := NotionBoardController()
-myNotionBoard.InitializeOnDesktop()
+onDemand := ProfileManager.Is(Profiles.djengus)
+myNotionBoard := NotionBoardController(onDemand)
 
-CapsLock.Hotkey("n", (*) => myNotionBoard.Toggle())
+if onDemand {
+    OnExit((*) => myNotionBoard.Release())
+    OnMessage(NotionBoardClient.OPEN_MESSAGE, HandleNotionBoardOpen)
+    myNotionBoard.OpenWithSavedGeometry()
+} else {
+    myNotionBoard.InitializeOnDesktop()
+    CapsLock.Hotkey("n", (*) => myNotionBoard.Toggle())
+}
+
+HandleNotionBoardOpen(toggle, lParam, msg, hwnd) {
+    if (hwnd = myNotionBoard.Hwnd) {
+        if toggle
+            myNotionBoard.Toggle()
+        else
+            myNotionBoard.Show()
+    }
+}
 

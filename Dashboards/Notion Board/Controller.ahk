@@ -49,8 +49,9 @@ class NotionBoardController extends PersistentWebView {
     })();
     )"
 
-    __New(settingsPath := NotionBoardController.SETTINGS_PATH) {
+    __New(onDemand := false, settingsPath := NotionBoardController.SETTINGS_PATH) {
         super.__New(NotionBoardController.BROWSER_DATA_DIR,,,,false) ; false to set default caption
+        this.onDemand := onDemand
         this.Gui.Title := NotionBoardController.WIN_TITLE
         this.EnableDarkCaption()
         defaultWidth := Round(A_ScreenWidth * 0.85)
@@ -65,7 +66,7 @@ class NotionBoardController extends PersistentWebView {
             this.settingsService.Window.Width,
             this.settingsService.Window.Height)
         this.windowPositionTracker := WindowPositionTracker(this.Gui, this.settingsService)
-        this.Gui.OnEvent("Close", (*) => this.SendToDesktop())
+        this.Gui.OnEvent("Close", (*) => this.Close())
         this.Gui.OnEvent("Escape", (*) => this.SendToDesktop())
         this.SystemCommandHandler := ObjBindMethod(this, "HandleSystemCommand")
         OnMessage(NotionBoardController.WM_SYSCOMMAND, this.SystemCommandHandler)
@@ -122,7 +123,23 @@ class NotionBoardController extends PersistentWebView {
         this.SendToDesktop()
     }
 
-    Close() => this.SendToDesktop()
+    OpenWithSavedGeometry() {
+        window := this.settingsService.Window
+        ; The tracker saves outer dimensions. Gui.Show's w/h are client sizes.
+        this.Gui.Move(window.x, window.y, window.Width, window.Height)
+        this.Show()
+    }
+
+    Close() {
+        if this.onDemand
+            ExitApp()
+        this.SendToDesktop()
+    }
+
+    Release() {
+        try this.windowPositionTracker.SaveSettings()
+        finally this.Destroy()
+    }
 
     Minimize() => this.SendToDesktop()
 
@@ -140,7 +157,7 @@ class NotionBoardController extends PersistentWebView {
 
         command := wParam & 0xFFF0
         if (command = NotionBoardController.SC_MINIMIZE
-            || command = NotionBoardController.SC_CLOSE) {
+            || (!this.onDemand && command = NotionBoardController.SC_CLOSE)) {
             this.SendToDesktop()
             return 0
         }
