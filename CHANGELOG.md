@@ -1,5 +1,13 @@
-<!-- last-pr: 136 -->
+<!-- last-pr: 153 -->
 # Changelog
+
+## 2026-11-10
+
+### Other
+- Add Notion Board dashboard with persistent WebView2 session ([#140](https://github.com/Flop0333/AutoHotkey/pull/140))
+- Start the Djengus Notion Board on demand ([#151](https://github.com/Flop0333/AutoHotkey/pull/151))
+- Restore Notion Board startup and lower background memory on Djengus ([#153](https://github.com/Flop0333/AutoHotkey/pull/153))
+
 
 ## 2026-09-12
 
